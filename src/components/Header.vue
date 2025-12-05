@@ -50,7 +50,6 @@
           </div>
         </div>
 
-        <!-- Центральная колонка -->
         <div class="catalogContCent" v-if="selectedCategoryId">
           <h1>
             {{ categories.find((c) => c.id === selectedCategoryId)?.name }}
@@ -69,9 +68,15 @@
             </button>
           </div>
         </div>
-        <div class="t1" v-else>
-          <!-- Анимация T1 -->
-          Выберите категорию
+        <div class="t1 anim1" v-else>
+          <video
+            ref="catalogVideo"
+            class="catalog-video"
+            :src="videoSrc"
+            muted
+            @loadeddata="onVideoLoaded"
+            @ended="onVideoEnded"
+          ></video>
         </div>
 
         <!-- Правая колонка -->
@@ -97,6 +102,10 @@
           <!-- Анимация T2 -->
           Выберите подкатегорию
         </div>
+
+        <div class="abc">
+          <img src="../../public/iconHed/abc.png" alt="" />
+        </div>
       </div>
     </div>
   </header>
@@ -118,6 +127,9 @@ export default {
       activeCategoryId: null,
       activeSubcategoryId: null,
       activeProductId: null,
+
+      videoSrc: '/videos/catalog-animation.mp4',
+      isVideoPlaying: false,
     }
   },
 
@@ -136,6 +148,17 @@ export default {
         this.selectedCategoryId = null
         this.selectedSubcategoryId = null
         this.resetSelections()
+        if (this.$refs.catalogVideo) {
+          this.$refs.catalogVideo.pause()
+          this.$refs.catalogVideo.currentTime = 0
+        }
+        this.isVideoPlaying = false
+      } else {
+        if (!this.selectedCategoryId) {
+          this.$nextTick(() => {
+            this.playVideo()
+          })
+        }
       }
     },
 
@@ -145,6 +168,11 @@ export default {
       this.activeCategoryId = categoryId
       this.activeSubcategoryId = null
       this.activeProductId = null
+
+      if (this.$refs.catalogVideo) {
+        this.$refs.catalogVideo.pause()
+        this.isVideoPlaying = false
+      }
     },
 
     selectSubcategory(subcategoryId) {
@@ -156,6 +184,7 @@ export default {
     selectProduct(productId) {
       this.activeProductId = productId
     },
+
     closeCatalog(event) {
       const catalogBlock = this.$refs.catalogBlock
       const buttonCatalog = event?.target?.closest('.headerBtnCategoryButtom')
@@ -166,6 +195,33 @@ export default {
         this.selectedCategoryId = null
         this.selectedSubcategoryId = null
         this.resetSelections()
+
+        if (this.$refs.catalogVideo) {
+          this.$refs.catalogVideo.pause()
+          this.$refs.catalogVideo.currentTime = 0
+        }
+        this.isVideoPlaying = false
+      }
+    },
+
+    onVideoLoaded() {
+      if (this.isCatalogOpen && !this.selectedCategoryId) {
+        this.playVideo()
+      }
+    },
+
+    onVideoEnded() {
+      if (this.$refs.catalogVideo) {
+        this.$refs.catalogVideo.pause()
+      }
+    },
+
+    playVideo() {
+      const video = this.$refs.catalogVideo
+      if (video) {
+        video.currentTime = 0
+        video.play()
+        this.isVideoPlaying = true
       }
     },
   },
@@ -375,7 +431,7 @@ header {
 
 .catalogCont {
   width: 85%;
-  height: 600px;
+  min-height: 500px;
   display: flex;
 }
 .catalogCont button {
@@ -400,7 +456,6 @@ header {
 }
 
 .catalogContLeft {
-  width: 24%;
   width: 24%;
 }
 .catalogContDiv {
@@ -478,5 +533,50 @@ header {
 
 .catalogCont button:hover .catalogButtom div {
   background-color: #ff4d4d;
+}
+
+.t1.anim1 {
+  width: 48%;
+  height: 400px;
+  margin-left: 2%;
+  margin-top: 25px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.catalog-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.t2 {
+  background-color: firebrick;
+  width: 24%;
+  height: 400px;
+  margin-left: 2%;
+  margin-top: 20px;
+  margin-top: 25px;
+}
+
+.abc {
+  width: 24%;
+  height: 400px;
+  margin-left: auto;
+  margin-top: 20px;
+  margin-top: 25px;
+  border-radius: 5px;
+  border: 1px solid #ff4d4d;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.abc img {
+  width: 100%;
 }
 </style>
