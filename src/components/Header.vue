@@ -79,7 +79,6 @@
           ></video>
         </div>
 
-        <!-- Правая колонка -->
         <div class="catalogContRight" v-if="selectedSubcategoryId">
           <h1>
             {{ subcategories.find((s) => s.id === selectedSubcategoryId)?.name }}
@@ -98,10 +97,7 @@
             </button>
           </div>
         </div>
-        <div class="t2" v-else-if="selectedCategoryId">
-          <!-- Анимация T2 -->
-          Выберите подкатегорию
-        </div>
+        <div class="t2" v-else-if="selectedCategoryId"></div>
 
         <div class="abc">
           <img src="../../public/iconHed/abc.png" alt="" />
@@ -410,20 +406,18 @@ header {
   width: 100%;
   z-index: 1000;
   overflow: hidden;
-  display: flex;
-  justify-content: center;
   opacity: 0;
   padding: 0;
   transform: translateY(-20px);
   transition:
-    max-height 0.4s ease-out,
     opacity 0.4s ease-out,
-    padding 0.4s ease-out,
     transform 0.4s ease-out;
+  display: none;
 }
 
 .catalog-block--open {
-  max-height: 600px;
+  display: flex;
+  min-height: 600px;
   opacity: 1;
   transform: translateY(0);
   background-color: white;
@@ -431,8 +425,10 @@ header {
 
 .catalogCont {
   width: 85%;
-  min-height: 500px;
+  min-height: 700px;
   display: flex;
+  margin-left: auto;
+  margin-right: auto;
 }
 .catalogCont button {
   width: 100%;
@@ -565,12 +561,11 @@ header {
 
 .abc {
   width: 24%;
-  height: 400px;
+  height: 700px;
   margin-left: auto;
   margin-top: 20px;
-  margin-top: 25px;
-  border-radius: 5px;
-  border: 1px solid #ff4d4d;
+  padding-top: 40px;
+  border-radius: 10px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
