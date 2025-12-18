@@ -35,7 +35,8 @@
       <div class="catalogCont">
         <div class="catalogContLeft">
           <h1>Каталог товаров</h1>
-          <div class="catalogContDiv">
+          <div v-if="loading" class="loading">Загрузка...</div>
+          <div v-else class="catalogContDiv">
             <button
               v-for="category in categories"
               :key="category.id"
@@ -52,7 +53,7 @@
 
         <div class="catalogContCent" v-if="selectedCategoryId">
           <h1>
-            {{ categories.find((c) => c.id === selectedCategoryId)?.name }}
+            {{ getCategoryName(selectedCategoryId) }}
           </h1>
           <div class="catalogContDiv">
             <button
@@ -81,20 +82,23 @@
 
         <div class="catalogContRight" v-if="selectedSubcategoryId">
           <h1>
-            {{ subcategories.find((s) => s.id === selectedSubcategoryId)?.name }}
+            {{ getSubcategoryName(selectedSubcategoryId) }}
           </h1>
           <div class="catalogContDiv">
-            <button
-              v-for="product in products"
-              :key="product.id"
-              @click="selectProduct(product.id)"
-              class="product-button"
-            >
-              <div class="catalogButtom">
-                <div></div>
-                {{ product.name }} - {{ product.price }} руб.
-              </div>
-            </button>
+            <div v-if="productsLoading" class="loading">Загрузка товаров...</div>
+            <div v-else>
+              <button
+                v-for="product in products"
+                :key="product.id"
+                @click="selectProduct(product.id)"
+                class="product-button"
+              >
+                <div class="catalogButtom">
+                  <div></div>
+                  {{ product.name }} - {{ product.price }} руб.
+                </div>
+              </button>
+            </div>
           </div>
         </div>
         <div class="t2" v-else-if="selectedCategoryId"></div>
@@ -108,7 +112,7 @@
 </template>
 
 <script>
-import catalogData from '@/data/data'
+import { fetchCatalog } from '@/api/catalog.js';
 
 export default {
   name: 'HeaderComponent',
@@ -116,7 +120,6 @@ export default {
   data() {
     return {
       isCatalogOpen: false,
-      catalogData: catalogData,
       selectedCategoryId: null,
       selectedSubcategoryId: null,
 
@@ -124,12 +127,34 @@ export default {
       activeSubcategoryId: null,
       activeProductId: null,
 
+      catalogData: {
+        categories: [],
+        subcategories: {},
+        products: {}
+      },
+
+      loading: false,
+      productsLoading: false,
+
       videoSrc: '/videos/catalog-animation.mp4',
       isVideoPlaying: false,
     }
   },
 
   methods: {
+    async loadCatalogData() {
+      this.loading = true;
+      try {
+        const data = await fetchCatalog();
+        this.catalogData = data;
+        console.log('Данные каталога загружены:', data);
+      } catch (error) {
+        console.error('Ошибка загрузки каталога:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+
     resetSelections() {
       this.selectedCategoryId = null
       this.selectedSubcategoryId = null
@@ -138,23 +163,27 @@ export default {
       this.activeProductId = null
     },
 
-    toggleCatalog() {
+    async toggleCatalog() {
       this.isCatalogOpen = !this.isCatalogOpen
-      if (!this.isCatalogOpen) {
-        this.selectedCategoryId = null
-        this.selectedSubcategoryId = null
-        this.resetSelections()
-        if (this.$refs.catalogVideo) {
-          this.$refs.catalogVideo.pause()
-          this.$refs.catalogVideo.currentTime = 0
-        }
-        this.isVideoPlaying = false
-      } else {
+
+      if (this.isCatalogOpen) {
+        await this.loadCatalogData();
+
         if (!this.selectedCategoryId) {
           this.$nextTick(() => {
             this.playVideo()
           })
         }
+      } else {
+        this.selectedCategoryId = null
+        this.selectedSubcategoryId = null
+        this.resetSelections()
+
+        if (this.$refs.catalogVideo) {
+          this.$refs.catalogVideo.pause()
+          this.$refs.catalogVideo.currentTime = 0
+        }
+        this.isVideoPlaying = false
       }
     },
 
@@ -175,10 +204,12 @@ export default {
       this.selectedSubcategoryId = subcategoryId
       this.activeSubcategoryId = subcategoryId
       this.activeProductId = null
+      this.loadProductsForSubcategory(subcategoryId);
     },
 
     selectProduct(productId) {
       this.activeProductId = productId
+      console.log('Выбран товар:', productId, this.catalogData.products[productId]);
     },
 
     closeCatalog(event) {
@@ -220,42 +251,63 @@ export default {
         this.isVideoPlaying = true
       }
     },
+
+    getCategoryName(categoryId) {
+      const category = this.catalogData.categories.find(cat => cat.id === categoryId);
+      return category ? category.name : '';
+    },
+
+    getSubcategoryName(subcategoryId) {
+      const subcat = this.catalogData.subcategories[subcategoryId];
+      return subcat ? subcat.name : '';
+    },
+
+
+    loadProductsForSubcategory(subcategoryId) {
+      this.productsLoading = true;
+      setTimeout(() => {
+        this.productsLoading = false;
+      }, 100);
+    },
   },
 
   computed: {
     categories() {
-      return this.catalogData.categories
+      return this.catalogData.categories || [];
     },
 
     subcategories() {
-      if (!this.selectedCategoryId) return []
+      if (!this.selectedCategoryId) return [];
 
-      const category = this.catalogData.categories.find((cat) => cat.id === this.selectedCategoryId)
-      if (!category || !category.subcategoryIds) return []
-      return category.subcategoryIds.map((id) => this.catalogData.subcategories[id])
+      const category = this.catalogData.categories.find((cat) => cat.id === this.selectedCategoryId);
+      if (!category || !category.subcategoryIds) return [];
+
+      return category.subcategoryIds
+        .map((id) => this.catalogData.subcategories[id])
+        .filter(subcat => subcat);
     },
 
     products() {
-      if (!this.selectedSubcategoryId) return []
+      if (!this.selectedSubcategoryId) return [];
 
-      const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId]
+      const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId];
+      if (!subcategory || !subcategory.productIds) return [];
 
-      if (!subcategory || !subcategory.productIds) return []
-
-      return subcategory.productIds.map((id) => this.catalogData.products[id])
+      return subcategory.productIds
+        .map((id) => this.catalogData.products[id])
+        .filter(product => product);
     },
   },
 
   mounted() {
-    document.addEventListener('click', this.closeCatalog)
+    document.addEventListener('click', this.closeCatalog);
   },
 
   beforeUnmount() {
-    document.removeEventListener('click', this.closeCatalog)
+    document.removeEventListener('click', this.closeCatalog);
   },
 }
 </script>
-
 <style scoped>
 @font-face {
   font-family: 'Inter';
@@ -573,5 +625,13 @@ header {
 }
 .abc img {
   width: 100%;
+}
+
+
+.loading {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
 }
 </style>
