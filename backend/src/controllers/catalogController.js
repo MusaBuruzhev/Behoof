@@ -1,12 +1,12 @@
 import { Category, Subcategory, Product } from '../models/index.js'
 import { getNextId } from '../utils/idGenerator.js'
+import { CATEGORY_TRAITS } from '../config/categoryTraits.js'
 
 export const getCatalog = async (req, res) => {
   try {
     const categories = await Category.find({}).sort({ id: 1 })
 
     const subcategoriesArray = await Subcategory.find({}).sort({ id: 1 })
-
 
     const subcategories = {}
     subcategoriesArray.forEach((sub) => {
@@ -55,6 +55,12 @@ export const addProduct = async (req, res) => {
       return res.status(404).json({ error: 'Категория не найдена' })
     }
 
+    const traits = CATEGORY_TRAITS[categoryId] || []
+    const traitRatings = {}
+    traits.forEach((trait) => {
+      traitRatings[trait] = 3
+    })
+
     const productId = await getNextId('p')
 
     let subcategory = await Subcategory.findOne({
@@ -85,6 +91,7 @@ export const addProduct = async (req, res) => {
       brand,
       categoryId,
       subcategoryId: subcategory.id,
+      traitRatings,
     })
 
     await product.save()
@@ -106,6 +113,7 @@ export const addProduct = async (req, res) => {
 
     res.status(201).json({
       message: 'Товар успешно добавлен',
+
       product: {
         id: product.id,
         name: product.name,
@@ -114,6 +122,7 @@ export const addProduct = async (req, res) => {
       },
       subcategoryCreated: !subcategory.isNew,
       subcategoryId: subcategory.id,
+      traitRatings: product.traitRatings,
     })
   } catch (error) {
     console.error('Ошибка добавления товара:', error)
@@ -123,7 +132,6 @@ export const addProduct = async (req, res) => {
 
 export const initializeData = async (req, res) => {
   try {
-
     const existingCategories = await Category.countDocuments()
 
     if (existingCategories === 0) {

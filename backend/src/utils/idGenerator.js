@@ -14,7 +14,7 @@ export const getNextId = async (prefix) => {
       { new: true, upsert: true }
     );
 
-    return `${prefix}${counter.value}`;
+    return `${prefix}${counter.value}`; 
   } catch (error) {
     console.error('Ошибка генерации ID:', error);
     throw error;
