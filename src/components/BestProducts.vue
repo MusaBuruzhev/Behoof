@@ -49,8 +49,9 @@
 
           <div class="product-content">
             <div class="product-image">
-              <!-- Placeholder for image -->
-              <div class="image-placeholder">📱</div>
+              <!-- Show first image if available -->
+              <img v-if="product.images && product.images.length > 0" :src="product.images[0]" :alt="product.name" class="product-img" />
+              <div v-else class="image-placeholder">📱</div>
             </div>
 
             <div class="product-traits">
@@ -394,18 +395,18 @@ display: flex
 }
 
 .nav-arrow {
-  width: 5%;
-  min-width: 40px;
-  max-width: 50px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: #f2f5f9;
-  color: #666;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.3s;
-  flex-shrink: 0;
+    width: 13%;
+    min-width: 40px;
+    max-width: 50px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: #f2f5f9;
+    color: #666;
+    font-size: 40px;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex-shrink: 0;
 }
 
 .nav-arrow:hover:not(:disabled) {
@@ -420,7 +421,7 @@ display: flex
 
 .products-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 3%;
   width: 90%;
 }
@@ -524,7 +525,7 @@ display: flex
 }
 
 .trait-name {
-  font-size: clamp(10px, 1.5vw, 15px);
+  font-size: clamp(10px, 1.5vw, 16px);
   color: #666;
   flex: 1;
 }
