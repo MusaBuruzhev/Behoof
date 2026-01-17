@@ -10,6 +10,11 @@ const api = axios.create({
   },
 });
 
+// Отдельный экземпляр для загрузки файлов без Content-Type
+const apiUpload = axios.create({
+  baseURL: API_URL,
+});
+
 /**
  * Получить весь каталог
  */
@@ -28,7 +33,8 @@ export const fetchCatalog = async () => {
  */
 export const addProduct = async (productData) => {
   try {
-    const response = await api.post('/products', productData);
+    // Используем отдельный экземпляр для FormData
+    const response = await apiUpload.post('/products', productData);
     return response.data;
   } catch (error) {
     console.error('Ошибка добавления товара:', error);
@@ -49,8 +55,50 @@ export const initializeData = async () => {
   }
 };
 
+/**
+ * Получить товар по ID
+ */
+export const getProduct = async (productId) => {
+  try {
+    const response = await api.get(`/products/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка получения товара:', error);
+    throw error;
+  }
+};
+
+/**
+ * Обновить товар
+ */
+export const updateProduct = async (productId, productData) => {
+  try {
+    const response = await api.put(`/products/${productId}`, productData);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка обновления товара:', error);
+    throw error;
+  }
+};
+
+/**
+ * Удалить товар
+ */
+export const deleteProduct = async (productId) => {
+  try {
+    const response = await api.delete(`/products/${productId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка удаления товара:', error);
+    throw error;
+  }
+};
+
 export default {
   fetchCatalog,
   addProduct,
-  initializeData
+  initializeData,
+  getProduct,
+  updateProduct,
+  deleteProduct
 };

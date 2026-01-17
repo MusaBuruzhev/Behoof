@@ -22,6 +22,9 @@
       </div>
 
       <nav class="headerNav">
+        <router-link to="/add-product" class="add-product-link">
+          <button title="Добавить товар">➕</button>
+        </router-link>
         <button><img src="../../public/iconHed/authorization.svg" alt="" /></button>
         <button><img src="../../public/iconHed/comparison.svg" alt="" /></button>
         <button><img src="../../public/iconHed/favourites.svg" alt="" /></button>
@@ -449,6 +452,19 @@ header {
   width: 52px;
   border: none;
   border-radius: 8px;
+}
+
+.add-product-link {
+  text-decoration: none;
+}
+
+.add-product-link button {
+  background-color: #28a745;
+  color: white;
+}
+
+.add-product-link button:hover {
+  background-color: #218838;
 }
 
 .catalog-block {

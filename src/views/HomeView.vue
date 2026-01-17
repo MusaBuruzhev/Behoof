@@ -1,18 +1,19 @@
 <template>
   <div class="home">
     <BanerComponent />
-    <h2>Добро пожаловать на мой сайт!</h2>
-    <p>Это главная страница</p>
+    <BestProductsComponent />
   </div>
 </template>
 
 <script>
 import BanerComponent from '../components/Baner.vue'
+import BestProductsComponent from '../components/BestProducts.vue'
 
 export default {
   name: 'HomeView',
   components: {
     BanerComponent,
+    BestProductsComponent,
   },
 }
 </script>

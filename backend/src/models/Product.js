@@ -32,6 +32,16 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.Mixed,
       default: {},
     },
+    images: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: function(arr) {
+          return arr.length >= 3 && arr.length <= 10;
+        },
+        message: 'Количество изображений должно быть от 3 до 10'
+      }
+    },
   },
   {
     timestamps: true,
