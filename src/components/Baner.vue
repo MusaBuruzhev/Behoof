@@ -113,7 +113,7 @@ export default {
 
 .banner-content p {
   margin: 0 0 16px;
-  font-size: 16px;
+  font-size: 18px;
   color: #000;
 }
 

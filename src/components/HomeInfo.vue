@@ -93,7 +93,7 @@ img{
   font-weight: 900;
 }
 .container div p{
-  font-size: 25px;
+  font-size: 18px;
 }
 
 

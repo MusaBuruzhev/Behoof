@@ -369,7 +369,7 @@ header {
   max-width: 200px;
   min-width: 200px;
   margin-left: 9px;
-  font-size: 19px;
+  font-size: 18px;
   margin-right: 5px;
 }
 

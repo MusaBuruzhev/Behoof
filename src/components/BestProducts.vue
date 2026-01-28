@@ -530,7 +530,7 @@ display: flex
 }
 
 .trait-name {
-  font-size: clamp(10px, 1.5vw, 20px);
+  font-size: 18px;
   color: #666;
   flex: 1;
   position: absolute;
@@ -561,7 +561,7 @@ display: flex
   padding: 5%;
   color: #666;
   width: 100%;
-  font-size: clamp(14px, 2vw, 16px);
+  font-size: 18px;
 }
 
 
