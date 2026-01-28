@@ -89,8 +89,7 @@
           </h1>
           <div class="catalogContDiv">
             <div v-if="productsLoading" class="loading">Загрузка товаров...</div>
-            <div v-else>
-              <button
+            <div v-else style="width: 100%;">               <button
                 v-for="product in products"
                 :key="product.id"
                 @click="selectProduct(product.id)"

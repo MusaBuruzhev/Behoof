@@ -1,8 +1,8 @@
 <template>
   <div class="best-products">
+    <div class="best-products-cont">
     <h2>Лучший выбор</h2>
 
-    <!-- Horizontal category navigation -->
     <div class="category-nav">
       <button
         v-for="category in categories"
@@ -16,7 +16,6 @@
       </button>
     </div>
 
-    <!-- Trait tags -->
     <div v-if="selectedCategoryId" class="trait-tags">
       <button
         v-for="trait in availableTraits"
@@ -29,7 +28,7 @@
       </button>
     </div>
 
-    <!-- Products grid -->
+
     <div v-if="selectedCategoryId && paginatedProducts.length" class="products-grid">
       <button @click="prevPage" :disabled="currentPage === 0" class="nav-arrow left-arrow">‹</button>
 
@@ -81,6 +80,7 @@
     <div v-else-if="selectedCategoryId" class="no-products">
       Нет товаров в выбранной категории
     </div>
+  </div>
   </div>
 </template>
 
@@ -289,18 +289,20 @@ export default {
   src: url('../../fonts/Inter_24pt-ExtraBold.ttf');
 }
 
-/* Контейнер всего компонента */
 .best-products {
-    width: 85%;
-    /* max-width: 1200px; */
+  width: 100%;
+  background-color: #F2F5F9;
+  padding: 30px 0 50px 0 ;
+  margin-top: 30px;
+}
+.best-products-cont{
+  width: 85%;
     margin: 0 auto;
-    /* padding: 0 2%; */
     box-sizing: border-box;
 }
 
-
 /* Заголовок */
-.best-products h2 {
+.best-products-cont h2 {
   font-size: clamp(24px, 3vw, 36px);
   font-weight: 700;
   margin-bottom: 3%;
@@ -395,18 +397,20 @@ display: flex
 }
 
 .nav-arrow {
-    width: 13%;
-    min-width: 40px;
-    max-width: 50px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background: #f2f5f9;
-    color: #666;
-    font-size: 40px;
-    cursor: pointer;
-    transition: all 0.3s;
-    flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #666;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .nav-arrow:hover:not(:disabled) {
@@ -522,20 +526,23 @@ display: flex
   align-items: center;
   margin-bottom: 3%;
   width: 100%;
+
 }
 
 .trait-name {
-  font-size: clamp(10px, 1.5vw, 16px);
+  font-size: clamp(10px, 1.5vw, 20px);
   color: #666;
   flex: 1;
+  position: absolute;
+  margin: 0 0 12px 0;
 }
 
 .rating-segments {
   display: flex;
   gap: 2px;
   flex-shrink: 0;
-  width: 40%;
-  max-width: 60px;
+  width: 100%;
+  margin: 10px 0 0 0 ;
 }
 
 .segment {
@@ -557,89 +564,5 @@ display: flex
   font-size: clamp(14px, 2vw, 16px);
 }
 
-/* Адаптивность для мобильных */
-@media (max-width: 768px) {
-  .best-products {
-    width: 95%;
-    padding: 0 2.5%;
-  }
 
-  .category-nav {
-    gap: 3%;
-    margin-bottom: 5%;
-  }
-
-  .category-btn {
-    width: 18%;
-    min-width: 70px;
-    padding: 4%;
-  }
-
-  .products-grid {
-    flex-direction: column;
-    gap: 4%;
-  }
-
-  .nav-arrow {
-    width: 10%;
-    order: -1;
-  }
-
-  .nav-arrow.left-arrow {
-    order: -1;
-  }
-
-  .nav-arrow.right-arrow {
-    order: 1;
-  }
-
-  .products-container {
-    width: 100%;
-    grid-template-columns: 1fr;
-    gap: 4%;
-  }
-
-  .product-content {
-    flex-direction: column;
-    gap: 3%;
-  }
-
-  .product-image {
-    width: 100%;
-    max-width: none;
-  }
-
-  .product-traits {
-    width: 100%;
-  }
-
-  .trait-item {
-    margin-bottom: 4%;
-  }
-
-  .rating-segments {
-    width: 50%;
-  }
-}
-
-@media (max-width: 480px) {
-  .best-products h2 {
-    font-size: 24px;
-    margin-bottom: 5%;
-  }
-
-  .category-btn {
-    width: 22%;
-    min-width: 60px;
-  }
-
-  .trait-tags {
-    gap: 2%;
-    margin-bottom: 6%;
-  }
-
-  .product-card {
-    padding: 5%;
-  }
-}
 </style>
