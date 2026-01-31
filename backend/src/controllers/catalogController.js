@@ -9,23 +9,17 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Настройка multer для загрузки изображений
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(__dirname, '..', '..', '..', 'public', 'uploads');
-    console.log('Upload destination:', uploadPath);
-
-    // Создаем папку, если она не существует
     if (!fs.existsSync(uploadPath)) {
       fs.mkdirSync(uploadPath, { recursive: true });
     }
-
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const filename = uniqueSuffix + path.extname(file.originalname);
-    console.log('Generated filename:', filename);
     cb(null, filename);
   }
 });
@@ -33,14 +27,12 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB
+    fileSize: 5 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|webp/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-
-    console.log('File validation:', { extname, mimetype, type: file.mimetype });
 
     if (mimetype && extname) {
       return cb(null, true);
@@ -75,6 +67,9 @@ export const getCatalog = async (req, res) => {
         id: product.id,
         name: product.name,
         price: product.price,
+        description: product.description,
+        characteristics: product.characteristics,
+        priceHistory: product.priceHistory,
         brand: product.brand,
         traitRatings: product.traitRatings,
         images: product.images || [],
@@ -94,10 +89,14 @@ export const getCatalog = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    console.log('req.body:', req.body);
-    console.log('req.files:', req.files);
+    const { name, price, brand, categoryId, description, characteristics } = req.body
 
-    const { name, price, brand, categoryId } = req.body
+    let parsedCharacteristics;
+    try {
+      parsedCharacteristics = characteristics ? JSON.parse(characteristics) : [];
+    } catch {
+      return res.status(400).json({ error: 'Неверный формат характеристик' });
+    }
 
     if (!name || !price || !brand || !categoryId) {
       return res.status(400).json({
@@ -105,9 +104,7 @@ export const addProduct = async (req, res) => {
       })
     }
 
-    // Проверяем количество загруженных файлов
     if (!req.files || req.files.length < 3 || req.files.length > 10) {
-      console.log('Files validation failed:', { files: req.files, length: req.files?.length });
       return res.status(400).json({
         error: 'Необходимо загрузить от 3 до 10 изображений',
       })
@@ -118,9 +115,9 @@ export const addProduct = async (req, res) => {
       return res.status(404).json({ error: 'Категория не найдена' })
     }
 
-    const traits = CATEGORY_TRAITS[categoryId] || []
+    const categoryTraits = CATEGORY_TRAITS[categoryId] || []
     const traitRatings = {}
-    traits.forEach((trait) => {
+    categoryTraits.forEach((trait) => {
       traitRatings[trait] = 3
     })
 
@@ -153,7 +150,9 @@ export const addProduct = async (req, res) => {
     const product = new Product({
       id: productId,
       name,
-      price: Number(price),
+      priceHistory: [{ date: new Date(), price: Number(price) }],
+      description: description || '',
+      characteristics: parsedCharacteristics,
       brand,
       categoryId,
       subcategoryId: subcategory.id,
@@ -184,6 +183,9 @@ export const addProduct = async (req, res) => {
         id: product.id,
         name: product.name,
         price: product.price,
+        description: product.description,
+        characteristics: product.characteristics,
+        priceHistory: product.priceHistory,
         brand: product.brand,
         images: product.images,
         traitRatings: product.traitRatings,
@@ -210,6 +212,9 @@ export const getProduct = async (req, res) => {
       id: product.id,
       name: product.name,
       price: product.price,
+      description: product.description,
+      characteristics: product.characteristics,
+      priceHistory: product.priceHistory,
       brand: product.brand,
       categoryId: product.categoryId,
       subcategoryId: product.subcategoryId,
@@ -232,11 +237,20 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ error: 'Товар не найден' })
     }
 
-    // Обновляем только разрешенные поля
-    const allowedFields = ['name', 'price', 'brand', 'traitRatings', 'images']
+    // Специальная обработка для цены - добавляем в историю если цена изменилась
+    if (updates.price !== undefined && Number(updates.price) !== product.price) {
+      product.priceHistory.push({ date: new Date(), price: Number(updates.price) })
+    }
+
+    // Обновляем разрешенные поля
+    const allowedFields = ['name', 'description', 'characteristics', 'brand', 'traitRatings', 'images']
     allowedFields.forEach(field => {
       if (updates[field] !== undefined) {
-        product[field] = updates[field]
+        if (field === 'characteristics') {
+          product[field] = Array.isArray(updates[field]) ? updates[field] : [updates[field]]
+        } else {
+          product[field] = updates[field]
+        }
       }
     })
 
@@ -248,6 +262,9 @@ export const updateProduct = async (req, res) => {
         id: product.id,
         name: product.name,
         price: product.price,
+        description: product.description,
+        characteristics: product.characteristics,
+        priceHistory: product.priceHistory,
         brand: product.brand,
         traitRatings: product.traitRatings,
         images: product.images,
