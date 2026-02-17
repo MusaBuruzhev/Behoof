@@ -633,7 +633,12 @@ export default {
           price: this.updateForm.price,
           brand: this.updateForm.brand,
           description: this.updateForm.description,
-          characteristics: this.updateForm.characteristics.filter(char => char.trim())
+          characteristics: this.updateForm.characteristics.filter(char => {
+            if (typeof char === 'string') {
+              return char.trim();
+            }
+            return char && char.value && char.value.trim();
+          })
         };
 
         await updateProduct(this.selectedProductId, updateData);

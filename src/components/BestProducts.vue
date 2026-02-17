@@ -560,7 +560,6 @@ display: flex
   text-align: center;
   padding: 5%;
   color: #666;
-  width: 100%;
   font-size: 18px;
 }
 

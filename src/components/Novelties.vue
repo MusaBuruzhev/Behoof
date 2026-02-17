@@ -1,0 +1,78 @@
+<template>
+  <div class="novelties">
+    <div class="header">
+      <h1>Новинки</h1>
+      <a href="/novelties">К новинкам ></a>
+    </div>
+    <div class="grid">
+      <ProductCard
+        v-for="product in products"
+        :key="product.id"
+        :product="product"
+        :categoryName="getCategoryName(product.categoryId)"
+      />
+    </div>
+  </div>
+</template>
+
+<script>
+import ProductCard from './ProductCard.vue'
+import { fetchCatalog } from '@/api/catalog.js'
+
+export default {
+  name: 'Novelties',
+  components: {
+    ProductCard
+  },
+  data() {
+    return {
+      products: [],
+      categories: []
+    }
+  },
+  async mounted() {
+    try {
+      const data = await fetchCatalog();
+      this.categories = data.categories;
+      this.products = Object.values(data.products).slice(-10);
+    } catch (error) {
+      console.error('Error fetching catalog:', error);
+    }
+  },
+  methods: {
+    getCategoryName(categoryId) {
+      const cat = this.categories.find(c => c.id === categoryId);
+      return cat ? cat.name : '';
+    }
+  }
+}
+</script>
+
+<style scoped>
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 50px;
+}
+
+.novelties{
+  width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+}
+
+.header a{
+  text-decoration: none;
+  color: #FF4D4D;
+  font-size: 20px;
+}
+
+</style>
