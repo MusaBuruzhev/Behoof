@@ -37,6 +37,7 @@
           v-for="product in paginatedProducts"
           :key="product.id"
           class="product-card"
+          @click="goToProductDetail(product.id)"
         >
           <div class="product-header">
             <h3>{{ product.name }}</h3>
@@ -257,6 +258,10 @@ export default {
         'Аксессуары': '/categoryIcons/accessories.svg',
       };
       return icons[name] || '/categoryIcons/default.svg';
+    },
+
+    goToProductDetail(productId) {
+      this.$router.push(`/product/${productId}`);
     },
   },
 }

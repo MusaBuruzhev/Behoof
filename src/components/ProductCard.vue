@@ -1,5 +1,5 @@
 <template>
-  <div class="product-card">
+  <div class="product-card" @click="goToProductDetail">
     <img :src="product.images[0]" :alt="product.name" />
     <div class="product-card-div">
       <p class="category">{{ categoryName }}</p>
@@ -53,6 +53,11 @@ export default {
       const current = prices[0].price;
       const previous = prices[1].price;
       return Math.round((current - previous) / previous * 100);
+    }
+  },
+  methods: {
+    goToProductDetail() {
+      this.$router.push(`/product/${this.product.id}`);
     }
   }
 }
