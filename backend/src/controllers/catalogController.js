@@ -1,4 +1,4 @@
-import { Category, Subcategory, Product } from '../models/index.js'
+import { Category, Subcategory, Product, Model } from '../models/index.js'
 import { getNextId } from '../utils/idGenerator.js'
 import { CATEGORY_TRAITS } from '../config/categoryTraits.js'
 import multer from 'multer'
@@ -46,7 +46,12 @@ export const uploadImages = upload.array('images', 10);
 
 export const getCatalog = async (req, res) => {
   try {
-    const categories = await Category.find({}).sort({ id: 1 })
+    const categoriesArray = await Category.find({}).sort({ id: 1 })
+
+    const categories = categoriesArray.map(cat => ({
+      ...cat.toObject(),
+      categoryTraits: CATEGORY_TRAITS[cat.id] || []
+    }));
 
     const subcategoriesArray = await Subcategory.find({}).sort({ id: 1 })
 
@@ -55,7 +60,20 @@ export const getCatalog = async (req, res) => {
       subcategories[sub.id] = {
         id: sub.id,
         name: sub.name,
+        categoryId: sub.categoryId,
         productIds: sub.productIds || [],
+      }
+    })
+
+    const modelsArray = await Model.find({}).sort({ id: 1 })
+
+    const models = {}
+    modelsArray.forEach((model) => {
+      models[model.id] = {
+        id: model.id,
+        name: model.name,
+        subcategoryId: model.subcategoryId,
+        productIds: model.productIds || [],
       }
     })
 
@@ -71,6 +89,7 @@ export const getCatalog = async (req, res) => {
         characteristics: product.characteristics,
         priceHistory: product.priceHistory,
         brand: product.brand,
+        modelId: product.modelId,
         traitRatings: product.traitRatings,
         images: product.images || [],
       }
@@ -79,6 +98,7 @@ export const getCatalog = async (req, res) => {
     res.json({
       categories,
       subcategories,
+      models,
       products,
     })
   } catch (error) {
@@ -89,7 +109,7 @@ export const getCatalog = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, price, brand, categoryId, description, characteristics } = req.body
+    const { name, price, brand, model, categoryId, description, characteristics } = req.body
 
     let parsedCharacteristics;
     try {
@@ -98,9 +118,9 @@ export const addProduct = async (req, res) => {
       return res.status(400).json({ error: 'Неверный формат характеристик' });
     }
 
-    if (!name || !price || !brand || !categoryId) {
+    if (!name || !price || !brand || !model || !categoryId) {
       return res.status(400).json({
-        error: 'Все поля обязательны: name, price, brand, categoryId',
+        error: 'Все поля обязательны: name, price, brand, model, categoryId',
       })
     }
 
@@ -147,6 +167,24 @@ export const addProduct = async (req, res) => {
       await category.save()
     }
 
+    let modelDoc = await Model.findOne({
+      name: model,
+      subcategoryId: subcategory.id,
+    })
+
+    if (!modelDoc) {
+      const modelId = await getNextId('mod')
+
+      modelDoc = new Model({
+        id: modelId,
+        name: model,
+        subcategoryId: subcategory.id,
+        productIds: [],
+      })
+
+      await modelDoc.save()
+    }
+
     const product = new Product({
       id: productId,
       name,
@@ -156,11 +194,15 @@ export const addProduct = async (req, res) => {
       brand,
       categoryId,
       subcategoryId: subcategory.id,
+      modelId: modelDoc.id,
       traitRatings,
       images: imagePaths,
     })
 
     await product.save()
+
+    modelDoc.productIds.push(productId)
+    await modelDoc.save()
 
     subcategory.productIds.push(productId)
     await subcategory.save()
@@ -218,6 +260,7 @@ export const getProduct = async (req, res) => {
       brand: product.brand,
       categoryId: product.categoryId,
       subcategoryId: product.subcategoryId,
+      modelId: product.modelId,
       traitRatings: product.traitRatings,
       images: product.images,
     })
@@ -285,7 +328,12 @@ export const deleteProduct = async (req, res) => {
       return res.status(404).json({ error: 'Товар не найден' })
     }
 
-    // Удаляем товар из подкатегорий
+    // Удаляем товар из моделей и подкатегорий
+    await Model.updateMany(
+      { productIds: id },
+      { $pull: { productIds: id } }
+    )
+
     await Subcategory.updateMany(
       { productIds: id },
       { $pull: { productIds: id } }
@@ -303,43 +351,111 @@ export const deleteProduct = async (req, res) => {
 
 export const initializeData = async (req, res) => {
   try {
-    const existingCategories = await Category.countDocuments()
+    // Очищаем существующие данные
+    await Category.deleteMany({});
+    await Subcategory.deleteMany({});
+    await Model.deleteMany({});
+    await Product.deleteMany({});
 
-    if (existingCategories === 0) {
-      const initialCategories = [
-        { id: 'cat1', name: 'Смартфоны', subcategoryIds: [] },
-        { id: 'cat2', name: 'Ноутбуки', subcategoryIds: [] },
-        { id: 'cat3', name: 'Планшеты', subcategoryIds: [] },
-        { id: 'cat4', name: 'Наушники', subcategoryIds: [] },
-        { id: 'cat5', name: 'Умные часы', subcategoryIds: [] },
-        { id: 'cat6', name: 'Игровые приставки', subcategoryIds: [] },
-        { id: 'cat7', name: 'Портативные колонки', subcategoryIds: [] },
-        { id: 'cat8', name: 'Аксессуары', subcategoryIds: [] },
-      ]
+    console.log('Initializing data...');
+    const initialCategories = [
+      { id: 'cat1', name: 'Смартфоны', subcategoryIds: [] },
+      { id: 'cat2', name: 'Ноутбуки', subcategoryIds: [] },
+      { id: 'cat3', name: 'Планшеты', subcategoryIds: [] },
+      { id: 'cat4', name: 'Наушники', subcategoryIds: [] },
+      { id: 'cat5', name: 'Умные часы', subcategoryIds: [] },
+      { id: 'cat6', name: 'Игровые приставки', subcategoryIds: [] },
+      { id: 'cat7', name: 'Портативные колонки', subcategoryIds: [] },
+      { id: 'cat8', name: 'Аксессуары', subcategoryIds: [] },
+    ]
 
-      await Category.insertMany(initialCategories)
+    await Category.insertMany(initialCategories)
 
-      for (const cat of initialCategories) {
-        const allSubcategory = new Subcategory({
-          id: await getNextId('sub'),
-          name: `Все ${cat.name}`,
-          categoryId: cat.id,
+    // Инициализация брендов и моделей для смартфонов
+    const phoneBrands = [
+      { name: 'Apple', models: ['iPhone 13', 'iPhone 14', 'iPhone 15', 'iPhone 16'] },
+      { name: 'Samsung', models: ['Galaxy S23', 'Galaxy S24', 'Galaxy A54', 'Galaxy A55'] },
+      { name: 'Xiaomi', models: ['Redmi Note 12', 'Redmi Note 13', 'Poco X5', 'Poco X6'] },
+      { name: 'Google', models: ['Pixel 7', 'Pixel 8', 'Pixel 9'] },
+    ]
+
+    for (const brandData of phoneBrands) {
+      const subcategory = new Subcategory({
+        id: await getNextId('sub'),
+        name: brandData.name,
+        categoryId: 'cat1',
+        productIds: [],
+      })
+      await subcategory.save()
+
+      for (const modelName of brandData.models) {
+        const model = new Model({
+          id: await getNextId('mod'),
+          name: modelName,
+          subcategoryId: subcategory.id,
           productIds: [],
-          isAllCategory: true,
         })
-
-        await allSubcategory.save()
-
-        await Category.findOneAndUpdate(
-          { id: cat.id },
-          { $push: { subcategoryIds: allSubcategory.id } },
-        )
+        await model.save()
       }
 
-      res.json({ message: 'Начальные данные инициализированы' })
-    } else {
-      res.json({ message: 'Данные уже существуют' })
+      await Category.findOneAndUpdate(
+        { id: 'cat1' },
+        { $push: { subcategoryIds: subcategory.id } },
+      )
     }
+
+    // Инициализация брендов и моделей для ноутбуков
+    const laptopBrands = [
+      { name: 'Apple', models: ['MacBook Air M2', 'MacBook Pro M3', 'MacBook Air M3'] },
+      { name: 'Dell', models: ['XPS 13', 'XPS 15', 'Inspiron 15'] },
+      { name: 'HP', models: ['Pavilion 15', 'Envy 13', 'Spectre x360'] },
+      { name: 'Lenovo', models: ['ThinkPad X1', 'Yoga 9', 'IdeaPad 5'] },
+    ]
+
+    for (const brandData of laptopBrands) {
+      const subcategory = new Subcategory({
+        id: await getNextId('sub'),
+        name: brandData.name,
+        categoryId: 'cat2',
+        productIds: [],
+      })
+      await subcategory.save()
+
+      for (const modelName of brandData.models) {
+        const model = new Model({
+          id: await getNextId('mod'),
+          name: modelName,
+          subcategoryId: subcategory.id,
+          productIds: [],
+        })
+        await model.save()
+      }
+
+      await Category.findOneAndUpdate(
+        { id: 'cat2' },
+        { $push: { subcategoryIds: subcategory.id } },
+      )
+    }
+
+    // Аналогично для других категорий, но для краткости добавим только "Все" подкатегории
+    for (const cat of initialCategories.slice(2)) {
+      const allSubcategory = new Subcategory({
+        id: await getNextId('sub'),
+        name: `Все ${cat.name}`,
+        categoryId: cat.id,
+        productIds: [],
+        isAllCategory: true,
+      })
+
+      await allSubcategory.save()
+
+      await Category.findOneAndUpdate(
+        { id: cat.id },
+        { $push: { subcategoryIds: allSubcategory.id } },
+      )
+    }
+
+    res.json({ message: 'Начальные данные инициализированы' })
   } catch (error) {
     console.error('Ошибка инициализации данных:', error)
     res.status(500).json({ error: 'Ошибка инициализации данных' })

@@ -60,6 +60,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    modelId: {
+      type: String,
+      required: true,
+    },
     traitRatings: {
       type: mongoose.Schema.Types.Mixed,
       default: {},

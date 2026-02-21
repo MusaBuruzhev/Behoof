@@ -1,7 +1,10 @@
 <template>
   <div class="product-management">
     <div class="container">
-      <h1>Управление товарами</h1>
+      <div class="header-section">
+        <h1>Управление товарами</h1>
+        <p>Добавляйте, обновляйте и удаляйте товары в каталоге</p>
+      </div>
 
       <!-- Tabs -->
       <div class="tabs">
@@ -11,6 +14,7 @@
           @click="activeTab = tab.id"
           :class="['tab-button', { active: activeTab === tab.id }]"
         >
+          <span class="tab-icon">{{ tab.icon }}</span>
           {{ tab.name }}
         </button>
       </div>
@@ -47,17 +51,6 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label for="brand">Бренд:</label>
-              <input
-                id="brand"
-                v-model="addForm.brand"
-                type="text"
-                required
-                placeholder="Введите бренд"
-              >
-            </div>
-
-            <div class="form-group">
               <label for="category">Категория:</label>
               <select id="category" v-model="addForm.categoryId" required>
                 <option value="">Выберите категорию</option>
@@ -69,6 +62,52 @@
                   {{ category.name }}
                 </option>
               </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="brand">Бренд:</label>
+              <select id="brand" v-model="addForm.brand" required>
+                <option value="">Выберите бренд</option>
+                <option
+                  v-for="brand in availableBrands"
+                  :key="brand"
+                  :value="brand"
+                >
+                  {{ brand }}
+                </option>
+                <option value="new_brand">Добавить новый бренд</option>
+              </select>
+              <input
+                v-if="addForm.brand === 'new_brand'"
+                v-model="newBrand"
+                type="text"
+                placeholder="Введите новый бренд"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="model">Модель:</label>
+              <select id="model" v-model="addForm.model" required>
+                <option value="">Выберите модель</option>
+                <option
+                  v-for="model in availableModels"
+                  :key="model"
+                  :value="model"
+                >
+                  {{ model }}
+                </option>
+                <option value="new_model">Добавить новую модель</option>
+              </select>
+              <input
+                v-if="addForm.model === 'new_model'"
+                v-model="newModel"
+                type="text"
+                placeholder="Введите новую модель"
+                required
+              >
             </div>
           </div>
 
@@ -398,20 +437,25 @@ export default {
     return {
       activeTab: 'add',
       tabs: [
-        { id: 'add', name: 'Добавить товар' },
-        { id: 'update', name: 'Обновить товар' },
-        { id: 'delete', name: 'Удалить товар' }
+        { id: 'add', name: 'Добавить товар', icon: '➕' },
+        { id: 'update', name: 'Обновить товар', icon: '✏️' },
+        { id: 'delete', name: 'Удалить товар', icon: '🗑️' }
       ],
       categories: [],
+      subcategories: {},
+      models: {},
       productsList: [],
 
       // Add form
       addSelectedFiles: [],
       selectedCharacteristic: '',
+      newBrand: '',
+      newModel: '',
       addForm: {
         name: '',
         price: null,
         brand: '',
+        model: '',
         categoryId: '',
         description: '',
         characteristics: []
@@ -438,6 +482,29 @@ export default {
         return PRODUCT_CHARACTERISTICS[this.addForm.categoryId];
       }
       return [];
+    },
+
+    availableBrands() {
+      if (!this.addForm.categoryId) return [];
+      const category = this.categories.find(cat => cat.id === this.addForm.categoryId);
+      if (!category || !category.subcategoryIds) return [];
+      return category.subcategoryIds
+        .map(id => this.subcategories[id]?.name)
+        .filter(name => name);
+    },
+
+    availableModels() {
+      if (!this.addForm.brand || this.addForm.brand === 'new_brand' || !this.addForm.categoryId) {
+        return [];
+      }
+      const subcategory = Object.values(this.subcategories).find(sub => sub.name === this.addForm.brand && sub.categoryId === this.addForm.categoryId);
+      if (!subcategory) {
+        return [];
+      }
+      const models = Object.values(this.models)
+        .filter(model => model.subcategoryId === subcategory.id)
+        .map(model => model.name);
+      return models;
     }
   },
 
@@ -450,6 +517,8 @@ export default {
       try {
         const data = await fetchCatalog();
         this.categories = data.categories || [];
+        this.subcategories = data.subcategories || {};
+        this.models = data.models || {};
         this.productsList = Object.values(data.products || {});
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
@@ -551,10 +620,14 @@ export default {
       this.error = false;
 
       try {
+        const finalBrand = this.addForm.brand === 'new_brand' ? this.newBrand : this.addForm.brand;
+        const finalModel = this.addForm.model === 'new_model' ? this.newModel : this.addForm.model;
+
         const formData = new FormData();
         formData.append('name', this.addForm.name);
         formData.append('price', this.addForm.price.toString());
-        formData.append('brand', this.addForm.brand);
+        formData.append('brand', finalBrand);
+        formData.append('model', finalModel);
         formData.append('categoryId', this.addForm.categoryId);
         formData.append('description', this.addForm.description);
         formData.append('characteristics', JSON.stringify(this.addForm.characteristics));
@@ -563,15 +636,6 @@ export default {
         this.addSelectedFiles.forEach((file) => {
           formData.append('images', file);
         });
-
-        console.log('Sending FormData:');
-        for (let [key, value] of formData.entries()) {
-          if (value instanceof File) {
-            console.log(key, ': File -', value.name, '(' + value.size + ' bytes)');
-          } else {
-            console.log(key, ':', value);
-          }
-        }
 
         await addProduct(formData);
 
@@ -583,10 +647,13 @@ export default {
           name: '',
           price: null,
           brand: '',
+          model: '',
           categoryId: '',
           description: '',
           characteristics: []
         };
+        this.newBrand = '';
+        this.newModel = '';
         this.selectedCharacteristic = '';
         this.addSelectedFiles = [];
         this.$refs.addFileInput.value = '';
@@ -692,49 +759,72 @@ export default {
 
 <style scoped>
 .product-management {
-  max-width: 1200px;
-  margin: 50px auto;
-  padding: 20px;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 20px 0;
   font-family: 'Inter', sans-serif;
 }
 
 .container {
-  width: 100%;
+  width: 85%;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
-.product-management h1 {
+.header-section {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 32px;
+  margin-bottom: 40px;
+}
+
+.header-section h1 {
+  font-size: 36px;
   color: #263141;
+  margin-bottom: 10px;
+}
+
+.header-section p {
+  font-size: 18px;
+  color: #666;
 }
 
 .tabs {
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
-  border-bottom: 1px solid #f2f5f9;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .tab-button {
-  padding: 12px 24px;
+  flex: 1;
+  padding: 15px 20px;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
   font-size: 16px;
   font-weight: 500;
   color: #666;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-icon {
+  font-size: 20px;
 }
 
 .tab-button:hover {
+  background: #f8f9fa;
   color: #ff4d4d;
 }
 
 .tab-button.active {
-  color: #ff4d4d;
-  border-bottom-color: #ff4d4d;
+  background: #ff4d4d;
+  color: white;
 }
 
 .tab-content {

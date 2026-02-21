@@ -83,27 +83,42 @@
           ></video>
         </div>
 
-        <div class="catalogContRight" v-if="selectedSubcategoryId">
+        <div class="catalogContMid" v-if="selectedSubcategoryId">
           <h1>
             {{ getSubcategoryName(selectedSubcategoryId) }}
           </h1>
           <div class="catalogContDiv">
-            <div v-if="productsLoading" class="loading">Загрузка товаров...</div>
-            <div v-else style="width: 100%;">               <button
-                v-for="product in products"
-                :key="product.id"
-                @click="selectProduct(product.id)"
-                class="product-button"
+            <div v-if="modelsLoading" class="loading">Загрузка моделей...</div>
+            <div v-else style="width: 100%;">
+              <button
+                v-for="model in models"
+                :key="model.id"
+                @click="selectModel(model.id)"
+                class="model-button"
               >
-                <div class="catalogButtom">
-                  <div></div>
-                  {{ product.name }} - {{ product.price }} руб.
+                <div class="catalogButtom" :class="{ active: activeModelId === model.id }">
+                  <div :class="{ active: activeModelId === model.id }"></div>
+                  {{ model.name }}
                 </div>
+                <span :class="{ active: activeModelId === model.id }">▶</span>
               </button>
             </div>
           </div>
         </div>
         <div class="t2" v-else-if="selectedCategoryId"></div>
+
+        <!-- В будущем при выборе модели перейти на страницу каталога -->
+        <div class="catalogContRight" v-if="selectedModelId">
+          <h1>
+            {{ getModelName(selectedModelId) }}
+          </h1>
+          <div class="catalogContDiv">
+            <p style="padding: 20px; text-align: center; color: #666;">
+              Выберите модель для просмотра товаров в каталоге
+            </p>
+          </div>
+        </div>
+        <div class="t3" v-else-if="selectedSubcategoryId"></div>
 
         <div class="abc">
           <img src="../../public/iconHed/abc.png" alt="" />
@@ -124,18 +139,22 @@ export default {
       isCatalogOpen: false,
       selectedCategoryId: null,
       selectedSubcategoryId: null,
+      selectedModelId: null,
 
       activeCategoryId: null,
       activeSubcategoryId: null,
+      activeModelId: null,
       activeProductId: null,
 
       catalogData: {
         categories: [],
         subcategories: {},
+        models: {},
         products: {}
       },
 
       loading: false,
+      modelsLoading: false,
       productsLoading: false,
 
       videoSrc: '/videos/catalog-animation.mp4',
@@ -160,8 +179,10 @@ export default {
     resetSelections() {
       this.selectedCategoryId = null
       this.selectedSubcategoryId = null
+      this.selectedModelId = null
       this.activeCategoryId = null
       this.activeSubcategoryId = null
+      this.activeModelId = null
       this.activeProductId = null
     },
 
@@ -192,8 +213,10 @@ export default {
     selectCategory(categoryId) {
       this.selectedCategoryId = categoryId
       this.selectedSubcategoryId = null
+      this.selectedModelId = null
       this.activeCategoryId = categoryId
       this.activeSubcategoryId = null
+      this.activeModelId = null
       this.activeProductId = null
 
       if (this.$refs.catalogVideo) {
@@ -204,9 +227,19 @@ export default {
 
     selectSubcategory(subcategoryId) {
       this.selectedSubcategoryId = subcategoryId
+      this.selectedModelId = null
       this.activeSubcategoryId = subcategoryId
+      this.activeModelId = null
       this.activeProductId = null
-      this.loadProductsForSubcategory(subcategoryId);
+      this.loadModelsForSubcategory(subcategoryId);
+    },
+
+    selectModel(modelId) {
+      this.selectedModelId = modelId
+      this.activeModelId = modelId
+      this.activeProductId = null
+      // Перенаправление на страницу каталога с выбранной моделью
+      this.$router.push(`/catalog?modelId=${modelId}`);
     },
 
     selectProduct(productId) {
@@ -264,8 +297,19 @@ export default {
       return subcat ? subcat.name : '';
     },
 
+    getModelName(modelId) {
+      const model = this.catalogData.models[modelId];
+      return model ? model.name : '';
+    },
 
-    loadProductsForSubcategory(subcategoryId) {
+    loadModelsForSubcategory(subcategoryId) {
+      this.modelsLoading = true;
+      setTimeout(() => {
+        this.modelsLoading = false;
+      }, 100);
+    },
+
+    loadProductsForModel(modelId) {
       this.productsLoading = true;
       setTimeout(() => {
         this.productsLoading = false;
@@ -289,13 +333,24 @@ export default {
         .filter(subcat => subcat);
     },
 
-    products() {
+    models() {
       if (!this.selectedSubcategoryId) return [];
 
       const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId];
-      if (!subcategory || !subcategory.productIds) return [];
+      if (!subcategory) return [];
 
-      return subcategory.productIds
+      // Фильтруем модели по subcategoryId
+      return Object.values(this.catalogData.models || {})
+        .filter(model => model.subcategoryId === this.selectedSubcategoryId);
+    },
+
+    products() {
+      if (!this.selectedModelId) return [];
+
+      const model = this.catalogData.models[this.selectedModelId];
+      if (!model || !model.productIds) return [];
+
+      return model.productIds
         .map((id) => this.catalogData.products[id])
         .filter(product => product);
     },
@@ -554,7 +609,15 @@ header {
 }
 
 .catalogContCent {
-  width: 24%;
+  width: 22%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 1.5%;
+}
+
+.catalogContMid {
+  width: 22%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -562,7 +625,7 @@ header {
 }
 
 .catalogContRight {
-  width: 24%;
+  width: 22%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
