@@ -107,6 +107,58 @@ export const getCatalog = async (req, res) => {
   }
 }
 
+export const getProducts = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1)
+    const limit = Math.min(100, parseInt(req.query.limit) || 20)
+    const q = req.query.q ? String(req.query.q).trim() : null
+    const { categoryId, subcategoryId, modelId } = req.query
+
+    const filter = {}
+    if (q) {
+      const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
+      filter.$or = [
+        { name: re },
+        { brand: re },
+        { description: re },
+      ]
+    }
+    if (categoryId) filter.categoryId = categoryId
+    if (subcategoryId) filter.subcategoryId = subcategoryId
+    if (modelId) filter.modelId = modelId
+
+    const skip = (page - 1) * limit
+
+    const [total, productsArray] = await Promise.all([
+      Product.countDocuments(filter),
+      Product.find(filter).sort({ id: 1 }).skip(skip).limit(limit),
+    ])
+
+    const products = productsArray.map((product) => ({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      characteristics: product.characteristics,
+      priceHistory: product.priceHistory,
+      brand: product.brand,
+      modelId: product.modelId,
+      traitRatings: product.traitRatings,
+      images: product.images || [],
+    }))
+
+    res.json({
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit) || 1,
+    })
+  } catch (error) {
+    console.error('Ошибка получения списка товаров:', error)
+    res.status(500).json({ error: 'Ошибка получения списка товаров' })
+  }
+}
+
 export const addProduct = async (req, res) => {
   try {
     const { name, price, brand, model, categoryId, description, characteristics } = req.body

@@ -29,6 +29,25 @@ export const fetchCatalog = async () => {
 };
 
 /**
+ * Получить продуктовый список с пагинацией и фильтрацией
+ */
+export const fetchProducts = async ({ page = 1, limit = 20, q, categoryId, subcategoryId, modelId } = {}) => {
+  try {
+    const params = { page, limit }
+    if (q) params.q = q
+    if (categoryId) params.categoryId = categoryId
+    if (subcategoryId) params.subcategoryId = subcategoryId
+    if (modelId) params.modelId = modelId
+
+    const response = await api.get('/products', { params })
+    return response.data
+  } catch (error) {
+    console.error('Ошибка получения списка товаров:', error)
+    throw error
+  }
+}
+
+/**
  * Добавить новый товар
  */
 export const addProduct = async (productData) => {
@@ -96,6 +115,7 @@ export const deleteProduct = async (productId) => {
 
 export default {
   fetchCatalog,
+  fetchProducts,
   addProduct,
   initializeData,
   getProduct,

@@ -1,9 +1,10 @@
 import express from 'express'
-import { getCatalog, addProduct, initializeData, getProduct, updateProduct, deleteProduct, uploadImages } from '../controllers/catalogController.js'
+import { getCatalog, getProducts, addProduct, initializeData, getProduct, updateProduct, deleteProduct, uploadImages } from '../controllers/catalogController.js'
 
 const router = express.Router()
 
 router.get('/catalog', getCatalog)
+router.get('/products', getProducts)
 
 router.post('/products', (req, res, next) => {
   uploadImages(req, res, (err) => {
