@@ -65,16 +65,16 @@
               placeholder="Поиск товаров..."
               @input="applyFilters"
             >
-            <span class="results-count">Найдено: {{ filteredProducts.length }}</span>
+            <span class="results-count">Найдено: {{ totalResults }}</span>
           </div>
 
           <div v-if="loading" class="loading">Загрузка товаров...</div>
-          <div v-else-if="filteredProducts.length === 0" class="no-products">
+          <div v-else-if="totalResults === 0" class="no-products">
             Товары не найдены
           </div>
           <div v-else class="products-grid">
             <ProductCard
-              v-for="product in paginatedProducts"
+              v-for="product in displayedProducts"
               :key="product.id"
               :product="product"
               :categoryName="categoryName"
@@ -106,7 +106,7 @@
 </template>
 
 <script>
-import { fetchCatalog } from '@/api/catalog.js';
+import { fetchCatalog, fetchProducts } from '@/api/catalog.js';
 import ProductCard from '@/components/ProductCard.vue';
 
 const ITEMS_PER_PAGE = 12;
@@ -130,6 +130,8 @@ export default {
       loading: false,
       searchQuery: '',
       currentPage: 1,
+      totalPages: 1,
+      totalResults: 0,
       filters: {
         priceMin: null,
         priceMax: null,
@@ -137,7 +139,7 @@ export default {
         sortBy: 'price-asc'
       },
       allProducts: [],
-      filteredProducts: []
+      products: []
     };
   },
   computed: {
@@ -152,13 +154,9 @@ export default {
       if (!subcategory) return '';
       return subcategory.categoryId;
     },
-    paginatedProducts() {
-      const start = (this.currentPage - 1) * ITEMS_PER_PAGE;
-      const end = start + ITEMS_PER_PAGE;
-      return this.filteredProducts.slice(start, end);
-    },
-    totalPages() {
-      return Math.ceil(this.filteredProducts.length / ITEMS_PER_PAGE);
+    // products already paginated by server
+    displayedProducts() {
+      return this.products;
     }
   },
   watch: {
@@ -167,6 +165,11 @@ export default {
       handler(newModelId) {
         this.modelId = newModelId;
         this.loadData();
+      }
+    },
+    currentPage(newPage, oldPage) {
+      if (newPage !== oldPage) {
+        this.loadPage();
       }
     }
   },
@@ -203,53 +206,10 @@ export default {
         this.loading = false;
       }
     },
-    applyFilters() {
-      let filtered = [...this.allProducts];
-
-      // Search filter
-      if (this.searchQuery.trim()) {
-        const query = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(product =>
-          product.name.toLowerCase().includes(query) ||
-          product.description.toLowerCase().includes(query)
-        );
-      }
-
-      // Price filter
-      if (this.filters.priceMin !== null && this.filters.priceMin !== '') {
-        filtered = filtered.filter(product => product.price >= this.filters.priceMin);
-      }
-      if (this.filters.priceMax !== null && this.filters.priceMax !== '') {
-        filtered = filtered.filter(product => product.price <= this.filters.priceMax);
-      }
-
-      // Brands filter
-      if (this.filters.selectedBrands.length > 0) {
-        filtered = filtered.filter(product =>
-          this.filters.selectedBrands.includes(product.brand)
-        );
-      }
-
-      // Sort
-      filtered.sort((a, b) => {
-        switch (this.filters.sortBy) {
-          case 'price-asc':
-            return a.price - b.price;
-          case 'price-desc':
-            return b.price - a.price;
-          case 'name-asc':
-            return a.name.localeCompare(b.name);
-          case 'name-desc':
-            return b.name.localeCompare(a.name);
-          case 'date-desc':
-            return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-          default:
-            return 0;
-        }
-      });
-
-      this.filteredProducts = filtered;
-      this.currentPage = 1; // Reset to first page
+    async applyFilters() {
+      // reset to first page when filters/search change
+      this.currentPage = 1;
+      await this.loadPage();
     },
     clearFilters() {
       this.filters = {
@@ -260,6 +220,31 @@ export default {
       };
       this.searchQuery = '';
       this.applyFilters();
+    },
+    async loadPage() {
+      this.loading = true;
+      try {
+        const params = {
+          page: this.currentPage,
+          limit: ITEMS_PER_PAGE,
+        };
+        if (this.searchQuery.trim()) params.q = this.searchQuery.trim();
+        if (this.modelId) params.modelId = this.modelId;
+        if (this.categoryId) params.categoryId = this.categoryId;
+        if (this.filters.priceMin !== null && this.filters.priceMin !== '') params.priceMin = this.filters.priceMin;
+        if (this.filters.priceMax !== null && this.filters.priceMax !== '') params.priceMax = this.filters.priceMax;
+        if (this.filters.selectedBrands.length > 0) params.brand = this.filters.selectedBrands.join(',');
+        if (this.filters.sortBy) params.sortBy = this.filters.sortBy;
+
+        const response = await fetchProducts(params);
+        this.products = response.products || [];
+        this.totalResults = response.total || 0;
+        this.totalPages = response.totalPages || 1;
+      } catch (error) {
+        console.error('Ошибка загрузки продуктов:', error);
+      } finally {
+        this.loading = false;
+      }
     }
   }
 };
