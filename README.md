@@ -65,10 +65,22 @@ npm run dev
 
 ### Основные эндпоинты
 - `GET /api/catalog` - Получить каталог
+- `GET /api/products` - Получить список товаров (поддерживается пагинация и фильтры, см. ниже)
 - `POST /api/products` - Добавить товар
 - `PUT /api/products/:id` - Обновить товар
 - `DELETE /api/products/:id` - Удалить товар
 - `GET /api/products/:id` - Получить товар
+
+### Параметры для `GET /api/products`
+Можно передавать query-параметры для фильтрации и пагинации:
+
+- `page` (number) – номер страницы (по умолчанию 1)
+- `limit` (number) – количество элементов на странице (макс. 100, по умолчанию 20)
+- `q` (string) – текстовый поиск по имени, бренду и описанию
+- `categoryId`, `subcategoryId`, `modelId` – фильтр по иерархии каталога
+- `priceMin`, `priceMax` – диапазон цены
+- `brand` – бренд или список брендов через запятую
+- `sortBy` – сортировка: `price-asc`, `price-desc`, `name-asc`, `name-desc`, `date-desc`
 
 ## 🏗 Архитектура
 
