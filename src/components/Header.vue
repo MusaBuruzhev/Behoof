@@ -238,7 +238,8 @@ export default {
       this.selectedModelId = modelId
       this.activeModelId = modelId
       this.activeProductId = null
-      // Перенаправление на страницу каталога с выбранной моделью
+      // Закрываем выпадающее меню и перенаправляем на страницу каталога с выбранной моделью
+      this.isCatalogOpen = false;
       this.$router.push(`/catalog?modelId=${modelId}`);
     },
 
