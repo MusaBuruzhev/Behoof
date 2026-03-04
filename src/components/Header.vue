@@ -25,7 +25,42 @@
         <router-link to="/add-product" class="add-product-link">
           <button title="Добавить товар">➕</button>
         </router-link>
-        <button><img src="../../public/iconHed/authorization.svg" alt="" /></button>
+        <div class="auth-section">
+          <button
+            v-if="!isAuthenticated"
+            @click="goToLogin"
+            class="auth-button"
+            title="Войти в аккаунт"
+          >
+            <img src="../../public/iconHed/authorization.svg" alt="Вход" />
+          </button>
+          <div v-else class="profile-menu">
+            <button @click="toggleProfileMenu" class="profile-button" :title="currentUser?.firstName">
+              <div class="profile-avatar">{{ userInitials }}</div>
+            </button>
+            <div v-show="showProfileMenu" class="profile-dropdown">
+              <div class="profile-info">
+                <div class="profile-info-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</div>
+                <div class="profile-info-email">{{ currentUser?.email }}</div>
+              </div>
+              <router-link to="/profile" class="profile-link">
+                <span>👤 Мой профиль</span>
+              </router-link>
+              <router-link to="/orders" class="profile-link">
+                <span>📦 Мои заказы</span>
+              </router-link>
+              <router-link to="/favorites" class="profile-link">
+                <span>❤️ Избранное</span>
+              </router-link>
+              <router-link to="/comparison" class="profile-link">
+                <span>⚖️ Сравнение</span>
+              </router-link>
+              <button @click="handleLogout" class="logout-button">
+                <span>🚪 Выход</span>
+              </button>
+            </div>
+          </div>
+        </div>
         <button><img src="../../public/iconHed/comparison.svg" alt="" /></button>
         <button><img src="../../public/iconHed/favourites.svg" alt="" /></button>
       </nav>
@@ -130,6 +165,7 @@
 
 <script>
 import { fetchCatalog } from '@/api/catalog.js';
+import authAPI from '@/api/auth.js';
 
 export default {
   name: 'HeaderComponent',
@@ -159,7 +195,57 @@ export default {
 
       videoSrc: '/videos/catalog-animation.mp4',
       isVideoPlaying: false,
+
+      isAuthenticated: false,
+      currentUser: null,
+      showProfileMenu: false
     }
+  },
+
+  computed: {
+    userInitials() {
+      if (this.currentUser) {
+        const first = this.currentUser.firstName?.[0] || '';
+        const last = this.currentUser.lastName?.[0] || '';
+        return (first + last).toUpperCase();
+      }
+      return '';
+    },
+    categories() {
+      return this.catalogData.categories || [];
+    },
+
+    subcategories() {
+      if (!this.selectedCategoryId) return [];
+
+      const category = this.catalogData.categories.find((cat) => cat.id === this.selectedCategoryId);
+      if (!category || !category.subcategoryIds) return [];
+
+      return category.subcategoryIds
+        .map((id) => this.catalogData.subcategories[id])
+        .filter(subcat => subcat);
+    },
+
+    models() {
+      if (!this.selectedSubcategoryId) return [];
+
+      const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId];
+      if (!subcategory) return [];
+
+      return Object.values(this.catalogData.models || {})
+        .filter(model => model.subcategoryId === this.selectedSubcategoryId);
+    },
+
+    products() {
+      if (!this.selectedModelId) return [];
+
+      const model = this.catalogData.models[this.selectedModelId];
+      if (!model || !model.productIds) return [];
+
+      return model.productIds
+        .map((id) => this.catalogData.products[id])
+        .filter(product => product);
+    },
   },
 
   methods: {
@@ -238,7 +324,6 @@ export default {
       this.selectedModelId = modelId
       this.activeModelId = modelId
       this.activeProductId = null
-      // Закрываем выпадающее меню и перенаправляем на страницу каталога с выбранной моделью
       this.isCatalogOpen = false;
       this.$router.push(`/catalog?modelId=${modelId}`);
     },
@@ -316,54 +401,55 @@ export default {
         this.productsLoading = false;
       }, 100);
     },
-  },
 
-  computed: {
-    categories() {
-      return this.catalogData.categories || [];
+    goToLogin() {
+      this.$router.push('/login');
     },
 
-    subcategories() {
-      if (!this.selectedCategoryId) return [];
-
-      const category = this.catalogData.categories.find((cat) => cat.id === this.selectedCategoryId);
-      if (!category || !category.subcategoryIds) return [];
-
-      return category.subcategoryIds
-        .map((id) => this.catalogData.subcategories[id])
-        .filter(subcat => subcat);
+    toggleProfileMenu() {
+      this.showProfileMenu = !this.showProfileMenu;
     },
 
-    models() {
-      if (!this.selectedSubcategoryId) return [];
-
-      const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId];
-      if (!subcategory) return [];
-
-      // Фильтруем модели по subcategoryId
-      return Object.values(this.catalogData.models || {})
-        .filter(model => model.subcategoryId === this.selectedSubcategoryId);
+    handleLogout() {
+      authAPI.logout();
+      this.isAuthenticated = false;
+      this.currentUser = null;
+      this.showProfileMenu = false;
+      this.$router.push('/');
     },
 
-    products() {
-      if (!this.selectedModelId) return [];
-
-      const model = this.catalogData.models[this.selectedModelId];
-      if (!model || !model.productIds) return [];
-
-      return model.productIds
-        .map((id) => this.catalogData.products[id])
-        .filter(product => product);
+    checkAuthStatus() {
+      this.isAuthenticated = authAPI.isAuthenticated();
+      if (this.isAuthenticated) {
+        this.currentUser = authAPI.getCurrentUser();
+      }
     },
+
+    closeProfileMenu(event) {
+      const profileMenu = this.$refs.profileMenu;
+      const profileButton = event?.target?.closest('.profile-button');
+      if (profileMenu && !profileMenu.contains(event.target) && !profileButton) {
+        this.showProfileMenu = false;
+      }
+    }
   },
 
   mounted() {
     document.addEventListener('click', this.closeCatalog);
+    document.addEventListener('click', this.closeProfileMenu);
+    this.checkAuthStatus();
   },
 
   beforeUnmount() {
     document.removeEventListener('click', this.closeCatalog);
+    document.removeEventListener('click', this.closeProfileMenu);
   },
+
+  watch: {
+    '$route'() {
+      this.checkAuthStatus();
+    }
+  }
 }
 </script>
 <style scoped>
@@ -712,5 +798,135 @@ header {
   text-align: center;
   color: #666;
   font-size: 16px;
+}
+
+.auth-section {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-button {
+  background-color: #f2f5f9;
+  height: 52px;
+  width: 52px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.auth-button:hover {
+  background-color: #e0e5f0;
+  transform: translateY(-2px);
+}
+
+.profile-menu {
+  position: relative;
+}
+
+.profile-button {
+  background-color: #667eea;
+  height: 52px;
+  width: 52px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.profile-button:hover {
+  background-color: #764ba2;
+  transform: translateY(-2px);
+}
+
+.profile-avatar {
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  min-width: 250px;
+  z-index: 1001;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.profile-info {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.profile-info-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.profile-info-email {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.profile-link {
+  display: block;
+  padding: 12px 16px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.profile-link:hover {
+  background-color: #f3f4f6;
+  color: #667eea;
+  padding-left: 20px;
+}
+
+.profile-link span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-button {
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  color: #dc2626;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #fee2e2;
+  padding-left: 20px;
+}
+
+.logout-button span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>

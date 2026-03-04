@@ -4,7 +4,8 @@
     <main>
       <router-view />
     </main>
-    <FooterComponent />
+    <!-- не показываем футер на экранах логина/регистрации -->
+    <FooterComponent v-if="!isAuthRoute" />
   </div>
 </template>
 
@@ -18,6 +19,12 @@ export default {
     HeaderComponent,
     FooterComponent,
   },
+  computed: {
+    isAuthRoute() {
+      const authPaths = ['/login', '/register'];
+      return authPaths.includes(this.$route.path);
+    }
+  }
 }
 </script>
 

@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import catalogRoutes from './src/routes/catalogRoutes.js';
+import authRoutes from './src/routes/authRoutes.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api', catalogRoutes);
+app.use('/api', authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Маршрут не найден' });
