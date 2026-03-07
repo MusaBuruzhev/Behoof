@@ -70,7 +70,10 @@
 
 
         <div class="actions">
-          <button class="favorite-btn">Добавить в избранное</button>
+          <button @click="toggleFavorite" class="favorite-btn" :class="{ 'active': isFavorite }" :disabled="isLoadingFavorite">
+            <span class="heart-icon">♥</span>
+            <span>{{ isFavorite ? 'В избранном' : 'Добавить в избранное' }}</span>
+          </button>
           <button class="cart-btn">Добавить в корзину</button>
         </div>
       </div>
@@ -80,6 +83,7 @@
 
 <script>
 import { getProduct } from '@/api/catalog.js';
+import favoritesAPI from '@/api/favorites.js';
 import PriceHistoryChart from '@/components/PriceHistoryChart.vue';
 
 export default {
@@ -87,12 +91,15 @@ export default {
     PriceHistoryChart,
   },
   name: 'ProductDetailView',
+  inject: ['showToast'],
   data() {
     return {
       product: null,
       currentImage: '',
       loading: true,
       error: null,
+      isFavorite: false,
+      isLoadingFavorite: false,
     };
   },
   async mounted() {
@@ -100,6 +107,7 @@ export default {
     try {
       this.product = await getProduct(productId);
       this.currentImage = this.product.images[0] || '';
+      await this.loadFavoriteStatus();
     } catch (error) {
       console.error('Ошибка загрузки товара:', error);
       this.error = 'Товар не найден';
@@ -138,6 +146,47 @@ export default {
       const currentIndex = this.currentImageIndex;
       const newIndex = currentIndex < this.product.images.length - 1 ? currentIndex + 1 : 0;
       this.currentImage = this.product.images[newIndex];
+    },
+    async loadFavoriteStatus() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.isFavorite = false;
+        return;
+      }
+
+      try {
+        const data = await favoritesAPI.getFavorites();
+        this.isFavorite = data.favorites.includes(this.product.id);
+      } catch (error) {
+        console.error('Ошибка при загрузке избранного:', error);
+        this.isFavorite = false;
+      }
+    },
+    async toggleFavorite() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.showToast('Войдите в аккаунт для добавления в избранное', 'warning');
+        this.$router.push('/login');
+        return;
+      }
+
+      this.isLoadingFavorite = true;
+      try {
+        if (this.isFavorite) {
+          await favoritesAPI.removeFromFavorites(this.product.id);
+          this.isFavorite = false;
+          this.showToast(`${this.product.name} удалён из избранного`, 'info');
+        } else {
+          await favoritesAPI.addToFavorites(this.product.id);
+          this.isFavorite = true;
+          this.showToast(`${this.product.name} добавлен в избранное ❤️`, 'heart');
+        }
+      } catch (error) {
+        console.error('Ошибка при изменении избранного:', error);
+        this.showToast('Ошибка при сохранении', 'error');
+      } finally {
+        this.isLoadingFavorite = false;
+      }
     },
   },
 };
@@ -349,17 +398,33 @@ export default {
 .favorite-btn, .cart-btn {
   padding: 15px 30px;
   border: none;
-  border-radius: 5px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .favorite-btn {
-  background-color: #f8f9fa;
+  background-color: #f2f5f9;
   color: #666;
+  border: 2px solid #e0e0e0;
 }
 
+.favorite-btn:hover:not(:disabled),
+.favorite-btn.active {
+  background-color: #ff4d4d;
+  color: white;
+  border-color: #ff4d4d;
+}
+
+.heart-icon {
+  font-size: 20px;
+}
+
+.favorite-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed
+}
 .favorite-btn:hover {
   background-color: #e9ecef;
 }
@@ -371,6 +436,7 @@ export default {
 
 .cart-btn:hover {
   background-color: #e63939;
+  transform: translateY(-2px);
 }
 
 .loading, .error {

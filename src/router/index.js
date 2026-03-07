@@ -6,6 +6,7 @@ import CatalogView from '@/views/CatalogView.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import ProfileView from '@/views/ProfileView.vue'
+import FavoritesView from '@/views/FavoritesView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -48,6 +49,26 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: ProfileView,
+  },
+  {
+    path: '/favorites',
+    name: 'favorites',
+    component: FavoritesView,
+  },
+  {
+    path: '/comparison',
+    name: 'comparison',
+    component: { template: '<div style="padding: 40px; text-align: center;"><h1>⚖️ Сравнение товаров</h1><p>Раздел в разработке</p></div>' },
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: { template: '<div style="padding: 40px; text-align: center;"><h1>📦 Мои заказы</h1><p>Раздел в разработке</p></div>' },
+  },
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: { template: '<div style="padding: 40px; text-align: center;"><h1>🔔 Уведомления</h1><p>Раздел в разработке</p></div>' },
   },
 ]
 

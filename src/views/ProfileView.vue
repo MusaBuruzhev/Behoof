@@ -41,7 +41,7 @@
             <div class="stat-label">Активных заказов</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">0</div>
+            <div class="stat-number">{{ favoritesCount }}</div>
             <div class="stat-label">Избранных товаров</div>
           </div>
           <div class="stat-card">
@@ -234,6 +234,7 @@
 
 <script>
 import authAPI from '@/api/auth.js';
+import favoritesAPI from '@/api/favorites.js';
 
 export default {
   name: 'ProfileView',
@@ -254,7 +255,8 @@ export default {
       errors: {},
       showDeleteModal: false,
       deleteConfirmEmail: '',
-      loading: true
+      loading: true,
+      favoritesCount: 0
     };
   },
 
@@ -270,6 +272,7 @@ export default {
   },
 
   async mounted() {
+    await this.loadFavoritesCount();
     await this.loadProfile();
   },
 
@@ -283,6 +286,16 @@ export default {
         this.saveError = 'Ошибка загрузки профиля: ' + error.message;
       } finally {
         this.loading = false;
+      }
+    },
+
+    async loadFavoritesCount() {
+      try {
+        const data = await favoritesAPI.getFavorites();
+        this.favoritesCount = data.favorites.length;
+      } catch (error) {
+        console.error('Ошибка загрузки счётчика избранного:', error);
+        this.favoritesCount = 0;
       }
     },
 
