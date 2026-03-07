@@ -21,7 +21,7 @@ export default {
   },
   computed: {
     isAuthRoute() {
-      const authPaths = ['/login', '/register'];
+      const authPaths = ['/login', '/register', '/profile'];
       return authPaths.includes(this.$route.path);
     }
   }

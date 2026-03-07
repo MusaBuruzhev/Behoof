@@ -119,7 +119,7 @@ export const updateProfile = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    const { firstName, lastName, phoneNumber, address, birthDate } = req.body;
+    const { firstName, lastName, phoneNumber } = req.body;
 
     const user = await User.findByIdAndUpdate(
       decoded.userId,
@@ -127,8 +127,6 @@ export const updateProfile = async (req, res) => {
         firstName: firstName || undefined,
         lastName: lastName || undefined,
         phoneNumber: phoneNumber || undefined,
-        address: address || undefined,
-        birthDate: birthDate || undefined,
         updatedAt: new Date()
       },
       { new: true, runValidators: true }
@@ -165,5 +163,28 @@ export const verifyToken = async (req, res) => {
     });
   } catch {
     res.status(401).json({ valid: false, error: 'Неверный или истекший токен' });
+  }
+};
+
+export const deleteProfile = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Токен не найден' });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findByIdAndDelete(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    res.json({
+      message: 'Профиль успешно удалён'
+    });
+  } catch {
+    res.status(401).json({ error: 'Неверный или истекший токен' });
   }
 };

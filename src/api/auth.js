@@ -55,6 +55,19 @@ const authAPI = {
     return response.data;
   },
 
+  deleteProfile: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Токен не найден');
+    }
+    const response = await axios.delete(`${API_BASE_URL}/auth/profile`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
+  },
+
   verifyToken: async () => {
     const token = localStorage.getItem('token');
     if (!token) {
