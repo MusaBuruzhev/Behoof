@@ -1,11 +1,16 @@
 <template>
   <header>
     <div class="container flex v-center">
+
       <div class="headerLogoInfo flex v-center">
+         <router-link to="/" class="flex v-center">
         <img src="../../public/logo.svg" alt="logo" />
+
         <h1>Behoof</h1>
+          </router-link>
         <p>Лучшие цены в интернет-магазинах</p>
       </div>
+
 
       <div class="headerBtnCategory">
         <button class="headerBtnCategoryButtom" @click="toggleCatalog">
@@ -44,19 +49,19 @@
                 <div class="profile-info-email">{{ currentUser?.email }}</div>
               </div>
               <router-link to="/profile" class="profile-link">
-                <span>👤 Мой профиль</span>
+                <span><img src="../../public/profIcon/l5.png" alt=""> Мой профиль</span>
               </router-link>
               <router-link to="/orders" class="profile-link">
-                <span>📦 Мои заказы</span>
+                <span><img src="../../public/profIcon/l3.png" alt=""> Мои заказы</span>
               </router-link>
               <router-link to="/favorites" class="profile-link">
-                <span>❤️ Избранное</span>
+                <span><img src="../../public/profIcon/l1.png" alt=""> Избранное</span>
               </router-link>
               <router-link to="/comparison" class="profile-link">
-                <span>⚖️ Сравнение</span>
+                <span><img src="../../public/profIcon/l2.png" alt=""> Сравнение</span>
               </router-link>
               <button @click="handleLogout" class="logout-button">
-                <span>🚪 Выход</span>
+                <span><img src="../../public/profIcon/l6.png" alt=""> Выход</span>
               </button>
             </div>
           </div>
@@ -500,11 +505,14 @@ header {
 
 .headerLogoInfo img {
   height: 40px;
+  margin-top: 48px;
 }
 
 .headerLogoInfo h1 {
   font-weight: 700;
   font-size: 52px;
+  text-decoration: none;
+  color: black;
   margin-left: 15px;
 }
 .headerLogoInfo p {
@@ -590,7 +598,6 @@ header {
 .headerNav button {
   background-color: #f2f5f9;
   height: 52px;
-  width: 52px;
   border: none;
   border-radius: 8px;
 }
@@ -602,6 +609,8 @@ header {
 .add-product-link button {
   background-color: #28a745;
   color: white;
+  width: 36px;
+  height: 36px;
 }
 
 .add-product-link button:hover {
@@ -844,7 +853,7 @@ header {
 
 .profile-button:hover {
   background-color: #764ba2;
-  transform: translateY(-2px);
+
 }
 
 .profile-avatar {
@@ -907,6 +916,11 @@ header {
   gap: 8px;
 }
 
+.profile-link img{
+  width: 20px;
+  height: 20px;
+}
+
 .logout-button {
   width: 100%;
   padding: 12px 16px;
@@ -928,5 +942,11 @@ header {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+
+.logout-button img{
+  width: 20px;
+  height: 20px;
 }
 </style>

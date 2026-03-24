@@ -17,19 +17,19 @@
 
       <div class="quick-actions">
         <router-link to="/favorites" class="quick-action-btn">
-          <span class="action-icon">❤️</span>
+          <span class="action-icon"><img src="../../public/profIcon/l1.png" alt=""></span>
           <span class="action-text">Избранное</span>
         </router-link>
         <router-link to="/comparison" class="quick-action-btn">
-          <span class="action-icon">⚖️</span>
+          <span class="action-icon"><img src="../../public/profIcon/l2.png" alt=""></span>
           <span class="action-text">Сравнение</span>
         </router-link>
         <router-link to="/orders" class="quick-action-btn">
-          <span class="action-icon">📦</span>
+          <span class="action-icon"><img src="../../public/profIcon/l3.png" alt=""> </span>
           <span class="action-text">Заказы</span>
         </router-link>
         <router-link to="/notifications" class="quick-action-btn">
-          <span class="action-icon">🔔</span>
+          <span class="action-icon"><img src="../../public/profIcon/l4.png" alt=""> </span>
           <span class="action-text">Уведомления</span>
         </router-link>
       </div>
@@ -466,7 +466,6 @@ export default {
 
 .back-button:hover {
   background: #e5e7eb;
-  transform: translateX(-4px);
 }
 
 .member-badge {
@@ -500,14 +499,15 @@ export default {
 }
 
 .quick-action-btn:hover {
-  border-color: #667eea;
+  border-color: #000000;
   background: #f0f4ff;
-  transform: translateY(-4px);
   box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
 }
 
-.action-icon {
-  font-size: 28px;
+.action-icon img {
+  width: 27px;
+  height: 27px;
+
 }
 
 .action-text {
@@ -525,19 +525,16 @@ export default {
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #000000 0%, #2c2c2c 100%);
   border-radius: 12px;
   padding: 24px 16px;
   text-align: center;
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-}
+
 
 .stat-number {
   font-size: 32px;
@@ -567,7 +564,7 @@ export default {
 }
 
 .security-card:hover {
-  border-color: #667eea;
+  border-color: #000000;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
 }
 
@@ -591,7 +588,7 @@ export default {
 
 .security-button {
   padding: 8px 12px;
-  background: #667eea;
+  background: #000000;
   color: white;
   border: none;
   border-radius: 6px;
@@ -649,7 +646,7 @@ export default {
 }
 
 .edit-button {
-  background: #667eea;
+  background: #000000;
   color: white;
   border: none;
   border-radius: 8px;
@@ -681,7 +678,7 @@ export default {
 }
 
 .info-card:hover {
-  border-color: #667eea;
+  border-color: #000000;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
 }
 
@@ -740,7 +737,7 @@ export default {
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #000000;
   background: white;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
@@ -799,7 +796,7 @@ export default {
 }
 
 .save-button:hover:not(:disabled) {
-  background: #667eea;
+  background: #000000;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
@@ -967,7 +964,7 @@ export default {
 
 .confirmation-email:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #000000;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
