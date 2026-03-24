@@ -7,6 +7,9 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import FavoritesView from '@/views/FavoritesView.vue'
+import OrdersView from '@/views/OrdersView.vue'
+import AdminPanelView from '@/views/AdminPanelView.vue'
+import authAPI from '@/api/auth.js'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -20,11 +23,12 @@ const routes = [
     name: 'about',
     component: AboutView,
   },
-  {
-    path: '/add-product',
-    name: 'add-product',
-    component: AddProductView,
-  },
+ {
+ path: '/add-product',
+ name: 'add-product',
+ component: AddProductView,
+ meta: { requiresAuth: true, requiresAdmin: true },
+ },
   {
     path: '/product/:id',
     name: 'product-detail',
@@ -60,11 +64,18 @@ const routes = [
     name: 'comparison',
     component: { template: '<div style="padding: 40px; text-align: center;"><h1>⚖️ Сравнение товаров</h1><p>Раздел в разработке</p></div>' },
   },
-  {
-    path: '/orders',
-    name: 'orders',
-    component: { template: '<div style="padding: 40px; text-align: center;"><h1>📦 Мои заказы</h1><p>Раздел в разработке</p></div>' },
-  },
+ {
+ path: '/orders',
+ name: 'orders',
+ component: OrdersView,
+ meta: { requiresAuth: true },
+ },
+ {
+ path: '/admin',
+ name: 'admin',
+ component: AdminPanelView,
+ meta: { requiresAuth: true, requiresAdmin: true },
+ },
   {
     path: '/notifications',
     name: 'notifications',
@@ -75,8 +86,34 @@ const routes = [
 
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+ history: createWebHistory(),
+ routes
 })
+
+router.beforeEach(async (to) => {
+ if (!to.meta.requiresAuth && !to.meta.requiresAdmin) {
+ return true;
+ }
+
+ const token = authAPI.getToken();
+ if (!token) {
+ return { path: '/login', query: { redirect: to.fullPath } };
+ }
+
+ const verification = await authAPI.verifyToken();
+ if (!verification.valid) {
+ return { path: '/login', query: { redirect: to.fullPath } };
+ }
+
+ if (to.meta.requiresAdmin && verification.user?.role !== 'admin') {
+ return { path: '/' };
+ }
+
+ if (verification.user) {
+ localStorage.setItem('user', JSON.stringify(verification.user));
+ }
+
+ return true;
+});
 
 export default router

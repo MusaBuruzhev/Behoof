@@ -27,9 +27,9 @@
       </div>
 
       <nav class="headerNav">
-        <router-link to="/add-product" class="add-product-link">
-          <button title="Добавить товар">➕</button>
-        </router-link>
+ <router-link v-if="isAdmin" to="/add-product" class="add-product-link">
+ <button title="Добавить товар">➕</button>
+ </router-link>
         <div class="auth-section">
           <button
             v-if="!isAuthenticated"
@@ -48,12 +48,15 @@
                 <div class="profile-info-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</div>
                 <div class="profile-info-email">{{ currentUser?.email }}</div>
               </div>
-              <router-link to="/profile" class="profile-link">
-                <span><img src="../../public/profIcon/l5.png" alt=""> Мой профиль</span>
-              </router-link>
-              <router-link to="/orders" class="profile-link">
-                <span><img src="../../public/profIcon/l3.png" alt=""> Мои заказы</span>
-              </router-link>
+ <router-link to="/profile" class="profile-link">
+ <span><img src="../../public/profIcon/l5.png" alt=""> Мой профиль</span>
+ </router-link>
+ <router-link to="/orders" class="profile-link">
+ <span><img src="../../public/profIcon/l3.png" alt=""> Мои заказы</span>
+ </router-link>
+ <router-link v-if="isAdmin" to="/admin" class="profile-link">
+ <span><img src="../../public/profIcon/l4.png" alt=""> Админ-панель</span>
+ </router-link>
               <router-link to="/favorites" class="profile-link">
                 <span><img src="../../public/profIcon/l1.png" alt=""> Избранное</span>
               </router-link>
@@ -207,15 +210,18 @@ export default {
     }
   },
 
-  computed: {
-    userInitials() {
-      if (this.currentUser) {
-        const first = this.currentUser.firstName?.[0] || '';
-        const last = this.currentUser.lastName?.[0] || '';
-        return (first + last).toUpperCase();
-      }
-      return '';
-    },
+ computed: {
+ isAdmin() {
+ return this.currentUser?.role === 'admin';
+ },
+ userInitials() {
+ if (this.currentUser) {
+ const first = this.currentUser.firstName?.[0] || '';
+ const last = this.currentUser.lastName?.[0] || '';
+ return (first + last).toUpperCase();
+ }
+ return '';
+ },
     categories() {
       return this.catalogData.categories || [];
     },

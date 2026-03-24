@@ -2,6 +2,11 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
+const authHeader = () => {
+ const token = localStorage.getItem('token');
+ return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 // Создаем экземпляр axios с базовым URL
 const api = axios.create({
   baseURL: API_URL,
@@ -51,27 +56,29 @@ export const fetchProducts = async ({ page = 1, limit = 20, q, categoryId, subca
  * Добавить новый товар
  */
 export const addProduct = async (productData) => {
-  try {
-    // Используем отдельный экземпляр для FormData
-    const response = await apiUpload.post('/products', productData);
-    return response.data;
-  } catch (error) {
-    console.error('Ошибка добавления товара:', error);
-    throw error;
-  }
+ try {
+ // Используем отдельный экземпляр для FormData
+ const response = await apiUpload.post('/products', productData, {
+ headers: authHeader(),
+ });
+ return response.data;
+ } catch (error) {
+ console.error('Ошибка добавления товара:', error);
+ throw error;
+ }
 };
 
 /**
  * Инициализировать начальные данные
  */
 export const initializeData = async () => {
-  try {
-    const response = await api.post('/initialize');
-    return response.data;
-  } catch (error) {
-    console.error('Ошибка инициализации данных:', error);
-    throw error;
-  }
+ try {
+ const response = await api.post('/initialize', {}, { headers: authHeader() });
+ return response.data;
+ } catch (error) {
+ console.error('Ошибка инициализации данных:', error);
+ throw error;
+ }
 };
 
 /**
@@ -91,26 +98,30 @@ export const getProduct = async (productId) => {
  * Обновить товар
  */
 export const updateProduct = async (productId, productData) => {
-  try {
-    const response = await api.put(`/products/${productId}`, productData);
-    return response.data;
-  } catch (error) {
-    console.error('Ошибка обновления товара:', error);
-    throw error;
-  }
+ try {
+ const response = await api.put(`/products/${productId}`, productData, {
+ headers: authHeader(),
+ });
+ return response.data;
+ } catch (error) {
+ console.error('Ошибка обновления товара:', error);
+ throw error;
+ }
 };
 
 /**
  * Удалить товар
  */
 export const deleteProduct = async (productId) => {
-  try {
-    const response = await api.delete(`/products/${productId}`);
-    return response.data;
-  } catch (error) {
-    console.error('Ошибка удаления товара:', error);
-    throw error;
-  }
+ try {
+ const response = await api.delete(`/products/${productId}`, {
+ headers: authHeader(),
+ });
+ return response.data;
+ } catch (error) {
+ console.error('Ошибка удаления товара:', error);
+ throw error;
+ }
 };
 
 export default {

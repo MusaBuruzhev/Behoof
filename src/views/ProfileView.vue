@@ -15,8 +15,12 @@
         <button @click="goBack" class="back-button">← Назад</button>
       </div>
 
-      <div class="quick-actions">
-        <router-link to="/favorites" class="quick-action-btn">
+ <div class="quick-actions">
+ <router-link v-if="isAdmin" to="/admin" class="quick-action-btn">
+ <span class="action-icon"><img src="../../public/profIcon/l4.png" alt=""></span>
+ <span class="action-text">Админ-панель</span>
+ </router-link>
+ <router-link to="/favorites" class="quick-action-btn">
           <span class="action-icon"><img src="../../public/profIcon/l1.png" alt=""></span>
           <span class="action-text">Избранное</span>
         </router-link>
@@ -260,16 +264,19 @@ export default {
     };
   },
 
-  computed: {
-    userInitials() {
-      if (this.user) {
-        const first = this.user.firstName?.[0] || '';
-        const last = this.user.lastName?.[0] || '';
-        return (first + last).toUpperCase();
-      }
-      return '';
-    }
-  },
+ computed: {
+ isAdmin() {
+ return this.user?.role === 'admin';
+ },
+ userInitials() {
+ if (this.user) {
+ const first = this.user.firstName?.[0] || '';
+ const last = this.user.lastName?.[0] || '';
+ return (first + last).toUpperCase();
+ }
+ return '';
+ }
+ },
 
   async mounted() {
     await this.loadFavoritesCount();

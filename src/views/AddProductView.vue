@@ -1,6 +1,11 @@
 <template>
-  <div class="product-management">
-    <div class="container">
+ <div class="product-management">
+ <div v-if="!isAdmin" class="forbidden container">
+ <h2>Доступ запрещён</h2>
+ <p>Управление товарами доступно только администраторам.</p>
+ <router-link to="/">Вернуться на главную</router-link>
+ </div>
+ <div v-else class="container">
       <div class="header-section">
         <h1>Управление товарами</h1>
         <p>Добавляйте, обновляйте и удаляйте товары в каталоге</p>
@@ -347,6 +352,7 @@
 
 <script>
 import { fetchCatalog, addProduct, updateProduct, deleteProduct, getProduct } from '@/api/catalog.js';
+import authAPI from '@/api/auth.js';
 
 const PRODUCT_CHARACTERISTICS = {
   cat1: [
@@ -433,9 +439,10 @@ const PRODUCT_CHARACTERISTICS = {
 export default {
   name: 'AddProductView',
 
-  data() {
-    return {
-      activeTab: 'add',
+ data() {
+ return {
+ isAdmin: false,
+ activeTab: 'add',
       tabs: [
         { id: 'add', name: 'Добавить товар', icon: '➕' },
         { id: 'update', name: 'Обновить товар', icon: '✏️' },
@@ -508,9 +515,11 @@ export default {
     }
   },
 
-  async mounted() {
-    await this.loadData();
-  },
+ async mounted() {
+ this.isAdmin = authAPI.isAdmin();
+ if (!this.isAdmin) return;
+ await this.loadData();
+ },
 
   methods: {
     async loadData() {

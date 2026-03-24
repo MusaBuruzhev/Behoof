@@ -3,11 +3,13 @@ import Subcategory from './Subcategory.js';
 import Product from './Product.js';
 import Model from './Model.js';
 import Counter from './Counter.js';
+import Order from './Order.js';
 
 export {
-  Category,
-  Subcategory,
-  Product,
-  Model,
-  Counter
+ Category,
+ Subcategory,
+ Product,
+ Model,
+ Counter,
+ Order
 };
