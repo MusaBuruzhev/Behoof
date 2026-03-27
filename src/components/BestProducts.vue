@@ -42,8 +42,8 @@
           <div class="product-header">
             <h3>{{ product.name }}</h3>
             <div class="actions">
-              <button class="action-btn favorite">♥</button>
-              <button class="action-btn details">⋯</button>
+              <button class="action-btn favorite" @click.stop="toggleFavorite(product)" :class="{ active: isFavorite(product.id) }">♥</button>
+              <button class="action-btn compare" @click.stop="addToCompare(product)" title="Сравнить">⚖️</button>
             </div>
           </div>
 
@@ -87,6 +87,8 @@
 
 <script>
 import { fetchCatalog } from '@/api/catalog.js';
+import favoritesAPI from '@/api/favorites.js';
+import comparisonAPI from '@/api/comparison.js';
 
 const CATEGORY_TRAITS = {
   cat1: ['дизайн', 'батарея', 'дисплей', 'камера', 'отзыв', 'портативность'],
@@ -113,6 +115,7 @@ export default {
       selectedTraits: [],
       currentPage: 0,
       itemsPerPage: 4,
+      favoriteIds: [],
     }
   },
 
@@ -121,6 +124,17 @@ export default {
       const data = await fetchCatalog();
       this.catalogData = data;
       console.log('BestProducts: loaded catalog data:', data);
+
+      // Загружаем избранное
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const favData = await favoritesAPI.getFavorites();
+          this.favoriteIds = favData.favorites || [];
+        }
+      } catch (e) {
+        console.log('Не удалось загрузить избранное:', e);
+      }
 
       // Default to first category
       if (this.categories.length > 0) {
@@ -262,6 +276,35 @@ export default {
 
     goToProductDetail(productId) {
       this.$router.push(`/product/${productId}`);
+    },
+
+    isFavorite(productId) {
+      return this.favoriteIds.includes(productId);
+    },
+
+    async toggleFavorite(product) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.$router.push('/login');
+        return;
+      }
+
+      try {
+        if (this.isFavorite(product.id)) {
+          await favoritesAPI.removeFromFavorites(product.id);
+          this.favoriteIds = this.favoriteIds.filter(id => id !== product.id);
+        } else {
+          await favoritesAPI.addToFavorites(product.id);
+          this.favoriteIds.push(product.id);
+        }
+      } catch (error) {
+        console.error('Ошибка изменения избранного:', error);
+      }
+    },
+
+    addToCompare(product) {
+      comparisonAPI.addToComparison(product.id);
+      this.$router.push('/comparison');
     },
   },
 }
@@ -489,6 +532,11 @@ display: flex
 
 .action-btn:hover {
   background: #ff4d4d;
+  color: white;
+}
+
+.action-btn.compare:hover {
+  background: #4d94ff;
   color: white;
 }
 

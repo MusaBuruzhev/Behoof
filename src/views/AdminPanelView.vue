@@ -65,13 +65,13 @@
  <td>{{ order.product?.name || 'Товар удалён' }}</td>
  <td>{{ formatDate(order.pickupAt) }}</td>
  <td>
- <select :value="order.status" @change="changeOrderStatus(order, $event.target.value)">
- <option value="pending">pending</option>
- <option value="confirmed">confirmed</option>
- <option value="ready">ready</option>
- <option value="completed">completed</option>
- <option value="cancelled">cancelled</option>
- </select>
+                <select :value="order.status" @change="changeOrderStatus(order, $event.target.value)">
+                  <option value="pending">Ожидает</option>
+                  <option value="confirmed">Подтверждён</option>
+                  <option value="ready">Готов</option>
+                  <option value="completed">Завершён</option>
+                  <option value="cancelled">Отменён</option>
+                </select>
  </td>
  </tr>
  </tbody>
@@ -147,7 +147,7 @@ export default {
 }
 
 .container {
- width:90%;
+ width:85%;
  margin:0 auto;
 }
 

@@ -3,9 +3,14 @@
     <div class="favorites-header">
       <h1>❤️ Избранные товары</h1>
       <p class="favorites-count">{{ favorites.length }} товаров в избранном</p>
-      <button v-if="favorites.length > 0" @click="clearAll" class="clear-btn">
-        🗑️ Очистить избранное
-      </button>
+      <div class="header-actions">
+        <router-link v-if="favorites.length > 1" to="/comparison" class="compare-link">
+          ⚖️ Сравнить товары
+        </router-link>
+        <button v-if="favorites.length > 0" @click="clearAll" class="clear-btn">
+          🗑️ Очистить избранное
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="loading">
@@ -29,27 +34,38 @@
         :product="product"
         :categoryName="getCategoryName(product.categoryId)"
         @removed="removeProduct"
+        @open-compare-modal="openCompareModal"
       />
     </div>
+
+    <CompareSelectModal
+      :show="compareModalOpen"
+      :currentProduct="compareProduct"
+      @close="closeCompareModal"
+    />
   </div>
 </template>
 
 <script>
 import ProductCard from '@/components/ProductCard.vue';
+import CompareSelectModal from '@/components/CompareSelectModal.vue';
 import favoritesAPI from '@/api/favorites.js';
 import catalogAPI from '@/api/catalog.js';
 
 export default {
   name: 'FavoritesView',
   components: {
-    ProductCard
+    ProductCard,
+    CompareSelectModal
   },
   data() {
     return {
       favorites: [],
       products: [],
       loading: true,
-      categories: []
+      categories: [],
+      compareModalOpen: false,
+      compareProduct: null
     };
   },
   methods: {
@@ -104,6 +120,14 @@ export default {
       } catch (error) {
         console.error('Ошибка очистки избранного:', error);
       }
+    },
+    openCompareModal(product) {
+      this.compareProduct = product;
+      this.compareModalOpen = true;
+    },
+    closeCompareModal() {
+      this.compareModalOpen = false;
+      this.compareProduct = null;
     }
   },
   mounted() {
@@ -114,7 +138,7 @@ export default {
 
 <style scoped>
 .favorites-container {
-  max-width: 1400px;
+  width: 85%;
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -135,6 +159,29 @@ export default {
   font-size: 18px;
   color: #666;
   margin: 0 0 20px 0;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.compare-link {
+  padding: 12px 24px;
+  background-color: #ff4d4d;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.compare-link:hover {
+  background-color: #e63939;
+  transform: translateY(-2px);
 }
 
 .clear-btn {

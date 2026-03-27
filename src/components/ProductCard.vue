@@ -18,7 +18,7 @@
       </div>
       <div class="buttons">
         <button @click.stop="toggleFavorite" class="action-btn favorite" :class="{ 'active': isFavorite }" :disabled="isLoading" title="Добавить в избранное">♥</button>
-        <button @click.stop class="action-btn"><img src="../../public/iconHed/chart.svg" alt="Сравнить"></button>
+        <button @click.stop="openCompareModal" class="action-btn compare" title="Сравнить"><img src="../../public/iconHed/chart.svg" alt="Сравнить"></button>
       </div>
     </div>
     </div>
@@ -41,14 +41,15 @@ export default {
     }
   },
   inject: ['showToast'],
+  emits: ['open-compare-modal'],
   data() {
     return {
       isFavorite: false,
       isLoading: false
     };
   },
-  computed: {
-    sortedPrices() {
+computed: {
+ sortedPrices() {
       return [...this.product.priceHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
     },
     currentPrice() {
@@ -94,6 +95,10 @@ export default {
       } finally {
         this.isLoading = false;
       }
+    },
+    openCompareModal() {
+      // Открываем модальное окно выбора товара для сравнения
+      this.$emit('open-compare-modal', this.product);
     },
     async loadFavoriteStatus() {
       const token = localStorage.getItem('token');
@@ -144,12 +149,12 @@ export default {
 }
 
 .buttons button.active {
-  background-color: #ffcccc;
-  transform: scale(1.05);
+ background-color: #ffcccc;
+ transform: scale(1.05);
 }
 
 .buttons button.active img {
-  filter: brightness(0.8);
+ filter: brightness(0.8);
 }
 
 .buttons button:disabled {

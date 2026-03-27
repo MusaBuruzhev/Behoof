@@ -1,7 +1,7 @@
 <template>
   <div class="catalog-page">
     <div class="container">
-      <h1>{{ modelName ? `${modelName} - Каталог товаров` : 'Каталог товаров' }}</h1>
+      <h1>{{ modelName ? `${modelName} - Каталог товаров` : categoryName ? `${categoryName} - Каталог товаров` : 'Каталог товаров' }}</h1>
 
       <!-- Filters Sidebar -->
       <div class="catalog-content">
@@ -78,8 +78,15 @@
               :key="product.id"
               :product="product"
               :categoryName="categoryName"
+              @open-compare-modal="openCompareModal"
             />
           </div>
+
+          <CompareSelectModal
+            :show="compareModalOpen"
+            :currentProduct="compareProduct"
+            @close="closeCompareModal"
+          />
 
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="pagination">
@@ -108,13 +115,15 @@
 <script>
 import { fetchCatalog, fetchProducts } from '@/api/catalog.js';
 import ProductCard from '@/components/ProductCard.vue';
+import CompareSelectModal from '@/components/CompareSelectModal.vue';
 
 const ITEMS_PER_PAGE = 12;
 
 export default {
   name: 'CatalogView',
   components: {
-    ProductCard
+    ProductCard,
+    CompareSelectModal
   },
   data() {
     return {
@@ -125,6 +134,7 @@ export default {
         products: {}
       },
       modelId: null,
+      categoryId: null,
       modelName: '',
       categoryName: '',
       loading: false,
@@ -139,20 +149,15 @@ export default {
         sortBy: 'price-asc'
       },
       allProducts: [],
-      products: []
+      products: [],
+      compareModalOpen: false,
+      compareProduct: null
     };
   },
   computed: {
     availableBrands() {
       const brands = [...new Set(this.allProducts.map(p => p.brand))];
       return brands.filter(b => b);
-    },
-    categoryId() {
-      if (!this.modelId || !this.catalogData.models[this.modelId]) return '';
-      const model = this.catalogData.models[this.modelId];
-      const subcategory = this.catalogData.subcategories[model.subcategoryId];
-      if (!subcategory) return '';
-      return subcategory.categoryId;
     },
     // products already paginated by server
     displayedProducts() {
@@ -164,6 +169,17 @@ export default {
       immediate: true,
       handler(newModelId) {
         this.modelId = newModelId;
+        this.loadData();
+      }
+    },
+    '$route.query.categoryId': {
+      immediate: true,
+      handler(newCategoryId) {
+        this.categoryId = newCategoryId;
+        if (newCategoryId) {
+          const category = this.catalogData.categories?.find(cat => cat.id === newCategoryId);
+          this.categoryName = category ? category.name : '';
+        }
         this.loadData();
       }
     },
@@ -180,6 +196,12 @@ export default {
         const data = await fetchCatalog();
         this.catalogData = data;
 
+        // Устанавливаем categoryName если передан categoryId
+        if (this.categoryId && !this.modelId) {
+          const category = this.catalogData.categories.find(cat => cat.id === this.categoryId);
+          this.categoryName = category ? category.name : '';
+        }
+
         if (this.modelId && this.catalogData.models[this.modelId]) {
           const model = this.catalogData.models[this.modelId];
           this.modelName = model.name;
@@ -194,8 +216,23 @@ export default {
           this.allProducts = model.productIds
             .map(id => this.catalogData.products[id])
             .filter(p => p);
+        } else if (this.categoryId) {
+          // Get products for this category
+          const subcategories = Object.values(this.catalogData.subcategories)
+            .filter(sub => sub.categoryId === this.categoryId);
+
+          const productIds = new Set();
+          subcategories.forEach(sub => {
+            if (sub.productIds) {
+              sub.productIds.forEach(id => productIds.add(id));
+            }
+          });
+
+          this.allProducts = [...productIds]
+            .map(id => this.catalogData.products[id])
+            .filter(p => p);
         } else {
-          // Show all products if no model selected
+          // Show all products if no model or category selected
           this.allProducts = Object.values(this.catalogData.products);
         }
 
@@ -230,7 +267,7 @@ export default {
         };
         if (this.searchQuery.trim()) params.q = this.searchQuery.trim();
         if (this.modelId) params.modelId = this.modelId;
-        if (this.categoryId) params.categoryId = this.categoryId;
+        if (this.categoryId && !this.modelId) params.categoryId = this.categoryId;
         if (this.filters.priceMin !== null && this.filters.priceMin !== '') params.priceMin = this.filters.priceMin;
         if (this.filters.priceMax !== null && this.filters.priceMax !== '') params.priceMax = this.filters.priceMax;
         if (this.filters.selectedBrands.length > 0) params.brand = this.filters.selectedBrands.join(',');
@@ -245,6 +282,14 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    openCompareModal(product) {
+      this.compareProduct = product;
+      this.compareModalOpen = true;
+    },
+    closeCompareModal() {
+      this.compareModalOpen = false;
+      this.compareProduct = null;
     }
   }
 };
@@ -339,7 +384,7 @@ h1 {
 .clear-filters-btn {
   width: 100%;
   padding: 10px;
-  background: #dc3545;
+  background: #ff4d4d;
   color: white;
   border: none;
   border-radius: 5px;
@@ -349,7 +394,7 @@ h1 {
 }
 
 .clear-filters-btn:hover {
-  background: #c82333;
+  background: #e63939;
 }
 
 .products-section {
@@ -409,7 +454,7 @@ h1 {
 
 .page-btn {
   padding: 10px 15px;
-  background: #007bff;
+  background: #ff4d4d;
   color: white;
   border: none;
   border-radius: 5px;
@@ -419,7 +464,7 @@ h1 {
 }
 
 .page-btn:hover:not(:disabled) {
-  background: #0056b3;
+  background: #e63939;
 }
 
 .page-btn:disabled {

@@ -24,10 +24,10 @@
           <span class="action-icon"><img src="../../public/profIcon/l1.png" alt=""></span>
           <span class="action-text">Избранное</span>
         </router-link>
-        <router-link to="/comparison" class="quick-action-btn">
+        <button @click="openCompareModal" class="quick-action-btn">
           <span class="action-icon"><img src="../../public/profIcon/l2.png" alt=""></span>
           <span class="action-text">Сравнение</span>
-        </router-link>
+        </button>
         <router-link to="/orders" class="quick-action-btn">
           <span class="action-icon"><img src="../../public/profIcon/l3.png" alt=""> </span>
           <span class="action-text">Заказы</span>
@@ -49,7 +49,7 @@
             <div class="stat-label">Избранных товаров</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number">0</div>
+            <div class="stat-number">{{ comparisonCount }}</div>
             <div class="stat-label">Сравниваемых товаров</div>
           </div>
           <div class="stat-card">
@@ -233,15 +233,26 @@
         </div>
       </div>
     </div>
+
+    <CompareSelectModal
+      :show="showCompareModal"
+      :currentProduct="null"
+      @close="closeCompareModal"
+    />
   </div>
 </template>
 
 <script>
 import authAPI from '@/api/auth.js';
 import favoritesAPI from '@/api/favorites.js';
+import comparisonAPI from '@/api/comparison.js';
+import CompareSelectModal from '@/components/CompareSelectModal.vue';
 
 export default {
   name: 'ProfileView',
+  components: {
+    CompareSelectModal
+  },
 
   data() {
     return {
@@ -260,7 +271,9 @@ export default {
       showDeleteModal: false,
       deleteConfirmEmail: '',
       loading: true,
-      favoritesCount: 0
+      favoritesCount: 0,
+      comparisonCount: 0,
+      showCompareModal: false
     };
   },
 
@@ -280,6 +293,7 @@ export default {
 
   async mounted() {
     await this.loadFavoritesCount();
+    this.loadComparisonCount();
     await this.loadProfile();
   },
 
@@ -304,6 +318,10 @@ export default {
         console.error('Ошибка загрузки счётчика избранного:', error);
         this.favoritesCount = 0;
       }
+    },
+
+    loadComparisonCount() {
+      this.comparisonCount = comparisonAPI.getComparison().length;
     },
 
     initializeEditForm() {
@@ -398,6 +416,15 @@ export default {
       if (!date) return 'Не указано';
       const d = new Date(date);
       return d.toLocaleDateString('ru-RU');
+    },
+
+    openCompareModal() {
+      this.showCompareModal = true;
+    },
+
+    closeCompareModal() {
+      this.showCompareModal = false;
+      this.loadComparisonCount();
     }
   }
 };

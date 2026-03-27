@@ -69,8 +69,8 @@
             </div>
           </div>
         </div>
-        <button><img src="../../public/iconHed/comparison.svg" alt="" /></button>
-        <button><img src="../../public/iconHed/favourites.svg" alt="" /></button>
+        <button @click="openCompareModal" title="Сравнение" class="header-icon-btn"><img src="../../public/iconHed/comparison.svg" alt="" /></button>
+        <router-link to="/favorites" title="Избранное"><img src="../../public/iconHed/favourites.svg" alt="" /></router-link>
       </nav>
     </div>
 
@@ -102,6 +102,15 @@
             {{ getCategoryName(selectedCategoryId) }}
           </h1>
           <div class="catalogContDiv">
+            <!-- Кнопка "Все [Категория]" -->
+            <button @click="goToCategoryCatalog(selectedCategoryId)" class="all-category-btn">
+              <div class="catalogButtom" :class="{ active: !selectedSubcategoryId }">
+                <div :class="{ active: !selectedSubcategoryId }"></div>
+                <p>Все {{ getCategoryName(selectedCategoryId) }}</p>
+              </div>
+              <span :class="{ active: !selectedSubcategoryId }">▶</span>
+            </button>
+
             <button
               v-for="subcat in subcategories"
               :key="subcat.id"
@@ -168,15 +177,25 @@
         </div>
       </div>
     </div>
+
+    <CompareSelectModal
+      :show="showCompareModal"
+      :currentProduct="null"
+      @close="closeCompareModal"
+    />
   </header>
 </template>
 
 <script>
 import { fetchCatalog } from '@/api/catalog.js';
 import authAPI from '@/api/auth.js';
+import CompareSelectModal from '@/components/CompareSelectModal.vue';
 
 export default {
   name: 'HeaderComponent',
+  components: {
+    CompareSelectModal
+  },
 
   data() {
     return {
@@ -206,7 +225,8 @@ export default {
 
       isAuthenticated: false,
       currentUser: null,
-      showProfileMenu: false
+      showProfileMenu: false,
+      showCompareModal: false
     }
   },
 
@@ -442,6 +462,24 @@ export default {
       if (profileMenu && !profileMenu.contains(event.target) && !profileButton) {
         this.showProfileMenu = false;
       }
+    },
+
+    openCompareModal() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        this.$router.push('/login');
+        return;
+      }
+      this.showCompareModal = true;
+    },
+
+    closeCompareModal() {
+      this.showCompareModal = false;
+    },
+
+    goToCategoryCatalog(categoryId) {
+      this.isCatalogOpen = false;
+      this.$router.push(`/catalog?categoryId=${categoryId}`);
     }
   },
 
@@ -601,11 +639,33 @@ header {
   justify-content: space-between;
   padding: 0 0 0 40px;
 }
-.headerNav button {
+.headerNav button,
+.headerNav a {
   background-color: #f2f5f9;
   height: 52px;
   border: none;
   border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.headerNav a:hover {
+  background-color: #e0e5f0;
+}
+
+.headerNav a img,
+.headerNav button.header-icon-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.headerNav button.header-icon-btn {
+  cursor: pointer;
+}
+
+.headerNav button.header-icon-btn:hover {
+  background-color: #e0e5f0;
 }
 
 .add-product-link {
@@ -696,6 +756,27 @@ header {
   width: 4px;
   border-radius: 0 5px 5px 0;
   margin-right: 7px;
+}
+
+.all-category-btn {
+  background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%) !important;
+  color: white !important;
+}
+
+.all-category-btn .catalogButtom {
+  color: white !important;
+}
+
+.all-category-btn .catalogButtom div {
+  background-color: white !important;
+}
+
+.all-category-btn span {
+  color: white !important;
+}
+
+.all-category-btn:hover {
+  background: linear-gradient(135deg, #e63939 0%, #ff5555 100%) !important;
 }
 
 .catalogCont button span {

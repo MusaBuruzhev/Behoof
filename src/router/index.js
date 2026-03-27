@@ -7,6 +7,7 @@ import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import FavoritesView from '@/views/FavoritesView.vue'
+import ComparisonView from '@/views/ComparisonView.vue'
 import OrdersView from '@/views/OrdersView.vue'
 import AdminPanelView from '@/views/AdminPanelView.vue'
 import authAPI from '@/api/auth.js'
@@ -62,7 +63,7 @@ const routes = [
   {
     path: '/comparison',
     name: 'comparison',
-    component: { template: '<div style="padding: 40px; text-align: center;"><h1>⚖️ Сравнение товаров</h1><p>Раздел в разработке</p></div>' },
+    component: ComparisonView,
   },
  {
  path: '/orders',

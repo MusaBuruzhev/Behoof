@@ -123,9 +123,9 @@ export default {
  border-radius:8px;
 }
 
-.status-pending { background: #fff3cd; }
-.status-confirmed { background: #d1ecf1; }
-.status-ready { background: #d4edda; }
-.status-completed { background: #e2e3e5; }
-.status-cancelled { background: #f8d7da; }
+.status-pending { background: #fff3cd; color: #856404; }
+.status-confirmed { background: #d1ecf1; color: #0c5460; }
+.status-ready { background: #d4edda; color: #155724; }
+.status-completed { background: #e2e3e5; color: #383d41; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
 </style>

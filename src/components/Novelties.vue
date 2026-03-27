@@ -10,6 +10,7 @@
         :key="product.id"
         :product="product"
         :categoryName="getCategoryName(product.categoryId)"
+        @open-compare-modal="openCompareModal"
       />
     </div>
   </div>
@@ -18,6 +19,7 @@
 <script>
 import ProductCard from './ProductCard.vue'
 import { fetchCatalog } from '@/api/catalog.js'
+import comparisonAPI from '@/api/comparison.js';
 
 export default {
   name: 'Novelties',
@@ -43,6 +45,10 @@ export default {
     getCategoryName(categoryId) {
       const cat = this.categories.find(c => c.id === categoryId);
       return cat ? cat.name : '';
+    },
+    openCompareModal(product) {
+      comparisonAPI.addToComparison(product.id);
+      this.$router.push('/comparison');
     }
   }
 }
