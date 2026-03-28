@@ -125,6 +125,12 @@ export default {
     ProductCard,
     CompareSelectModal
   },
+  props: {
+    defaultSortBy: {
+      type: String,
+      default: null
+    }
+  },
   data() {
     return {
       catalogData: {
@@ -162,6 +168,12 @@ export default {
     // products already paginated by server
     displayedProducts() {
       return this.products;
+    }
+  },
+  mounted() {
+    // Установить сортировку по умолчанию если передан defaultSortBy
+    if (this.defaultSortBy) {
+      this.filters.sortBy = this.defaultSortBy;
     }
   },
   watch: {

@@ -41,6 +41,12 @@ const routes = [
     component: CatalogView,
   },
   {
+    path: '/novelties',
+    name: 'novelties',
+    component: CatalogView,
+    props: { defaultSortBy: 'date-desc' }
+  },
+  {
     path: '/login',
     name: 'login',
     component: LoginView,

@@ -112,40 +112,105 @@ export const getProducts = async (req, res) => {
     const page = Math.max(1, parseInt(req.query.page) || 1)
     const limit = Math.min(100, parseInt(req.query.limit) || 20)
     const q = req.query.q ? String(req.query.q).trim() : null
-    const { categoryId, subcategoryId, modelId } = req.query
+    const { categoryId, subcategoryId, modelId, sortBy, priceMin, priceMax, brand } = req.query
 
-    const filter = {}
+    // Сначала получаем все товары без фильтрации по цене
+    let baseFilter = {}
     if (q) {
       const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i')
-      filter.$or = [
+      baseFilter.$or = [
         { name: re },
         { brand: re },
         { description: re },
       ]
     }
-    if (categoryId) filter.categoryId = categoryId
-    if (subcategoryId) filter.subcategoryId = subcategoryId
-    if (modelId) filter.modelId = modelId
+    if (categoryId) baseFilter.categoryId = categoryId
+    if (subcategoryId) baseFilter.subcategoryId = subcategoryId
+    if (modelId) baseFilter.modelId = modelId
 
+    // Фильтр по бренду
+    if (brand) {
+      const brands = brand.split(',').map(b => b.trim())
+      baseFilter.brand = { $in: brands }
+    }
+
+    console.log('Base filter:', baseFilter)
+
+    // Получаем товары с базовым фильтром
+    let productsArray = await Product.find(baseFilter).lean()
+
+    // Фильтрация по цене (так как price - виртуальное поле)
+    if (priceMin !== undefined && priceMin !== null && priceMin !== '') {
+      const minPrice = parseFloat(priceMin)
+      productsArray = productsArray.filter(p => {
+        const currentPrice = p.priceHistory?.length > 0
+          ? p.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price
+          : 0
+        return currentPrice >= minPrice
+      })
+    }
+    if (priceMax !== undefined && priceMax !== null && priceMax !== '') {
+      const maxPrice = parseFloat(priceMax)
+      productsArray = productsArray.filter(p => {
+        const currentPrice = p.priceHistory?.length > 0
+          ? p.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price
+          : 0
+        return currentPrice <= maxPrice
+      })
+    }
+
+    // Сортировка
+    if (sortBy) {
+      switch (sortBy) {
+        case 'price-asc':
+          productsArray.sort((a, b) => {
+            const priceA = a.priceHistory?.length > 0 ? a.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price : 0
+            const priceB = b.priceHistory?.length > 0 ? b.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price : 0
+            return priceA - priceB
+          })
+          break
+        case 'price-desc':
+          productsArray.sort((a, b) => {
+            const priceA = a.priceHistory?.length > 0 ? a.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price : 0
+            const priceB = b.priceHistory?.length > 0 ? b.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price : 0
+            return priceB - priceA
+          })
+          break
+        case 'name-asc':
+          productsArray.sort((a, b) => a.name.localeCompare(b.name))
+          break
+        case 'name-desc':
+          productsArray.sort((a, b) => b.name.localeCompare(a.name))
+          break
+        case 'date-desc':
+          productsArray.sort((a, b) => b.id.localeCompare(a.id))
+          break
+      }
+    } else {
+      productsArray.sort((a, b) => a.id.localeCompare(b.id))
+    }
+
+    const total = productsArray.length
     const skip = (page - 1) * limit
+    const paginatedProducts = productsArray.slice(skip, skip + limit)
 
-    const [total, productsArray] = await Promise.all([
-      Product.countDocuments(filter),
-      Product.find(filter).sort({ id: 1 }).skip(skip).limit(limit),
-    ])
-
-    const products = productsArray.map((product) => ({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      characteristics: product.characteristics,
-      priceHistory: product.priceHistory,
-      brand: product.brand,
-      modelId: product.modelId,
-      traitRatings: product.traitRatings,
-      images: product.images || [],
-    }))
+    const products = paginatedProducts.map((product) => {
+      const currentPrice = product.priceHistory?.length > 0
+        ? product.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price
+        : 0
+      return {
+        id: product.id,
+        name: product.name,
+        price: currentPrice,
+        description: product.description,
+        characteristics: product.characteristics,
+        priceHistory: product.priceHistory,
+        brand: product.brand,
+        modelId: product.modelId,
+        traitRatings: product.traitRatings,
+        images: product.images || [],
+      }
+    })
 
     res.json({
       products,

@@ -36,13 +36,17 @@ export const fetchCatalog = async () => {
 /**
  * Получить продуктовый список с пагинацией и фильтрацией
  */
-export const fetchProducts = async ({ page = 1, limit = 20, q, categoryId, subcategoryId, modelId } = {}) => {
+export const fetchProducts = async ({ page = 1, limit = 20, q, categoryId, subcategoryId, modelId, sortBy, priceMin, priceMax, brand } = {}) => {
   try {
     const params = { page, limit }
     if (q) params.q = q
     if (categoryId) params.categoryId = categoryId
     if (subcategoryId) params.subcategoryId = subcategoryId
     if (modelId) params.modelId = modelId
+    if (sortBy) params.sortBy = sortBy
+    if (priceMin !== null && priceMin !== undefined && priceMin !== '') params.priceMin = priceMin
+    if (priceMax !== null && priceMax !== undefined && priceMax !== '') params.priceMax = priceMax
+    if (brand) params.brand = brand
 
     const response = await api.get('/products', { params })
     return response.data

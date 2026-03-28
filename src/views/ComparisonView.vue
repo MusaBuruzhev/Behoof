@@ -187,6 +187,27 @@ async loadProducts() {
  } finally {
  this.loading = false;
  }
+  this.loading = true;
+  try {
+    // Получаем товары только из localStorage
+    const compareIds = comparisonAPI.getComparison();
+
+    if (compareIds.length === 0) {
+      this.products = [];
+      return;
+    }
+
+    const data = await fetchProducts({ limit: 1000 });
+    this.allProducts = data.products || [];
+
+    this.products = compareIds
+      .map(id => this.allProducts.find(p => p.id === id))
+      .filter(p => p);
+  } catch (error) {
+    console.error('Ошибка загрузки товаров для сравнения:', error);
+  } finally {
+    this.loading = false;
+  }
 },
 
  currentPrice(product) {

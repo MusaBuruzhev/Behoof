@@ -2,7 +2,7 @@
   <div class="novelties">
     <div class="header">
       <h1>Новинки</h1>
-      <a href="/novelties">К новинкам ></a>
+      <router-link to="/novelties" class="novelties-link">К новинкам ></router-link>
     </div>
     <div class="grid">
       <ProductCard
