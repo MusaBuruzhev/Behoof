@@ -5,38 +5,42 @@
         <div class="footerGrid">
           <div class="footerSection">
             <div class="footerLogoInfo flex v-center">
-              <img src="../../public/logo.svg" alt="logo" />
-              <h1>Behoof</h1>
+              <router-link to="/">
+                <img src="../../public/logo.svg" alt="logo" />
+              </router-link>
+              <router-link to="/">
+                <h1>Behoof</h1>
+              </router-link>
             </div>
             <p>Лучшие цены в интернет-магазинах. Мы сравниваем предложения от ведущих продавцов и помогаем вам найти оптимальные варианты.</p>
           </div>
           <div class="footerSection">
             <h3>Навигация</h3>
             <ul>
-              <li><a href="#">Главная</a></li>
-              <li><a href="#">Каталог</a></li>
-              <li><a href="#">Обзоры</a></li>
-              <li><a href="#">Новинки</a></li>
+              <li><router-link to="/">Главная</router-link></li>
+              <li><router-link to="/catalog">Каталог</router-link></li>
+              <li><router-link to="/novelties">Новинки</router-link></li>
+              <li><router-link to="/favorites">Избранное</router-link></li>
             </ul>
           </div>
           <div class="footerSection">
             <h3>Информация</h3>
             <ul>
-              <li><a href="#">О нас</a></li>
-              <li><a href="#">Контакты</a></li>
-              <li><a href="#">Доставка</a></li>
-              <li><a href="#">Условия использования</a></li>
+              <li><router-link to="/about">О нас</router-link></li>
+              <li><a href="mailto:info@behoof.com">Контакты</a></li>
+              <li><router-link to="/catalog">Каталог</router-link></li>
+              <li><router-link to="/login">Условия использования</router-link></li>
             </ul>
           </div>
           <div class="footerSection">
             <h3>Контакты</h3>
-            <p>Email: info@behoof.com</p>
+            <p>Email: <a href="mailto:info@behoof.com">info@behoof.com</a></p>
             <p>Телефон: +7 (123) 456-78-90</p>
             <p>Адрес: г. Москва, ул. Примерная, 1</p>
             <div class="socialLinks">
-              <a href="#" class="socialIcon">VK</a>
-              <a href="#" class="socialIcon">TG</a>
-              <a href="#" class="socialIcon">IG</a>
+              <a href="https://vk.com" target="_blank" class="socialIcon">VK</a>
+              <a href="https://t.me" target="_blank" class="socialIcon">TG</a>
+              <a href="https://instagram.com" target="_blank" class="socialIcon">IG</a>
             </div>
           </div>
         </div>
@@ -44,15 +48,26 @@
     </div>
     <div class="footerBottom">
       <div class="container flex v-center">
-        <p>&copy; 2023 Behoof. Все права защищены.</p>
+        <p>&copy; {{ currentYear }} Behoof. Все права защищены.</p>
         <div class="footerBottomLinks">
-          <a href="#">Политика конфиденциальности</a>
-          <a href="#">Пользовательское соглашение</a>
+          <router-link to="/">Политика конфиденциальности</router-link>
+          <router-link to="/">Пользовательское соглашение</router-link>
         </div>
       </div>
     </div>
   </footer>
 </template>
+
+<script>
+export default {
+  name: 'FooterComponent',
+  computed: {
+    currentYear() {
+      return new Date().getFullYear();
+    }
+  }
+}
+</script>
 
 <script>
 export default {
@@ -139,14 +154,18 @@ footer {
   margin-bottom: 8px;
 }
 
-.footerSection ul li a {
+.footerSection ul li a,
+.footerSection ul li router-link,
+.footerSection a {
   text-decoration: none;
   color: #263141;
   font-size: 14px;
   font-weight: 400;
 }
 
-.footerSection ul li a:hover {
+.footerSection ul li a:hover,
+.footerSection ul li router-link:hover,
+.footerSection a:hover {
   color: #ff4d4d;
 }
 
@@ -204,13 +223,15 @@ footer {
   gap: 20px;
 }
 
-.footerBottomLinks a {
+.footerBottomLinks a,
+.footerBottomLinks router-link {
   text-decoration: none;
   color: #666;
   font-size: 14px;
 }
 
-.footerBottomLinks a:hover {
+.footerBottomLinks a:hover,
+.footerBottomLinks router-link:hover {
   color: #ff4d4d;
 }
 </style>

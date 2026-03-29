@@ -21,9 +21,15 @@
         </button>
       </div>
 
-      <div class="searchCont" @click="toggleCatalog">
+      <div class="searchCont">
         <span class="searchImg"><img src="../../public/iconHed/Search.svg" alt="" /></span>
-        <input type="text" class="searchInput" placeholder="Поиск товаров" />
+        <input 
+          type="text" 
+          class="searchInput" 
+          placeholder="Поиск товаров" 
+          v-model="searchQuery"
+          @keyup.enter="doSearch"
+        />
       </div>
 
       <nav class="headerNav">
@@ -39,7 +45,7 @@
           >
             <img src="../../public/iconHed/authorization.svg" alt="Вход" />
           </button>
-          <div v-else class="profile-menu">
+          <div v-else class="profile-menu" ref="profileMenu">
             <button @click="toggleProfileMenu" class="profile-button" :title="currentUser?.firstName">
               <div class="profile-avatar">{{ userInitials }}</div>
             </button>
@@ -226,7 +232,8 @@ export default {
       isAuthenticated: false,
       currentUser: null,
       showProfileMenu: false,
-      showCompareModal: false
+      showCompareModal: false,
+      searchQuery: ''
     }
   },
 
@@ -480,6 +487,13 @@ export default {
     goToCategoryCatalog(categoryId) {
       this.isCatalogOpen = false;
       this.$router.push(`/catalog?categoryId=${categoryId}`);
+    },
+
+    doSearch() {
+      if (this.searchQuery.trim()) {
+        this.isCatalogOpen = false;
+        this.$router.push(`/catalog?search=${encodeURIComponent(this.searchQuery.trim())}`);
+      }
     }
   },
 

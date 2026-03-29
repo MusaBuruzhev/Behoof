@@ -195,6 +195,22 @@ export default {
         this.loadData();
       }
     },
+    '$route.query.search': {
+      immediate: true,
+      handler(newSearch) {
+        this.searchQuery = newSearch || '';
+        this.applyFilters();
+      }
+    },
+    '$route.query.sort': {
+      immediate: true,
+      handler(newSort) {
+        if (newSort) {
+          this.filters.sortBy = newSort;
+          this.applyFilters();
+        }
+      }
+    },
     currentPage(newPage, oldPage) {
       if (newPage !== oldPage) {
         this.loadPage();

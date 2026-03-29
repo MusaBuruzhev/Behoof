@@ -8,11 +8,11 @@
         </div>
         <div class="banner-content">
           <h2>
-            <span class="highlight">1.8 млн</span> товаров в
-            <span class="highlight">2272</span> магазинах найди, сравни, выбери!
+            <span class="highlight">{{ productCountText }}</span> товаров в
+            <span class="highlight">{{ shopCount }}</span> магазинах найди, сравни, выбери!
           </h2>
           <p></p>
-          <button class="btn">Перейти к категориям</button>
+          <router-link to="/catalog" class="btn">Перейти к категориям</router-link>
         </div>
       </div>
 
@@ -22,9 +22,9 @@
           <img src="../../public/fon/Patterns.png" alt="" />
         </div>
         <div class="banner-content">
-          <h2><span class="highlight">Топ-10</span> смартфонов 2023 года</h2>
+          <h2><span class="highlight">Топ-10</span> смартфонов {{ currentYear }} года</h2>
           <p></p>
-          <button class="btn">Смотреть</button>
+          <router-link to="/catalog?sort=rating-desc&categoryId=smartphones" class="btn">Смотреть</router-link>
         </div>
       </div>
     </div>
@@ -32,8 +32,46 @@
 </template>
 
 <script>
+import catalogAPI from '@/api/catalog.js';
+
 export default {
   name: 'BannerComponent',
+  data() {
+    return {
+      productCount: 0,
+      shopCount: 2272,
+      loading: true
+    };
+  },
+  computed: {
+    currentYear() {
+      return new Date().getFullYear();
+    },
+    productCountText() {
+      if (this.productCount >= 1000000) {
+        return (this.productCount / 1000000).toFixed(1) + ' млн';
+      } else if (this.productCount >= 1000) {
+        return (this.productCount / 1000).toFixed(0) + ' тыс';
+      }
+      return this.productCount;
+    }
+  },
+  async mounted() {
+    await this.loadProductCount();
+  },
+  methods: {
+    async loadProductCount() {
+      try {
+        const response = await catalogAPI.getAll();
+        if (response.products) {
+          this.productCount = response.products.length;
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки количества товаров:', error);
+        this.productCount = 1800000; // fallback значение
+      }
+    }
+  }
 }
 </script>
 
@@ -130,5 +168,13 @@ export default {
   font-size: 14px;
   cursor: pointer;
   width: fit-content;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  background-color: #e63939;
+  transform: translateY(-2px);
 }
 </style>
