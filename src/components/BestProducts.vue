@@ -42,8 +42,12 @@
           <div class="product-header">
             <h3>{{ product.name }}</h3>
             <div class="actions">
-              <button class="action-btn favorite" @click.stop="toggleFavorite(product)" :class="{ active: isFavorite(product.id) }">♥</button>
-              <button class="action-btn compare" @click.stop="addToCompare(product)" title="Сравнить">⚖️</button>
+              <button class="action-btn favorite" @click.stop="toggleFavorite(product)" :class="{ active: isFavorite(product.id) }">
+                <img src="/iconHed/heart.svg" alt="Избранное" class="btn-icon" />
+              </button>
+              <button class="action-btn compare" @click.stop="addToCompare(product)" title="Сравнить">
+                <img src="/iconHed/comparison.svg" alt="Сравнить" class="btn-icon" />
+              </button>
             </div>
           </div>
 
@@ -51,7 +55,9 @@
             <div class="product-image">
               <!-- Show first image if available -->
               <img v-if="product.images && product.images.length > 0" :src="product.images[0]" :alt="product.name" class="product-img" />
-              <div v-else class="image-placeholder">📱</div>
+              <div v-else class="image-placeholder">
+                <img src="/profIcon/l1.png" alt="Изображение недоступно" class="placeholder-img" />
+              </div>
             </div>
 
             <div class="product-traits">
@@ -515,9 +521,9 @@ display: flex
 }
 
 .action-btn {
-  width: 15%;
-  min-width: 25px;
-  max-width: 30px;
+  width: 85%;
+  
+ 
   aspect-ratio: 1;
   border: none;
   border-radius: 50%;
@@ -533,6 +539,23 @@ display: flex
 .action-btn:hover {
   background: #ff4d4d;
   color: white;
+}
+
+.action-btn.active {
+  background: #ff4d4d;
+  color: white;
+}
+
+.btn-icon {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.placeholder-img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
 }
 
 .action-btn.compare:hover {

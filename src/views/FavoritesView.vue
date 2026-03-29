@@ -1,14 +1,16 @@
 <template>
   <div class="favorites-container">
     <div class="favorites-header">
-      <h1>❤️ Избранные товары</h1>
+      <h1><img src="/iconHed/heart.svg" alt="Избранное" class="header-icon" /> Избранные товары</h1>
       <p class="favorites-count">{{ favorites.length }} товаров в избранном</p>
       <div class="header-actions">
         <router-link v-if="favorites.length > 1" to="/comparison" class="compare-link">
-          ⚖️ Сравнить товары
+          <img src="/iconHed/comparison.svg" alt="Сравнить" class="action-icon" />
+          Сравнить товары
         </router-link>
         <button v-if="favorites.length > 0" @click="clearAll" class="clear-btn">
-          🗑️ Очистить избранное
+          <img src="/profIcon/l6.png" alt="Очистить" class="action-icon" />
+          Очистить избранное
         </button>
       </div>
     </div>
@@ -19,7 +21,7 @@
     </div>
 
     <div v-else-if="favorites.length === 0" class="empty-state">
-      <div class="empty-icon">❤️</div>
+      <img src="/iconHed/heart.svg" alt="Избранное" class="empty-icon-img" />
       <h2>Избранное пусто</h2>
       <p>Добавьте товары в избранное, чтобы они появились здесь</p>
       <router-link to="/catalog" class="go-catalog-btn">
@@ -153,6 +155,23 @@ export default {
   font-size: 48px;
   margin: 0 0 15px 0;
   color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.header-icon {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.action-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-right: 8px;
 }
 
 .favorites-count {
@@ -235,6 +254,13 @@ export default {
 
 .empty-icon {
   font-size: 80px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.empty-icon-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
   animation: float 3s ease-in-out infinite;
 }
 

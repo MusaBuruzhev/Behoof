@@ -2,7 +2,7 @@
 <template>
  <div class="comparison-page">
  <div class="container">
- <h1>⚖️ Сравнение товаров</h1>
+ <h1><img src="/iconHed/comparison.svg" alt="Сравнение" class="page-icon" /> Сравнение товаров</h1>
 
  <div v-if="loading" class="loading">Загрузка товаров...</div>
 
@@ -166,30 +166,8 @@ export default {
  },
  methods: {
 async loadProducts() {
- this.loading = true;
- try {
- // Получаем товары только из localStorage (не из избранного)
- const compareIds = comparisonAPI.getComparison();
-
- if (compareIds.length ===0) {
- this.products = [];
- return;
- }
-
- const data = await fetchProducts({ limit:1000 });
- this.allProducts = data.products || [];
-
- this.products = compareIds
- .map(id => this.allProducts.find(p => p.id === id))
- .filter(p => p);
- } catch (error) {
- console.error('Ошибка загрузки товаров для сравнения:', error);
- } finally {
- this.loading = false;
- }
   this.loading = true;
   try {
-    // Получаем товары только из localStorage
     const compareIds = comparisonAPI.getComparison();
 
     if (compareIds.length === 0) {
@@ -330,6 +308,18 @@ async loadProducts() {
 .container {
  width: 85%;
  margin: 0 auto;
+}
+
+h1 {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.page-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
 
 .loading,

@@ -9,7 +9,7 @@
  </div>
 
  <div v-else-if="orders.length === 0" class="empty">
- <div class="empty-icon">📦</div>
+ <img src="/profIcon/l5.png" alt="Нет заказов" class="empty-icon-img" />
  <p>У вас пока нет заказов</p>
  <router-link to="/catalog" class="go-catalog">Перейти в каталог</router-link>
  </div>
@@ -23,7 +23,9 @@
  :src="order.product.images[0]" 
  :alt="order.product?.name"
  >
- <div v-else class="no-image">📷</div>
+ <div v-else class="no-image">
+  <img src="/profIcon/l3.png" alt="Нет изображения" class="no-image-img" />
+</div>
  </div>
 
  <div class="order-content">
@@ -172,6 +174,19 @@ h1 {
 .empty-icon {
  font-size: 64px;
  margin-bottom: 20px;
+}
+
+.empty-icon-img {
+ width: 80px;
+ height: 80px;
+ object-fit: contain;
+ margin-bottom: 20px;
+}
+
+.no-image-img {
+ width: 60%;
+ height: 60%;
+ object-fit: contain;
 }
 
 .empty p {

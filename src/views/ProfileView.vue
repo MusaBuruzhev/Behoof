@@ -158,25 +158,25 @@
 
           <div class="security-grid">
             <div class="security-card">
-              <div class="security-icon">🔐</div>
+              <img src="/iconHed/authorization.svg" alt="Пароль" class="security-icon-img" />
               <h3>Пароль</h3>
               <p>Последнее изменение неизвестно</p>
               <button class="security-button">Изменить пароль</button>
             </div>
             <div class="security-card">
-              <div class="security-icon">📧</div>
+              <img src="/iconHed/authorization.svg" alt="Email" class="security-icon-img" />
               <h3>Email</h3>
               <p>{{ user?.email }}</p>
               <button class="security-button" disabled>Привязан</button>
             </div>
             <div class="security-card">
-              <div class="security-icon">📱</div>
+              <img src="/profIcon/l1.png" alt="2FA" class="security-icon-img" />
               <h3>Двухфакторная аутентификация</h3>
               <p>Не включена</p>
               <button class="security-button">Включить 2FA</button>
             </div>
             <div class="security-card">
-              <div class="security-icon">📊</div>
+              <img src="/iconHed/chart.svg" alt="Сессии" class="security-icon-img" />
               <h3>Активные сессии</h3>
               <p>1 активная сессия</p>
               <button class="security-button">Управление</button>
@@ -195,7 +195,8 @@
               <p>Эта операция необратима. Все ваши данные будут удалены.</p>
             </div>
             <button @click="openDeleteModal" class="delete-button">
-              🗑️ Удалить профиль
+              <img src="/profIcon/l6.png" alt="Удалить" class="delete-icon" />
+              Удалить профиль
             </button>
           </div>
         </div>
@@ -464,7 +465,7 @@ export default {
   height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%);
-  color: white;
+  color: rgb(0, 0, 0);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -607,6 +608,20 @@ export default {
   margin-bottom: 12px;
 }
 
+.security-icon-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.delete-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-right: 8px;
+}
+
 .security-card h3 {
   margin: 0 0 8px 0;
   font-size: 14px;
@@ -634,7 +649,7 @@ export default {
 }
 
 .security-button:hover:not(:disabled) {
-  background: #5568d3;
+  background: #ff4d4d;
   transform: translateY(-2px);
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
@@ -692,7 +707,7 @@ export default {
 }
 
 .edit-button:hover {
-  background: #5568d3;
+  background: #ff4d4d;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
