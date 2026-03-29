@@ -460,7 +460,7 @@ async loadProducts() {
  color: #fff;
  border-radius: 50%;
  cursor: pointer;
- font-size: 12px;
+ font-size: 14px;
 }
 
 .product-header img {
@@ -471,13 +471,13 @@ async loadProducts() {
 }
 
 .product-header h3 {
- font-size: 14px;
+ font-size: 16px;
  margin: 10px 0 5px;
  min-height: 40px;
 }
 
 .product-header .brand {
- font-size: 12px;
+ font-size: 14px;
  color: #666;
  margin: 0;
 }
@@ -547,12 +547,12 @@ async loadProducts() {
 }
 
 .rating-value {
- font-size: 12px;
+ font-size: 14px;
  color: #666;
 }
 
 .description {
- font-size: 13px;
+ font-size: 15px;
  color: #555;
  line-height: 1.5;
 }

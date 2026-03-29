@@ -318,7 +318,7 @@ export default {
 }
 
 .feature-card p {
-  font-size: 12px;
+  font-size: 14px;
   opacity: 0.7;
   margin: 0;
 }
@@ -370,7 +370,7 @@ export default {
 }
 
 .password-label-row label {
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 600;
   color: #374151;
   text-transform: uppercase;
@@ -378,7 +378,7 @@ export default {
 }
 
 .forgot-link {
-  font-size: 12px;
+  font-size: 14px;
   color: #ff4d4d;
   text-decoration: none;
   font-weight: 500;

@@ -1069,7 +1069,7 @@ export default {
 }
 
 .preview-name {
-  font-size: 11px;
+  font-size: 13px;
   color: #666;
   text-align: center;
   max-width: 90px;
@@ -1079,11 +1079,12 @@ export default {
 }
 
 .file-input {
-  padding: 10px;
+  padding: 12px;
   border: 2px dashed #ccc;
   border-radius: 8px;
   width: 100%;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .file-input:hover {
@@ -1093,7 +1094,7 @@ export default {
 
 .hint {
   color: #666;
-  font-size: 12px;
+  font-size: 14px;
   margin-top: 4px;
 }
 

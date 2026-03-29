@@ -596,7 +596,7 @@ header {
 .headerBtnCategoryButtomSpan {
   color: white;
   font-weight: 500;
-  font-size: 11px;
+  font-size: 14px;
   display: inline-block;
   transition: transform 0.3s ease;
 }
@@ -732,7 +732,7 @@ header {
 .catalogCont button span {
   margin-left: auto;
   padding: 15px 15px 0 0;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .catalogContLeft {

@@ -171,7 +171,7 @@ computed: {
 }
 
 .category {
-  font-size: 12px;
+  font-size: 14px;
   color: gray;
   margin-bottom: 5px;
 }
@@ -210,12 +210,12 @@ computed: {
 }
 
 .price-info_b p {
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
 }
 
 .price-info_b span {
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
 }
 
@@ -319,7 +319,7 @@ computed: {
 
   .price-info_b p,
   .price-info_b span {
-    font-size: 11px;
+    font-size: 13px;
   }
 }
 </style>
