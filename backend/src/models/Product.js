@@ -78,6 +78,37 @@ const productSchema = new mongoose.Schema(
         message: 'Количество изображений должно быть от 3 до 10'
       }
     },
+    reviews: {
+      type: [{
+        userId: {
+          type: String,
+          required: true,
+        },
+        userName: {
+          type: String,
+          required: true,
+        },
+        userAvatar: {
+          type: String,
+          default: null,
+        },
+        text: {
+          type: String,
+          required: true,
+          trim: true,
+          maxlength: 2000,
+        },
+        traitRatings: {
+          type: mongoose.Schema.Types.Mixed,
+          default: {},
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      }],
+      default: [],
+    },
   },
   {
     timestamps: true,

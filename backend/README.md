@@ -173,9 +173,56 @@ GET /products/:id
     "дизайн": 5,
     "батарея": 4
   },
-  "images": ["/uploads/image1.jpg", "/uploads/image2.jpg"]
+  "images": ["/uploads/image1.jpg", "/uploads/image2.jpg"],
+  "reviews": [
+    {
+      "id": "...",
+      "userId": "...",
+      "userName": "Иван Петров",
+      "userAvatar": null,
+      "text": "Отличный вариант за свои деньги",
+      "traitRatings": {
+        "дизайн": 5,
+        "батарея": 4
+      },
+      "createdAt": "2026-01-15T12:34:56.000Z"
+    }
+  ]
 }
 ```
+
+#### 💬 Отзывы о товаре
+
+##### Добавить отзыв
+```http
+POST /products/:id/reviews
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Тело запроса:**
+```json
+{
+  "text": "Отличный смартфон, камера порадовала",
+  "traitRatings": {
+    "дизайн": 5,
+    "камера": 4,
+    "батарея": 4
+  }
+}
+```
+
+- `text` обязателен.
+- `traitRatings` необязателен: можно передавать только часть характеристик или не передавать вовсе.
+- После добавления отзыва `traitRatings` товара пересчитываются как среднее с базовой оценкой `3/5`.
+
+##### Удалить отзыв
+```http
+DELETE /products/:id/reviews/:reviewId
+Authorization: Bearer <token>
+```
+
+Удалять можно свой отзыв (или любой, если роль `admin`).
 
 #### ✏️ Обновление товара
 
@@ -291,8 +338,16 @@ backend/
   brand: String,        // Бренд
   categoryId: String,   // ID категории
   subcategoryId: String,// ID подкатегории
-  traitRatings: Object, // Рейтинги характеристик
-  images: [String]      // Пути к изображениям
+  traitRatings: Object, // Агрегированные рейтинги характеристик
+  images: [String],     // Пути к изображениям
+  reviews: [{           // Отзывы пользователей
+    userId: String,
+    userName: String,
+    userAvatar: String | null,
+    text: String,
+    traitRatings: Object,
+    createdAt: Date
+  }]
 }
 ```
 

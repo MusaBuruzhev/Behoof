@@ -22,7 +22,7 @@ import { fetchCatalog } from '@/api/catalog.js'
 import comparisonAPI from '@/api/comparison.js';
 
 export default {
-  name: 'Novelties',
+  name: 'NoveltiesSection',
   components: {
     ProductCard
   },

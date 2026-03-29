@@ -58,10 +58,11 @@
  <h3>Оценки характеристик</h3>
  <div class="rating-list">
  <div v-for="(rating, trait) in product.traitRatings" :key="trait" class="rating-item">
- <span class="trait-name rating-list-s">{{ trait }}</span>
+ <span class="trait-name">{{ trait }}</span>
  <div class="rating-segments">
- <span v-for="i in 5" :key="i" :class="{ filled: i <= rating }" class="segment"></span>
+ <span v-for="i in 5" :key="i" :class="{ filled: i <= Math.round(rating || 0) }" class="segment"></span>
  </div>
+ <span class="rating-value">{{ formatRating(rating) }}/5</span>
  </div>
  </div>
  </div>
@@ -72,6 +73,88 @@
  <span>{{ isFavorite ? 'В избранном' : 'Добавить в избранное' }}</span>
  </button>
  <button class="cart-btn" @click="openOrderModal">Заказать</button>
+ </div>
+
+ <div class="reviews-section">
+ <div class="reviews-header">
+ <h3>Отзывы</h3>
+ <button class="review-btn large-btn" @click="toggleReviewForm">
+ {{ showReviewForm ? 'Скрыть форму' : ownReview ? 'Редактировать отзыв' : 'Оставить отзыв' }}
+ </button>
+ </div>
+
+ <p class="reviews-count">Всего отзывов: {{ reviewsCount }}</p>
+
+ <div v-if="showReviewForm" class="review-form">
+ <h4>{{ ownReview ? 'Редактирование отзыва' : 'Оцените характеристики (можно пропустить)' }}</h4>
+ <div class="review-traits-grid">
+ <div v-for="trait in categoryTraits" :key="trait" class="review-trait-item">
+ <span class="trait-name">{{ trait }}</span>
+ <div class="star-picker">
+ <button
+ v-for="i in 5"
+ :key="`${trait}-${i}`"
+ type="button"
+ class="star-btn"
+ :class="{ active: (reviewForm.traitRatings[trait] || 0) >= i }"
+ @click="setTraitRating(trait, i)"
+ >
+ ★
+ </button>
+ <button type="button" class="clear-rating-btn" @click="clearTraitRating(trait)">очистить</button>
+ </div>
+ </div>
+ </div>
+
+ <textarea
+ v-model="reviewForm.text"
+ class="review-textarea"
+ maxlength="2000"
+ placeholder="Поделитесь впечатлениями о товаре"
+ ></textarea>
+ <div class="review-form-footer">
+ <span>{{ reviewForm.text.length }}/2000</span>
+ <button class="review-btn large-btn" @click="submitReview" :disabled="isSubmittingReview">
+ {{ isSubmittingReview ? 'Отправка...' : ownReview ? 'Сохранить изменения' : 'Отправить отзыв' }}
+ </button>
+ </div>
+ </div>
+
+ <div v-if="sortedReviews.length === 0" class="no-reviews">
+ Пока нет отзывов — будьте первым 👋
+ </div>
+
+ <div v-else class="reviews-list">
+ <article v-for="review in sortedReviews" :key="review.id" class="review-card">
+ <div class="review-card-head">
+ <img :src="getAvatarUrl(review.userAvatar, review.userName)" alt="avatar" class="review-avatar" />
+ <div>
+ <p class="review-author">{{ review.userName || 'Пользователь' }}</p>
+ <p class="review-date">{{ formatReviewDate(review.createdAt) }}</p>
+ </div>
+ <button
+ v-if="canDeleteReview(review)"
+ type="button"
+ class="delete-review-btn"
+ @click="removeReview(review.id)"
+ >
+ Удалить
+ </button>
+ </div>
+
+ <div v-if="review.traitRatings && Object.keys(review.traitRatings).length" class="review-traits">
+ <div v-for="(rating, trait) in review.traitRatings" :key="`${review.id}-${trait}`" class="review-trait-row">
+ <span class="trait-name">{{ trait }}</span>
+ <div class="rating-segments">
+ <span v-for="i in 5" :key="i" :class="{ filled: i <= rating }" class="segment"></span>
+ </div>
+ <span class="rating-value">{{ rating }}/5</span>
+ </div>
+ </div>
+
+ <p class="review-text">{{ review.text }}</p>
+ </article>
+ </div>
  </div>
  </div>
  </div>
@@ -108,7 +191,7 @@
 </template>
 
 <script>
-import { getProduct } from '@/api/catalog.js';
+import { getProduct, addProductReview, deleteProductReview } from '@/api/catalog.js';
 import favoritesAPI from '@/api/favorites.js';
 import ordersAPI from '@/api/orders.js';
 import PriceHistoryChart from '@/components/PriceHistoryChart.vue';
@@ -129,6 +212,12 @@ export default {
  isLoadingFavorite: false,
  showOrderModal: false,
  isOrdering: false,
+ showReviewForm: false,
+ isSubmittingReview: false,
+ reviewForm: {
+ text: '',
+ traitRatings: {},
+ },
  orderForm: {
  pickupAt: '',
  contactPhone: '',
@@ -159,6 +248,27 @@ export default {
  },
  currentImageIndex() {
  return this.product?.images?.indexOf(this.currentImage) || 0;
+ },
+ categoryTraits() {
+ return this.product?.traitRatings ? Object.keys(this.product.traitRatings) : [];
+ },
+ sortedReviews() {
+ return [...(this.product?.reviews || [])].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+ },
+ reviewsCount() {
+ return this.sortedReviews.length;
+ },
+ currentUser() {
+ try {
+ const raw = localStorage.getItem('user');
+ return raw ? JSON.parse(raw) : null;
+ } catch {
+ return null;
+ }
+ },
+ ownReview() {
+ if (!this.currentUser?._id || !this.product?.reviews?.length) return null;
+ return this.product.reviews.find((review) => review.userId === this.currentUser._id) || null;
  },
  },
  methods: {
@@ -254,6 +364,104 @@ export default {
  } finally {
  this.isOrdering = false;
  }
+ },
+ formatRating(rating) {
+ const normalized = Number(rating) || 0;
+ return Number.isInteger(normalized) ? String(normalized) : normalized.toFixed(1);
+ },
+ toggleReviewForm() {
+ const token = localStorage.getItem('token');
+ if (!token) {
+ this.showToast('Войдите в аккаунт, чтобы оставить отзыв', 'warning');
+ this.$router.push('/login');
+ return;
+ }
+
+ const nextValue = !this.showReviewForm;
+ this.showReviewForm = nextValue;
+
+ if (nextValue && this.ownReview) {
+ this.reviewForm.text = this.ownReview.text || '';
+ this.reviewForm.traitRatings = { ...(this.ownReview.traitRatings || {}) };
+ }
+ },
+ setTraitRating(trait, rating) {
+ this.reviewForm.traitRatings = {
+ ...this.reviewForm.traitRatings,
+ [trait]: rating,
+ };
+ },
+ clearTraitRating(trait) {
+ const nextRatings = { ...this.reviewForm.traitRatings };
+ delete nextRatings[trait];
+ this.reviewForm.traitRatings = nextRatings;
+ },
+ async submitReview() {
+ const text = this.reviewForm.text.trim();
+ if (!text) {
+ this.showToast('Введите текст отзыва', 'warning');
+ return;
+ }
+
+ this.isSubmittingReview = true;
+ try {
+ const response = await addProductReview(this.product.id, {
+ text,
+ traitRatings: this.reviewForm.traitRatings,
+ });
+
+ if (response.review) {
+ const existingIndex = (this.product.reviews || []).findIndex((review) => review.userId === response.review.userId);
+
+ if (existingIndex >= 0) {
+ this.product.reviews.splice(existingIndex, 1, response.review);
+ } else {
+ this.product.reviews = [response.review, ...(this.product.reviews || [])];
+ }
+ }
+
+ this.product.traitRatings = response.traitRatings || this.product.traitRatings;
+ this.reviewForm.text = '';
+ this.reviewForm.traitRatings = {};
+ this.showReviewForm = false;
+ this.showToast(response.isUpdated ? 'Отзыв обновлён' : 'Спасибо! Отзыв добавлен', 'success');
+ } catch (error) {
+ console.error('Ошибка отправки отзыва:', error);
+ this.showToast(error.response?.data?.error || 'Не удалось отправить отзыв', 'error');
+ } finally {
+ this.isSubmittingReview = false;
+ }
+ },
+ async removeReview(reviewId) {
+ try {
+ const response = await deleteProductReview(this.product.id, reviewId);
+ this.product.reviews = (this.product.reviews || []).filter((review) => review.id !== reviewId);
+ this.product.traitRatings = response.traitRatings || this.product.traitRatings;
+ this.showToast('Отзыв удалён', 'info');
+ } catch (error) {
+ console.error('Ошибка удаления отзыва:', error);
+ this.showToast(error.response?.data?.error || 'Не удалось удалить отзыв', 'error');
+ }
+ },
+ canDeleteReview(review) {
+ if (!this.currentUser) return false;
+ if (this.currentUser.role === 'admin') return true;
+ return review.userId && this.currentUser._id && review.userId === this.currentUser._id;
+ },
+ formatReviewDate(date) {
+ if (!date) return '';
+ return new Date(date).toLocaleDateString('ru-RU', {
+ year: 'numeric',
+ month: 'long',
+ day: 'numeric',
+ hour: '2-digit',
+ minute: '2-digit',
+ });
+ },
+ getAvatarUrl(avatar, userName = 'User') {
+ if (avatar) return avatar;
+ const seed = encodeURIComponent(userName || 'User');
+ return `https://api.dicebear.com/9.x/initials/svg?seed=${seed}&backgroundColor=f2f5f9`;
  },
  },
 };
@@ -431,29 +639,40 @@ export default {
 .trait-item,
 .rating-item {
  display: flex;
- justify-content: space-between;
  align-items: center;
  padding:10px0;
  border-bottom:1px solid #eee;
 }
 
+.trait-name {
+ width:140px;
+ flex-shrink:0;
+ text-transform: capitalize;
+}
+
 .rating-segments {
  display: flex;
- gap:2px;
- flex-shrink:0;
- width:100%;
+ gap:4px;
+ flex:1;
  margin:010px;
 }
 
 .segment {
  flex:1;
- height:6px;
+ height:7px;
  background: #e0e0e0;
  border-radius:3px;
 }
 
 .segment.filled {
  background: #ff4d4d;
+}
+
+.rating-value {
+ width:42px;
+ text-align: right;
+ color: #666;
+ font-size:14px;
 }
 
 .actions {
@@ -518,10 +737,183 @@ export default {
  color: red;
 }
 
-.rating-list-s {
- position: absolute;
- margin-top: -25px;
- margin-left:10px;
+.reviews-section {
+ margin-bottom:30px;
+}
+
+.reviews-header {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ margin-bottom:10px;
+}
+
+.reviews-count {
+ color: #666;
+ margin-bottom:14px;
+}
+
+.review-form {
+ border:1px solid #eee;
+ border-radius:12px;
+ padding:16px;
+ margin-bottom:16px;
+ background: #fafafa;
+}
+
+.review-traits-grid {
+ display: grid;
+ grid-template-columns:1fr;
+ gap:10px;
+ margin:10px016px;
+}
+
+.review-trait-item {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ gap:12px;
+}
+
+.star-picker {
+ display: flex;
+ align-items: center;
+ gap:4px;
+}
+
+.star-btn {
+ border: none;
+ background: transparent;
+ font-size:20px;
+ color: #cfcfcf;
+ cursor: pointer;
+ line-height:1;
+ padding:4px;
+}
+
+.star-btn.active {
+ color: #ffb300;
+}
+
+.clear-rating-btn {
+ border: none;
+ background: transparent;
+ color: #999;
+ cursor: pointer;
+ font-size:12px;
+ margin-left:6px;
+}
+
+.review-textarea {
+ width:100%;
+ min-height:120px;
+ border:1px solid #ddd;
+ border-radius:10px;
+ padding:12px;
+ resize: vertical;
+}
+
+.review-form-footer {
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ margin-top:10px;
+ color: #666;
+}
+
+.review-btn {
+ border: none;
+ border-radius:10px;
+ background: #ff4d4d;
+ color: #fff;
+ padding:10px16px;
+ cursor: pointer;
+ font-size:16px;
+ font-weight:500;
+}
+
+.review-btn.large-btn {
+ padding:16px32px;
+ font-size:18px;
+ font-weight:600;
+ border-radius:12px;
+}
+
+.review-btn:disabled {
+ opacity:0.6;
+ cursor: not-allowed;
+}
+
+.no-reviews {
+ color: #666;
+ padding:10px0;
+}
+
+.reviews-list {
+ display: flex;
+ flex-direction: column;
+ gap:12px;
+}
+
+.review-card {
+ border:1px solid #eee;
+ border-radius:12px;
+ padding:14px;
+ background: #fff;
+}
+
+.review-card-head {
+ display: flex;
+ align-items: center;
+ gap:10px;
+ margin-bottom:10px;
+}
+
+.review-avatar {
+ width:42px;
+ height:42px;
+ border-radius:50%;
+ object-fit: cover;
+ background: #f2f5f9;
+}
+
+.review-author {
+ font-weight:600;
+ margin:0;
+}
+
+.review-date {
+ margin:0;
+ color: #888;
+ font-size:13px;
+}
+
+.review-traits {
+ display: flex;
+ flex-direction: column;
+ gap:8px;
+ margin-bottom:10px;
+}
+
+.review-trait-row {
+ display: flex;
+ align-items: center;
+}
+
+.review-text {
+ margin:0;
+ line-height:1.5;
+ white-space: pre-wrap;
+}
+
+.delete-review-btn {
+ margin-left: auto;
+ border:1px solid #ffd3d3;
+ color: #b90000;
+ background: #fff5f5;
+ border-radius:8px;
+ padding:6px10px;
+ cursor: pointer;
 }
 
 .order-modal {

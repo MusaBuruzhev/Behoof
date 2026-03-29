@@ -177,14 +177,19 @@
               @change="handleFileSelect('add')"
               ref="addFileInput"
               required
+              class="file-input"
             >
             <div v-if="addSelectedFiles.length > 0" class="selected-files">
-              <p>Выбрано файлов: {{ addSelectedFiles.length }}</p>
-              <ul>
-                <li v-for="(file, index) in addSelectedFiles" :key="index">
-                  {{ file.name }} ({{ (file.size / 1024 / 1024).toFixed(2) }} MB)
-                </li>
-              </ul>
+              <p class="files-count">Выбрано файлов: {{ addSelectedFiles.length }} / от 3 до 10</p>
+              <div class="image-previews">
+                <div v-for="(file, index) in addSelectedFiles" :key="index" class="preview-item">
+                  <div class="preview-image-wrapper">
+                    <img :src="getPreviewUrl(file)" :alt="file.name" class="preview-image">
+                    <button type="button" class="remove-preview-btn" @click="removeFile(index)">×</button>
+                  </div>
+                  <span class="preview-name">{{ file.name }}</span>
+                </div>
+              </div>
             </div>
             <small class="hint">
               Выберите от 3 до 10 изображений товара (JPEG, PNG, WebP)
@@ -618,6 +623,16 @@ export default {
       this.error = false;
     },
 
+    getPreviewUrl(file) {
+      return URL.createObjectURL(file);
+    },
+
+    removeFile(index) {
+      this.addSelectedFiles.splice(index, 1);
+      // Also clear the file input to allow re-selecting the same files
+      this.$refs.addFileInput.value = '';
+    },
+
     async submitAddForm() {
       if (this.addSelectedFiles.length < 3 || this.addSelectedFiles.length > 10) {
         this.showMessage('Необходимо выбрать от 3 до 10 изображений', true);
@@ -990,20 +1005,90 @@ export default {
 
 .selected-files {
   margin-top: 10px;
-  padding: 10px;
+  padding: 15px;
   background: white;
-  border-radius: 4px;
+  border-radius: 8px;
   border: 1px solid #e0e0e0;
 }
 
-.selected-files ul {
-  margin: 5px 0 0 0;
-  padding-left: 20px;
+.files-count {
+  margin: 0 0 12px 0;
+  font-weight: 600;
+  color: #263141;
+  font-size: 15px;
 }
 
-.selected-files li {
+.image-previews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+}
+
+.preview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.preview-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e0e0e0;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-preview-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  border: none;
   font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.remove-preview-btn:hover {
+  background: #dc3545;
+}
+
+.preview-name {
+  font-size: 11px;
   color: #666;
+  text-align: center;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-input {
+  padding: 10px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.file-input:hover {
+  border-color: #ff4d4d;
+  background: #fff5f5;
 }
 
 .hint {

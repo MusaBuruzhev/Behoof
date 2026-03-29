@@ -35,7 +35,7 @@
 
 <script>
 export default {
-  name: 'Reviews'
+  name: 'ProductReviews'
 }
 </script>
 

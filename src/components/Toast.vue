@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'Toast',
+  name: 'ToastNotification',
   props: {
     message: {
       type: String,

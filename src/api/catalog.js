@@ -99,6 +99,36 @@ export const getProduct = async (productId) => {
 };
 
 /**
+ * Добавить отзыв о товаре
+ */
+export const addProductReview = async (productId, reviewData) => {
+  try {
+    const response = await api.post(`/products/${productId}/reviews`, reviewData, {
+      headers: authHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка добавления отзыва:', error);
+    throw error;
+  }
+};
+
+/**
+ * Удалить отзыв о товаре
+ */
+export const deleteProductReview = async (productId, reviewId) => {
+  try {
+    const response = await api.delete(`/products/${productId}/reviews/${reviewId}`, {
+      headers: authHeader(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка удаления отзыва:', error);
+    throw error;
+  }
+};
+
+/**
  * Обновить товар
  */
 export const updateProduct = async (productId, productData) => {
@@ -134,6 +164,8 @@ export default {
   addProduct,
   initializeData,
   getProduct,
+  addProductReview,
+  deleteProductReview,
   updateProduct,
   deleteProduct
 };

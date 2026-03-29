@@ -44,6 +44,112 @@ const upload = multer({
 
 export const uploadImages = upload.array('images', 10);
 
+const DEFAULT_TRAIT_RATING = 3;
+
+const getTraitValue = (traitRatings, trait) => {
+  if (!traitRatings) return undefined;
+  if (typeof traitRatings.get === 'function') {
+    return traitRatings.get(trait);
+  }
+  return traitRatings[trait];
+};
+
+const recalculateTraitRatings = (product) => {
+  const categoryTraits = CATEGORY_TRAITS[product.categoryId] || [];
+  const recalculatedRatings = {};
+
+  categoryTraits.forEach((trait) => {
+    let sum = 0;
+    let count = 0;
+
+    (product.reviews || []).forEach((review) => {
+      const rawValue = getTraitValue(review.traitRatings, trait);
+      const value = Number(rawValue);
+
+      if (Number.isFinite(value) && value >= 1 && value <= 5) {
+        sum += value;
+        count += 1;
+      }
+    });
+
+    const average = count > 0
+      ? (DEFAULT_TRAIT_RATING + sum) / (count + 1)
+      : DEFAULT_TRAIT_RATING;
+
+    recalculatedRatings[trait] = Math.round(average * 10) / 10;
+  });
+
+  product.traitRatings = recalculatedRatings;
+};
+
+const mapReview = (review) => ({
+  id: review._id,
+  userId: review.userId,
+  userName: review.userName,
+  userAvatar: review.userAvatar,
+  text: review.text,
+  traitRatings: review.traitRatings || {},
+  createdAt: review.createdAt,
+});
+
+const buildDisplayName = (user) => {
+  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+  return fullName || user.email || 'Пользователь';
+};
+
+const isReviewOwner = (review, user) => String(review.userId) === String(user._id);
+
+const normalizeReviewTraitRatings = (rawTraitRatings, categoryTraits) => {
+  if (!rawTraitRatings || typeof rawTraitRatings !== 'object') {
+    return {};
+  }
+
+  const normalized = {};
+
+  for (const [trait, rawValue] of Object.entries(rawTraitRatings)) {
+    if (!categoryTraits.includes(trait)) {
+      const error = new Error(`Характеристика "${trait}" недоступна для категории`);
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const value = Number(rawValue);
+    const roundedValue = Math.round(value);
+
+    if (!Number.isFinite(value) || roundedValue < 1 || roundedValue > 5) {
+      const error = new Error(`Оценка для "${trait}" должна быть от 1 до 5`);
+      error.statusCode = 400;
+      throw error;
+    }
+
+    normalized[trait] = roundedValue;
+  }
+
+  return normalized;
+};
+
+const mapProductResponse = (product) => ({
+  id: product.id,
+  name: product.name,
+  price: product.price,
+  description: product.description,
+  characteristics: product.characteristics,
+  priceHistory: product.priceHistory,
+  brand: product.brand,
+  categoryId: product.categoryId,
+  subcategoryId: product.subcategoryId,
+  modelId: product.modelId,
+  traitRatings: product.traitRatings,
+  images: product.images,
+  reviews: (product.reviews || []).map(mapReview),
+});
+
+const handleControllerError = (res, error, fallbackMessage) => {
+  console.error(fallbackMessage, error);
+  const status = error.statusCode || 500;
+  res.status(status).json({ error: error.message || fallbackMessage });
+};
+
 export const getCatalog = async (req, res) => {
   try {
     const categoriesArray = await Category.find({}).sort({ id: 1 })
@@ -81,18 +187,7 @@ export const getCatalog = async (req, res) => {
 
     const products = {}
     productsArray.forEach((product) => {
-      products[product.id] = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        description: product.description,
-        characteristics: product.characteristics,
-        priceHistory: product.priceHistory,
-        brand: product.brand,
-        modelId: product.modelId,
-        traitRatings: product.traitRatings,
-        images: product.images || [],
-      }
+      products[product.id] = mapProductResponse(product)
     })
 
     res.json({
@@ -199,16 +294,8 @@ export const getProducts = async (req, res) => {
         ? product.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price
         : 0
       return {
-        id: product.id,
-        name: product.name,
+        ...mapProductResponse(product),
         price: currentPrice,
-        description: product.description,
-        characteristics: product.characteristics,
-        priceHistory: product.priceHistory,
-        brand: product.brand,
-        modelId: product.modelId,
-        traitRatings: product.traitRatings,
-        images: product.images || [],
       }
     })
 
@@ -255,7 +342,7 @@ export const addProduct = async (req, res) => {
     const categoryTraits = CATEGORY_TRAITS[categoryId] || []
     const traitRatings = {}
     categoryTraits.forEach((trait) => {
-      traitRatings[trait] = 3
+      traitRatings[trait] = DEFAULT_TRAIT_RATING
     })
 
     const productId = await getNextId('p')
@@ -314,6 +401,7 @@ export const addProduct = async (req, res) => {
       modelId: modelDoc.id,
       traitRatings,
       images: imagePaths,
+      reviews: [],
     })
 
     await product.save()
@@ -338,17 +426,7 @@ export const addProduct = async (req, res) => {
 
     res.status(201).json({
       message: 'Товар успешно добавлен',
-      product: {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        description: product.description,
-        characteristics: product.characteristics,
-        priceHistory: product.priceHistory,
-        brand: product.brand,
-        images: product.images,
-        traitRatings: product.traitRatings,
-      },
+      product: mapProductResponse(product),
       subcategoryCreated: !subcategory.isNew,
       subcategoryId: subcategory.id,
     })
@@ -367,20 +445,7 @@ export const getProduct = async (req, res) => {
       return res.status(404).json({ error: 'Товар не найден' })
     }
 
-    res.json({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      characteristics: product.characteristics,
-      priceHistory: product.priceHistory,
-      brand: product.brand,
-      categoryId: product.categoryId,
-      subcategoryId: product.subcategoryId,
-      modelId: product.modelId,
-      traitRatings: product.traitRatings,
-      images: product.images,
-    })
+    res.json(mapProductResponse(product))
   } catch (error) {
     console.error('Ошибка получения товара:', error)
     res.status(500).json({ error: 'Ошибка получения товара' })
@@ -418,21 +483,102 @@ export const updateProduct = async (req, res) => {
 
     res.json({
       message: 'Товар успешно обновлен',
-      product: {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        description: product.description,
-        characteristics: product.characteristics,
-        priceHistory: product.priceHistory,
-        brand: product.brand,
-        traitRatings: product.traitRatings,
-        images: product.images,
-      }
+      product: mapProductResponse(product),
     })
   } catch (error) {
     console.error('Ошибка обновления товара:', error)
     res.status(500).json({ error: 'Ошибка обновления товара' })
+  }
+}
+
+export const addReview = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { text, traitRatings } = req.body
+
+    const normalizedText = typeof text === 'string' ? text.trim() : ''
+    if (!normalizedText) {
+      return res.status(400).json({ error: 'Текст отзыва обязателен' })
+    }
+
+    if (normalizedText.length > 2000) {
+      return res.status(400).json({ error: 'Текст отзыва слишком длинный (максимум 2000 символов)' })
+    }
+
+    const product = await Product.findOne({ id })
+    if (!product) {
+      return res.status(404).json({ error: 'Товар не найден' })
+    }
+
+    const categoryTraits = CATEGORY_TRAITS[product.categoryId] || []
+    const normalizedTraitRatings = normalizeReviewTraitRatings(traitRatings, categoryTraits)
+
+    const existingReview = (product.reviews || []).find((review) => isReviewOwner(review, req.user))
+
+    if (existingReview) {
+      existingReview.userName = buildDisplayName(req.user)
+      existingReview.userAvatar = req.user.avatar || null
+      existingReview.text = normalizedText
+      existingReview.traitRatings = normalizedTraitRatings
+      existingReview.createdAt = new Date()
+    } else {
+      product.reviews.push({
+        userId: String(req.user._id),
+        userName: buildDisplayName(req.user),
+        userAvatar: req.user.avatar || null,
+        text: normalizedText,
+        traitRatings: normalizedTraitRatings,
+        createdAt: new Date(),
+      })
+    }
+
+    recalculateTraitRatings(product)
+    await product.save()
+
+    const actualReview = (product.reviews || []).find((review) => isReviewOwner(review, req.user))
+
+    res.status(existingReview ? 200 : 201).json({
+      message: existingReview ? 'Отзыв успешно обновлён' : 'Отзыв успешно добавлен',
+      review: actualReview ? mapReview(actualReview) : null,
+      traitRatings: product.traitRatings,
+      reviewsCount: product.reviews.length,
+      isUpdated: Boolean(existingReview),
+    })
+  } catch (error) {
+    handleControllerError(res, error, 'Ошибка добавления отзыва')
+  }
+}
+
+export const deleteReview = async (req, res) => {
+  try {
+    const { id, reviewId } = req.params
+
+    const product = await Product.findOne({ id })
+    if (!product) {
+      return res.status(404).json({ error: 'Товар не найден' })
+    }
+
+    const review = product.reviews.id(reviewId)
+    if (!review) {
+      return res.status(404).json({ error: 'Отзыв не найден' })
+    }
+
+    const isOwner = String(review.userId) === String(req.user._id)
+    if (!isOwner && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Можно удалять только свои отзывы' })
+    }
+
+    review.deleteOne()
+    recalculateTraitRatings(product)
+    await product.save()
+
+    res.json({
+      message: 'Отзыв удалён',
+      traitRatings: product.traitRatings,
+      reviewsCount: product.reviews.length,
+    })
+  } catch (error) {
+    handleControllerError(res, error, 'Ошибка удаления отзыва')
   }
 }
 

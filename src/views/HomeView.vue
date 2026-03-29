@@ -3,8 +3,8 @@
     <BanerComponent />
     <BestProductsComponent />
     <HomeInfo/>
-    <Novelties />
-    <Reviews/>
+    <NoveltiesSection />
+    <ProductReviews/>
   </div>
 </template>
 
@@ -12,8 +12,8 @@
 import BanerComponent from '../components/Baner.vue'
 import BestProductsComponent from '../components/BestProducts.vue'
 import HomeInfo from '@/components/HomeInfo.vue';
-import Novelties from '@/components/Novelties.vue';
-import Reviews from '@/components/Reviews.vue';
+import NoveltiesSection from '@/components/Novelties.vue';
+import ProductReviews from '@/components/Reviews.vue';
 
 export default {
   name: 'HomeView',
@@ -21,8 +21,8 @@ export default {
     BanerComponent,
     BestProductsComponent,
     HomeInfo,
-    Novelties,
-    Reviews
+    NoveltiesSection,
+    ProductReviews
   },
 }
 </script>

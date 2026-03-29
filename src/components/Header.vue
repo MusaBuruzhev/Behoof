@@ -419,14 +419,14 @@ export default {
       return model ? model.name : '';
     },
 
-    loadModelsForSubcategory(subcategoryId) {
+    loadModelsForSubcategory() {
       this.modelsLoading = true;
       setTimeout(() => {
         this.modelsLoading = false;
       }, 100);
     },
 
-    loadProductsForModel(modelId) {
+    loadProductsForModel() {
       this.productsLoading = true;
       setTimeout(() => {
         this.productsLoading = false;

@@ -1,5 +1,16 @@
 import express from 'express'
-import { getCatalog, getProducts, addProduct, initializeData, getProduct, updateProduct, deleteProduct, uploadImages } from '../controllers/catalogController.js'
+import {
+  getCatalog,
+  getProducts,
+  addProduct,
+  initializeData,
+  getProduct,
+  updateProduct,
+  deleteProduct,
+  uploadImages,
+  addReview,
+  deleteReview,
+} from '../controllers/catalogController.js'
 import { authenticate, requireAdmin } from '../controllers/authController.js'
 
 const router = express.Router()
@@ -17,6 +28,8 @@ router.post('/products', authenticate, requireAdmin, (req, res, next) => {
  });
 }, addProduct)
 router.get('/products/:id', getProduct)
+router.post('/products/:id/reviews', authenticate, addReview)
+router.delete('/products/:id/reviews/:reviewId', authenticate, deleteReview)
 router.put('/products/:id', authenticate, requireAdmin, updateProduct)
 router.delete('/products/:id', authenticate, requireAdmin, deleteProduct)
 

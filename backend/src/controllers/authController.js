@@ -1,4 +1,6 @@
-﻿import User from '../models/User.js';
+﻿/* global process */
+
+import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import jwt from 'jsonwebtoken';
