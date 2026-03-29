@@ -12,7 +12,10 @@
                 <h1>Behoof</h1>
               </router-link>
             </div>
-            <p>Лучшие цены в интернет-магазинах. Мы сравниваем предложения от ведущих продавцов и помогаем вам найти оптимальные варианты.</p>
+            <p>
+              Лучшие цены в интернет-магазинах. Мы сравниваем предложения от ведущих продавцов и
+              помогаем вам найти оптимальные варианты.
+            </p>
           </div>
           <div class="footerSection">
             <h3>Навигация</h3>
@@ -63,15 +66,9 @@ export default {
   name: 'FooterComponent',
   computed: {
     currentYear() {
-      return new Date().getFullYear();
-    }
-  }
-}
-</script>
-
-<script>
-export default {
-  name: 'FooterComponent'
+      return new Date().getFullYear()
+    },
+  },
 }
 </script>
 
@@ -109,7 +106,7 @@ footer {
 }
 
 .footerTop {
-  background-color: #F6F7FA;
+  background-color: #f6f7fa;
   padding: 40px 0;
 }
 
