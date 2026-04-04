@@ -14,22 +14,22 @@ export default {
   props: {
     message: {
       type: String,
-      default: ''
+      default: '',
     },
     type: {
       type: String,
       default: 'info',
-      validator: (value) => ['success', 'error', 'info', 'warning', 'heart'].includes(value)
+      validator: (value) => ['success', 'error', 'info', 'warning', 'heart'].includes(value),
     },
     duration: {
       type: Number,
-      default: 3000
-    }
+      default: 3000,
+    },
   },
   data() {
     return {
-      timeout: null
-    };
+      timeout: null,
+    }
   },
   computed: {
     icon() {
@@ -38,38 +38,38 @@ export default {
         error: '✕',
         info: 'ℹ',
         warning: '⚠',
-        heart: '❤️'
-      };
-      return icons[this.type] || '✓';
-    }
+        heart: '❤️',
+      }
+      return icons[this.type] || '✓'
+    },
   },
   watch: {
     message(newVal) {
       if (newVal) {
-        this.startTimer();
+        this.startTimer()
       }
-    }
+    },
   },
   methods: {
     close() {
-      this.$emit('close');
-      clearTimeout(this.timeout);
+      this.$emit('close')
+      clearTimeout(this.timeout)
     },
     startTimer() {
-      clearTimeout(this.timeout);
+      clearTimeout(this.timeout)
       this.timeout = setTimeout(() => {
-        this.close();
-      }, this.duration);
-    }
+        this.close()
+      }, this.duration)
+    },
   },
   mounted() {
     if (this.message) {
-      this.startTimer();
+      this.startTimer()
     }
   },
   beforeUnmount() {
-    clearTimeout(this.timeout);
-  }
+    clearTimeout(this.timeout)
+  },
 }
 </script>
 

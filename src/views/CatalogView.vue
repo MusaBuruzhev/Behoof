@@ -1,7 +1,15 @@
 <template>
   <div class="catalog-page">
     <div class="container">
-      <h1>{{ modelName ? `${modelName} - Каталог товаров` : categoryName ? `${categoryName} - Каталог товаров` : 'Каталог товаров' }}</h1>
+      <h1>
+        {{
+          modelName
+            ? `${modelName} - Каталог товаров`
+            : categoryName
+              ? `${categoryName} - Каталог товаров`
+              : 'Каталог товаров'
+        }}
+      </h1>
 
       <!-- Filters Sidebar -->
       <div class="catalog-content">
@@ -15,14 +23,14 @@
                 placeholder="От"
                 min="0"
                 @input="applyFilters"
-              >
+              />
               <input
                 v-model.number="filters.priceMax"
                 type="number"
                 placeholder="До"
                 min="0"
                 @input="applyFilters"
-              >
+              />
             </div>
           </div>
 
@@ -36,7 +44,7 @@
                   :value="brand"
                   v-model="filters.selectedBrands"
                   @change="applyFilters"
-                >
+                />
                 <label :for="brand">{{ brand }}</label>
               </div>
             </div>
@@ -64,14 +72,12 @@
               type="text"
               placeholder="Поиск товаров..."
               @input="applyFilters"
-            >
+            />
             <span class="results-count">Найдено: {{ totalResults }}</span>
           </div>
 
           <div v-if="loading" class="loading">Загрузка товаров...</div>
-          <div v-else-if="totalResults === 0" class="no-products">
-            Товары не найдены
-          </div>
+          <div v-else-if="totalResults === 0" class="no-products">Товары не найдены</div>
           <div v-else class="products-grid">
             <ProductCard
               v-for="product in displayedProducts"
@@ -90,19 +96,9 @@
 
           <!-- Pagination -->
           <div v-if="totalPages > 1" class="pagination">
-            <button
-              @click="currentPage--"
-              :disabled="currentPage === 1"
-              class="page-btn"
-            >
-              ‹
-            </button>
+            <button @click="currentPage--" :disabled="currentPage === 1" class="page-btn">‹</button>
             <span>{{ currentPage }} из {{ totalPages }}</span>
-            <button
-              @click="currentPage++"
-              :disabled="currentPage === totalPages"
-              class="page-btn"
-            >
+            <button @click="currentPage++" :disabled="currentPage === totalPages" class="page-btn">
               ›
             </button>
           </div>
@@ -113,23 +109,23 @@
 </template>
 
 <script>
-import { fetchCatalog, fetchProducts } from '@/api/catalog.js';
-import ProductCard from '@/components/ProductCard.vue';
-import CompareSelectModal from '@/components/CompareSelectModal.vue';
+import { fetchCatalog, fetchProducts } from '@/api/catalog.js'
+import ProductCard from '@/components/ProductCard.vue'
+import CompareSelectModal from '@/components/CompareSelectModal.vue'
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 12
 
 export default {
   name: 'CatalogView',
   components: {
     ProductCard,
-    CompareSelectModal
+    CompareSelectModal,
   },
   props: {
     defaultSortBy: {
       type: String,
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
@@ -137,7 +133,7 @@ export default {
         categories: [],
         subcategories: {},
         models: {},
-        products: {}
+        products: {},
       },
       modelId: null,
       categoryId: null,
@@ -152,175 +148,181 @@ export default {
         priceMin: null,
         priceMax: null,
         selectedBrands: [],
-        sortBy: 'price-asc'
+        sortBy: 'price-asc',
       },
       allProducts: [],
       products: [],
       compareModalOpen: false,
-      compareProduct: null
-    };
+      compareProduct: null,
+    }
   },
   computed: {
     availableBrands() {
-      const brands = [...new Set(this.allProducts.map(p => p.brand))];
-      return brands.filter(b => b);
+      const brands = [...new Set(this.allProducts.map((p) => p.brand))]
+      return brands.filter((b) => b)
     },
     // products already paginated by server
     displayedProducts() {
-      return this.products;
-    }
+      return this.products
+    },
   },
   mounted() {
     // Установить сортировку по умолчанию если передан defaultSortBy
     if (this.defaultSortBy) {
-      this.filters.sortBy = this.defaultSortBy;
+      this.filters.sortBy = this.defaultSortBy
     }
   },
   watch: {
     '$route.query.modelId': {
       immediate: true,
       handler(newModelId) {
-        this.modelId = newModelId;
-        this.loadData();
-      }
+        this.modelId = newModelId
+        this.loadData()
+      },
     },
     '$route.query.categoryId': {
       immediate: true,
       handler(newCategoryId) {
-        this.categoryId = newCategoryId;
+        this.categoryId = newCategoryId
         if (newCategoryId) {
-          const category = this.catalogData.categories?.find(cat => cat.id === newCategoryId);
-          this.categoryName = category ? category.name : '';
+          const category = this.catalogData.categories?.find((cat) => cat.id === newCategoryId)
+          this.categoryName = category ? category.name : ''
         }
-        this.loadData();
-      }
+        this.loadData()
+      },
     },
     '$route.query.search': {
       immediate: true,
       handler(newSearch) {
-        this.searchQuery = newSearch || '';
-        this.applyFilters();
-      }
+        this.searchQuery = newSearch || ''
+        this.applyFilters()
+      },
     },
     '$route.query.sort': {
       immediate: true,
       handler(newSort) {
         if (newSort) {
-          this.filters.sortBy = newSort;
-          this.applyFilters();
+          this.filters.sortBy = newSort
+          this.applyFilters()
         }
-      }
+      },
     },
     currentPage(newPage, oldPage) {
       if (newPage !== oldPage) {
-        this.loadPage();
+        this.loadPage()
       }
-    }
+    },
   },
   methods: {
     async loadData() {
-      this.loading = true;
+      this.loading = true
       try {
-        const data = await fetchCatalog();
-        this.catalogData = data;
+        const data = await fetchCatalog()
+        this.catalogData = data
 
         // Устанавливаем categoryName если передан categoryId
         if (this.categoryId && !this.modelId) {
-          const category = this.catalogData.categories.find(cat => cat.id === this.categoryId);
-          this.categoryName = category ? category.name : '';
+          const category = this.catalogData.categories.find((cat) => cat.id === this.categoryId)
+          this.categoryName = category ? category.name : ''
         }
 
         if (this.modelId && this.catalogData.models[this.modelId]) {
-          const model = this.catalogData.models[this.modelId];
-          this.modelName = model.name;
+          const model = this.catalogData.models[this.modelId]
+          this.modelName = model.name
 
-          const subcategory = this.catalogData.subcategories[model.subcategoryId];
+          const subcategory = this.catalogData.subcategories[model.subcategoryId]
           if (subcategory) {
-            const category = this.catalogData.categories.find(cat => cat.id === subcategory.categoryId);
-            this.categoryName = category ? category.name : '';
+            const category = this.catalogData.categories.find(
+              (cat) => cat.id === subcategory.categoryId,
+            )
+            this.categoryName = category ? category.name : ''
           }
 
           // Get products for this model
           this.allProducts = model.productIds
-            .map(id => this.catalogData.products[id])
-            .filter(p => p);
+            .map((id) => this.catalogData.products[id])
+            .filter((p) => p)
         } else if (this.categoryId) {
           // Get products for this category
-          const subcategories = Object.values(this.catalogData.subcategories)
-            .filter(sub => sub.categoryId === this.categoryId);
+          const subcategories = Object.values(this.catalogData.subcategories).filter(
+            (sub) => sub.categoryId === this.categoryId,
+          )
 
-          const productIds = new Set();
-          subcategories.forEach(sub => {
+          const productIds = new Set()
+          subcategories.forEach((sub) => {
             if (sub.productIds) {
-              sub.productIds.forEach(id => productIds.add(id));
+              sub.productIds.forEach((id) => productIds.add(id))
             }
-          });
+          })
 
           this.allProducts = [...productIds]
-            .map(id => this.catalogData.products[id])
-            .filter(p => p);
+            .map((id) => this.catalogData.products[id])
+            .filter((p) => p)
         } else {
           // Show all products if no model or category selected
-          this.allProducts = Object.values(this.catalogData.products);
+          this.allProducts = Object.values(this.catalogData.products)
         }
 
-        this.applyFilters();
+        this.applyFilters()
       } catch (error) {
-        console.error('Ошибка загрузки каталога:', error);
+        console.error('Ошибка загрузки каталога:', error)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     async applyFilters() {
       // reset to first page when filters/search change
-      this.currentPage = 1;
-      await this.loadPage();
+      this.currentPage = 1
+      await this.loadPage()
     },
     clearFilters() {
       this.filters = {
         priceMin: null,
         priceMax: null,
         selectedBrands: [],
-        sortBy: 'price-asc'
-      };
-      this.searchQuery = '';
-      this.applyFilters();
+        sortBy: 'price-asc',
+      }
+      this.searchQuery = ''
+      this.applyFilters()
     },
     async loadPage() {
-      this.loading = true;
+      this.loading = true
       try {
         const params = {
           page: this.currentPage,
           limit: ITEMS_PER_PAGE,
-        };
-        if (this.searchQuery.trim()) params.q = this.searchQuery.trim();
-        if (this.modelId) params.modelId = this.modelId;
-        if (this.categoryId && !this.modelId) params.categoryId = this.categoryId;
-        if (this.filters.priceMin !== null && this.filters.priceMin !== '') params.priceMin = this.filters.priceMin;
-        if (this.filters.priceMax !== null && this.filters.priceMax !== '') params.priceMax = this.filters.priceMax;
-        if (this.filters.selectedBrands.length > 0) params.brand = this.filters.selectedBrands.join(',');
-        if (this.filters.sortBy) params.sortBy = this.filters.sortBy;
+        }
+        if (this.searchQuery.trim()) params.q = this.searchQuery.trim()
+        if (this.modelId) params.modelId = this.modelId
+        if (this.categoryId && !this.modelId) params.categoryId = this.categoryId
+        if (this.filters.priceMin !== null && this.filters.priceMin !== '')
+          params.priceMin = this.filters.priceMin
+        if (this.filters.priceMax !== null && this.filters.priceMax !== '')
+          params.priceMax = this.filters.priceMax
+        if (this.filters.selectedBrands.length > 0)
+          params.brand = this.filters.selectedBrands.join(',')
+        if (this.filters.sortBy) params.sortBy = this.filters.sortBy
 
-        const response = await fetchProducts(params);
-        this.products = response.products || [];
-        this.totalResults = response.total || 0;
-        this.totalPages = response.totalPages || 1;
+        const response = await fetchProducts(params)
+        this.products = response.products || []
+        this.totalResults = response.total || 0
+        this.totalPages = response.totalPages || 1
       } catch (error) {
-        console.error('Ошибка загрузки продуктов:', error);
+        console.error('Ошибка загрузки продуктов:', error)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     openCompareModal(product) {
-      this.compareProduct = product;
-      this.compareModalOpen = true;
+      this.compareProduct = product
+      this.compareModalOpen = true
     },
     closeCompareModal() {
-      this.compareModalOpen = false;
-      this.compareProduct = null;
-    }
-  }
-};
+      this.compareModalOpen = false
+      this.compareProduct = null
+    },
+  },
+}
 </script>
 
 <style scoped>
@@ -461,7 +463,8 @@ h1 {
   margin-bottom: 30px;
 }
 
-.loading, .no-products {
+.loading,
+.no-products {
   text-align: center;
   padding: 50px;
   font-size: 18px;

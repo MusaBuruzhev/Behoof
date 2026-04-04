@@ -1,16 +1,14 @@
 <template>
   <header>
     <div class="container flex v-center">
-
       <div class="headerLogoInfo flex v-center">
-         <router-link to="/" class="flex v-center">
-        <img src="../../public/logo.svg" alt="logo" />
+        <router-link to="/" class="flex v-center">
+          <img src="../../public/logo.svg" alt="logo" />
 
-        <h1>Behoof</h1>
-          </router-link>
+          <h1>Behoof</h1>
+        </router-link>
         <p>Лучшие цены в интернет-магазинах</p>
       </div>
-
 
       <div class="headerBtnCategory">
         <button class="headerBtnCategoryButtom" @click="toggleCatalog">
@@ -23,19 +21,19 @@
 
       <div class="searchCont">
         <span class="searchImg"><img src="../../public/iconHed/Search.svg" alt="" /></span>
-        <input 
-          type="text" 
-          class="searchInput" 
-          placeholder="Поиск товаров" 
+        <input
+          type="text"
+          class="searchInput"
+          placeholder="Поиск товаров"
           v-model="searchQuery"
           @keyup.enter="doSearch"
         />
       </div>
 
       <nav class="headerNav">
- <router-link v-if="isAdmin" to="/add-product" class="add-product-link">
- <button title="Добавить товар">➕</button>
- </router-link>
+        <router-link v-if="isAdmin" to="/add-product" class="add-product-link">
+          <button title="Добавить товар">➕</button>
+        </router-link>
         <div class="auth-section">
           <button
             v-if="!isAuthenticated"
@@ -46,37 +44,68 @@
             <img src="../../public/iconHed/authorization.svg" alt="Вход" />
           </button>
           <div v-else class="profile-menu" ref="profileMenu">
-            <button @click="toggleProfileMenu" class="profile-button" :title="currentUser?.firstName">
+            <button
+              @click="toggleProfileMenu"
+              class="profile-button"
+              :title="currentUser?.firstName"
+            >
               <div class="profile-avatar">{{ userInitials }}</div>
             </button>
             <div v-show="showProfileMenu" class="profile-dropdown">
               <div class="profile-info">
-                <div class="profile-info-name">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</div>
+                <div class="profile-info-name">
+                  {{ currentUser?.firstName }} {{ currentUser?.lastName }}
+                </div>
                 <div class="profile-info-email">{{ currentUser?.email }}</div>
               </div>
- <router-link to="/profile" class="profile-link">
- <span><img src="../../public/profIcon/l5.png" alt=""> Мой профиль</span>
- </router-link>
- <router-link to="/orders" class="profile-link">
- <span><img src="../../public/profIcon/l3.png" alt=""> Мои заказы</span>
- </router-link>
- <router-link v-if="isAdmin" to="/admin" class="profile-link">
- <span><img src="../../public/profIcon/l4.png" alt=""> Админ-панель</span>
- </router-link>
+              <router-link to="/profile" class="profile-link">
+                <span><img src="../../public/profIcon/l5.png" alt="" /> Мой профиль</span>
+              </router-link>
+              <router-link to="/orders" class="profile-link">
+                <span><img src="../../public/profIcon/l3.png" alt="" /> Мои заказы</span>
+              </router-link>
+              <router-link v-if="isAdmin" to="/admin" class="profile-link">
+                <span><img src="../../public/profIcon/l4.png" alt="" /> Админ-панель</span>
+              </router-link>
               <router-link to="/favorites" class="profile-link">
-                <span><img src="../../public/profIcon/l1.png" alt=""> Избранное</span>
+                <span><img src="../../public/profIcon/l1.png" alt="" /> Избранное</span>
               </router-link>
               <router-link to="/comparison" class="profile-link">
-                <span><img src="../../public/profIcon/l2.png" alt=""> Сравнение</span>
+                <span><img src="../../public/profIcon/l2.png" alt="" /> Сравнение</span>
               </router-link>
               <button @click="handleLogout" class="logout-button">
-                <span><img src="../../public/profIcon/l6.png" alt=""> Выход</span>
+                <span><img src="../../public/profIcon/l6.png" alt="" /> Выход</span>
               </button>
             </div>
           </div>
         </div>
-        <button @click="openCompareModal" title="Сравнение" class="header-icon-btn"><img src="../../public/iconHed/comparison.svg" alt="" /></button>
-        <router-link to="/favorites" title="Избранное"><img src="../../public/iconHed/favourites.svg" alt="" /></router-link>
+        <button @click="openCompareModal" title="Сравнение" class="header-icon-btn">
+          <img src="../../public/iconHed/comparison.svg" alt="" />
+        </button>
+        <router-link to="/favorites" title="Избранное" class="header-icon-btn"
+          ><img src="../../public/iconHed/favourites.svg" alt=""
+        /></router-link>
+        <router-link
+          v-if="isAuthenticated"
+          to="/notifications"
+          title="Уведомления"
+          class="header-icon-btn notifications-link"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span v-if="unreadCount > 0" class="notifications-badge">{{
+            unreadCount > 99 ? '99+' : unreadCount
+          }}</span>
+        </router-link>
       </nav>
     </div>
 
@@ -147,7 +176,7 @@
           </h1>
           <div class="catalogContDiv">
             <div v-if="modelsLoading" class="loading">Загрузка моделей...</div>
-            <div v-else style="width: 100%;">
+            <div v-else style="width: 100%">
               <button
                 v-for="model in models"
                 :key="model.id"
@@ -171,7 +200,7 @@
             {{ getModelName(selectedModelId) }}
           </h1>
           <div class="catalogContDiv">
-            <p style="padding: 20px; text-align: center; color: #666;">
+            <p style="padding: 20px; text-align: center; color: #666">
               Выберите модель для просмотра товаров в каталоге
             </p>
           </div>
@@ -193,14 +222,15 @@
 </template>
 
 <script>
-import { fetchCatalog } from '@/api/catalog.js';
-import authAPI from '@/api/auth.js';
-import CompareSelectModal from '@/components/CompareSelectModal.vue';
+import { fetchCatalog } from '@/api/catalog.js'
+import authAPI from '@/api/auth.js'
+import notificationsAPI from '@/api/notifications.js'
+import CompareSelectModal from '@/components/CompareSelectModal.vue'
 
 export default {
   name: 'HeaderComponent',
   components: {
-    CompareSelectModal
+    CompareSelectModal,
   },
 
   data() {
@@ -219,7 +249,7 @@ export default {
         categories: [],
         subcategories: {},
         models: {},
-        products: {}
+        products: {},
       },
 
       loading: false,
@@ -233,70 +263,72 @@ export default {
       currentUser: null,
       showProfileMenu: false,
       showCompareModal: false,
-      searchQuery: ''
+      searchQuery: '',
+      unreadCount: 0,
     }
   },
 
- computed: {
- isAdmin() {
- return this.currentUser?.role === 'admin';
- },
- userInitials() {
- if (this.currentUser) {
- const first = this.currentUser.firstName?.[0] || '';
- const last = this.currentUser.lastName?.[0] || '';
- return (first + last).toUpperCase();
- }
- return '';
- },
+  computed: {
+    isAdmin() {
+      return this.currentUser?.role === 'admin'
+    },
+    userInitials() {
+      if (this.currentUser) {
+        const first = this.currentUser.firstName?.[0] || ''
+        const last = this.currentUser.lastName?.[0] || ''
+        return (first + last).toUpperCase()
+      }
+      return ''
+    },
     categories() {
-      return this.catalogData.categories || [];
+      return this.catalogData.categories || []
     },
 
     subcategories() {
-      if (!this.selectedCategoryId) return [];
+      if (!this.selectedCategoryId) return []
 
-      const category = this.catalogData.categories.find((cat) => cat.id === this.selectedCategoryId);
-      if (!category || !category.subcategoryIds) return [];
+      const category = this.catalogData.categories.find((cat) => cat.id === this.selectedCategoryId)
+      if (!category || !category.subcategoryIds) return []
 
       return category.subcategoryIds
         .map((id) => this.catalogData.subcategories[id])
-        .filter(subcat => subcat);
+        .filter((subcat) => subcat)
     },
 
     models() {
-      if (!this.selectedSubcategoryId) return [];
+      if (!this.selectedSubcategoryId) return []
 
-      const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId];
-      if (!subcategory) return [];
+      const subcategory = this.catalogData.subcategories[this.selectedSubcategoryId]
+      if (!subcategory) return []
 
-      return Object.values(this.catalogData.models || {})
-        .filter(model => model.subcategoryId === this.selectedSubcategoryId);
+      return Object.values(this.catalogData.models || {}).filter(
+        (model) => model.subcategoryId === this.selectedSubcategoryId,
+      )
     },
 
     products() {
-      if (!this.selectedModelId) return [];
+      if (!this.selectedModelId) return []
 
-      const model = this.catalogData.models[this.selectedModelId];
-      if (!model || !model.productIds) return [];
+      const model = this.catalogData.models[this.selectedModelId]
+      if (!model || !model.productIds) return []
 
       return model.productIds
         .map((id) => this.catalogData.products[id])
-        .filter(product => product);
+        .filter((product) => product)
     },
   },
 
   methods: {
     async loadCatalogData() {
-      this.loading = true;
+      this.loading = true
       try {
-        const data = await fetchCatalog();
-        this.catalogData = data;
-        console.log('Данные каталога загружены:', data);
+        const data = await fetchCatalog()
+        this.catalogData = data
+        console.log('Данные каталога загружены:', data)
       } catch (error) {
-        console.error('Ошибка загрузки каталога:', error);
+        console.error('Ошибка загрузки каталога:', error)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
@@ -314,7 +346,7 @@ export default {
       this.isCatalogOpen = !this.isCatalogOpen
 
       if (this.isCatalogOpen) {
-        await this.loadCatalogData();
+        await this.loadCatalogData()
 
         if (!this.selectedCategoryId) {
           this.$nextTick(() => {
@@ -355,20 +387,20 @@ export default {
       this.activeSubcategoryId = subcategoryId
       this.activeModelId = null
       this.activeProductId = null
-      this.loadModelsForSubcategory(subcategoryId);
+      this.loadModelsForSubcategory(subcategoryId)
     },
 
     selectModel(modelId) {
       this.selectedModelId = modelId
       this.activeModelId = modelId
       this.activeProductId = null
-      this.isCatalogOpen = false;
-      this.$router.push(`/catalog?modelId=${modelId}`);
+      this.isCatalogOpen = false
+      this.$router.push(`/catalog?modelId=${modelId}`)
     },
 
     selectProduct(productId) {
       this.activeProductId = productId
-      console.log('Выбран товар:', productId, this.catalogData.products[productId]);
+      console.log('Выбран товар:', productId, this.catalogData.products[productId])
     },
 
     closeCatalog(event) {
@@ -412,107 +444,123 @@ export default {
     },
 
     getCategoryName(categoryId) {
-      const category = this.catalogData.categories.find(cat => cat.id === categoryId);
-      return category ? category.name : '';
+      const category = this.catalogData.categories.find((cat) => cat.id === categoryId)
+      return category ? category.name : ''
     },
 
     getSubcategoryName(subcategoryId) {
-      const subcat = this.catalogData.subcategories[subcategoryId];
-      return subcat ? subcat.name : '';
+      const subcat = this.catalogData.subcategories[subcategoryId]
+      return subcat ? subcat.name : ''
     },
 
     getModelName(modelId) {
-      const model = this.catalogData.models[modelId];
-      return model ? model.name : '';
+      const model = this.catalogData.models[modelId]
+      return model ? model.name : ''
     },
 
     loadModelsForSubcategory() {
-      this.modelsLoading = true;
+      this.modelsLoading = true
       setTimeout(() => {
-        this.modelsLoading = false;
-      }, 100);
+        this.modelsLoading = false
+      }, 100)
     },
 
     loadProductsForModel() {
-      this.productsLoading = true;
+      this.productsLoading = true
       setTimeout(() => {
-        this.productsLoading = false;
-      }, 100);
+        this.productsLoading = false
+      }, 100)
     },
 
     goToLogin() {
-      this.$router.push('/login');
+      this.$router.push('/login')
     },
 
     toggleProfileMenu() {
-      this.showProfileMenu = !this.showProfileMenu;
+      this.showProfileMenu = !this.showProfileMenu
     },
 
     handleLogout() {
-      authAPI.logout();
-      this.isAuthenticated = false;
-      this.currentUser = null;
-      this.showProfileMenu = false;
-      this.$router.push('/');
+      authAPI.logout()
+      this.isAuthenticated = false
+      this.currentUser = null
+      this.showProfileMenu = false
+      this.$router.push('/')
     },
 
     checkAuthStatus() {
-      this.isAuthenticated = authAPI.isAuthenticated();
+      this.isAuthenticated = authAPI.isAuthenticated()
       if (this.isAuthenticated) {
-        this.currentUser = authAPI.getCurrentUser();
+        this.currentUser = authAPI.getCurrentUser()
+        this.loadUnreadCount()
+      } else {
+        this.unreadCount = 0
+      }
+    },
+
+    async loadUnreadCount() {
+      if (!this.isAuthenticated) return
+      try {
+        const data = await notificationsAPI.getUnreadCount()
+        this.unreadCount = data.unreadCount || 0
+      } catch (error) {
+        console.error('Ошибка загрузки счетчика уведомлений:', error)
       }
     },
 
     closeProfileMenu(event) {
-      const profileMenu = this.$refs.profileMenu;
-      const profileButton = event?.target?.closest('.profile-button');
+      const profileMenu = this.$refs.profileMenu
+      const profileButton = event?.target?.closest('.profile-button')
       if (profileMenu && !profileMenu.contains(event.target) && !profileButton) {
-        this.showProfileMenu = false;
+        this.showProfileMenu = false
       }
     },
 
     openCompareModal() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       if (!token) {
-        this.$router.push('/login');
-        return;
+        this.$router.push('/login')
+        return
       }
-      this.showCompareModal = true;
+      this.showCompareModal = true
     },
 
     closeCompareModal() {
-      this.showCompareModal = false;
+      this.showCompareModal = false
     },
 
     goToCategoryCatalog(categoryId) {
-      this.isCatalogOpen = false;
-      this.$router.push(`/catalog?categoryId=${categoryId}`);
+      this.isCatalogOpen = false
+      this.$router.push(`/catalog?categoryId=${categoryId}`)
     },
 
     doSearch() {
       if (this.searchQuery.trim()) {
-        this.isCatalogOpen = false;
-        this.$router.push(`/catalog?search=${encodeURIComponent(this.searchQuery.trim())}`);
+        this.isCatalogOpen = false
+        this.$router.push(`/catalog?search=${encodeURIComponent(this.searchQuery.trim())}`)
       }
-    }
+    },
   },
 
   mounted() {
-    document.addEventListener('click', this.closeCatalog);
-    document.addEventListener('click', this.closeProfileMenu);
-    this.checkAuthStatus();
+    document.addEventListener('click', this.closeCatalog)
+    document.addEventListener('click', this.closeProfileMenu)
+    this.checkAuthStatus()
   },
 
   beforeUnmount() {
-    document.removeEventListener('click', this.closeCatalog);
-    document.removeEventListener('click', this.closeProfileMenu);
+    document.removeEventListener('click', this.closeCatalog)
+    document.removeEventListener('click', this.closeProfileMenu)
   },
 
   watch: {
-    '$route'() {
-      this.checkAuthStatus();
-    }
-  }
+    $route() {
+      this.checkAuthStatus()
+      if (this.isAuthenticated) {
+        this.loadUnreadCount()
+      }
+    },
+  },
 }
 </script>
 <style scoped>
@@ -680,6 +728,45 @@ header {
 
 .headerNav button.header-icon-btn:hover {
   background-color: #e0e5f0;
+}
+
+.notifications-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: #f2f5f9;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.notifications-link:hover {
+  background-color: #e0e5f0;
+}
+
+.notifications-link svg {
+  color: #666;
+}
+
+.notifications-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff4d4d;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  border: 2px solid white;
 }
 
 .add-product-link {
@@ -902,7 +989,6 @@ header {
   width: 100%;
 }
 
-
 .loading {
   padding: 20px;
   text-align: center;
@@ -939,32 +1025,31 @@ header {
 }
 
 .profile-button {
- background: linear-gradient(135deg, #667eea0%, #764ba2100%);
- height:52px;
- width:52px;
- border:none;
- border-radius:12px;
- cursor: pointer;
- display: flex;
- align-items: center;
- justify-content: center;
- transition: all0.3s ease;
- padding:0;
- box-shadow:03px10px rgba(102,126,234,0.3);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 52px;
+  width: 52px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  padding: 0;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
 }
 
 .profile-button:hover {
- transform: translateY(-2px);
- box-shadow:06px20px rgba(102,126,234,0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .profile-button:active {
- transform: translateY(0);
+  transform: translateY(0);
 }
 
 .profile-button:hover {
   background-color: #764ba2;
-
 }
 
 .profile-avatar {
@@ -974,147 +1059,146 @@ header {
 }
 
 .profile-dropdown {
- position: absolute;
- top:100%;
- right:0;
- background: linear-gradient(180deg, #ffffff0%, #f8fafc100%);
- border-radius:16px;
- box-shadow:
-020px40px rgba(0,0,0,0.1),
-0001px rgba(255,255,255,0.5) inset;
- min-width:280px;
- z-index:1001;
- margin-top:12px;
- overflow: hidden;
- animation: dropdownFadeIn0.3s ease-out;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 0 1px rgba(255, 255, 255, 0.5) inset;
+  min-width: 280px;
+  z-index: 1001;
+  margin-top: 12px;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.3s ease-out;
 }
 
 @keyframes dropdownFadeIn {
- from {
- opacity:0;
- transform: translateY(-10px);
- }
- to {
- opacity:1;
- transform: translateY(0);
- }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .profile-info {
- padding:20px;
- background: linear-gradient(135deg, #667eea0%, #764ba2100%);
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .profile-info-name {
- font-weight:700;
- color: #ffffff;
- font-size:16px;
- margin-bottom:4px;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 16px;
+  margin-bottom: 4px;
 }
 
 .profile-info-email {
- font-size:13px;
- color: rgba(255,255,255,0.85);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .profile-link {
- display: block;
- padding:14px20px;
- color: #374151;
- text-decoration: none;
- font-size:15px;
- font-weight:500;
- transition: all0.3s ease;
- border-bottom:1px solid #f1f5f9;
- position: relative;
- overflow: hidden;
+  display: block;
+  padding: 14px 20px;
+  color: #374151;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
 }
 
 .profile-link::before {
- content: '';
- position: absolute;
- left:0;
- top:0;
- height:100%;
- width:4px;
- background: linear-gradient(135deg, #667eea0%, #764ba2100%);
- transform: scaleY(0);
- transition: transform0.3s ease;
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
 }
 
 .profile-link:hover {
- background: linear-gradient(90deg, #f8fafc0%, #f1f5f9100%);
- color: #667eea;
- padding-left:28px;
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  color: #667eea;
+  padding-left: 28px;
 }
 
 .profile-link:hover::before {
- transform: scaleY(1);
+  transform: scaleY(1);
 }
 
 .profile-link span {
- display: flex;
- align-items: center;
- gap:14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.profile-link img{
- width:22px;
- height:22px;
- filter: grayscale(0);
- transition: filter0.3s ease;
+.profile-link img {
+  width: 22px;
+  height: 22px;
+  filter: grayscale(0);
+  transition: filter 0.3s ease;
 }
 
 .profile-link:hover img {
- filter: grayscale(0) brightness(0.6) sepia(1) hue-rotate(180deg) saturate(3);
+  filter: grayscale(0) brightness(0.6) sepia(1) hue-rotate(180deg) saturate(3);
 }
 
 .logout-button {
- width:100%;
- padding:14px20px;
- background: none;
- border: none;
- text-align: left;
- color: #dc2626;
- font-size:15px;
- font-weight:500;
- cursor: pointer;
- transition: all0.3s ease;
- position: relative;
- overflow: hidden;
+  width: 100%;
+  padding: 14px 20px;
+  background: none;
+  border: none;
+  text-align: left;
+  color: #dc2626;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .logout-button::before {
- content: '';
- position: absolute;
- left:0;
- top:0;
- height:100%;
- width:4px;
- background: #dc2626;
- transform: scaleY(0);
- transition: transform0.3s ease;
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background: #dc2626;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
 }
 
 .logout-button:hover {
- background: linear-gradient(90deg, #fef2f20%, #fee2e2100%);
- padding-left:28px;
+  background: linear-gradient(90deg, #fef2f2 0%, #fee2e2 100%);
+  padding-left: 28px;
 }
 
 .logout-button:hover::before {
- transform: scaleY(1);
+  transform: scaleY(1);
 }
 
 .logout-button span {
- display: flex;
- align-items: center;
- gap:14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-
-.logout-button img{
- width:22px;
- height:22px;
+.logout-button img {
+  width: 22px;
+  height: 22px;
 }
 
 .profile-info {
@@ -1157,7 +1241,7 @@ header {
   gap: 8px;
 }
 
-.profile-link img{
+.profile-link img {
   width: 20px;
   height: 20px;
 }
@@ -1185,8 +1269,7 @@ header {
   gap: 8px;
 }
 
-
-.logout-button img{
+.logout-button img {
   width: 20px;
   height: 20px;
 }

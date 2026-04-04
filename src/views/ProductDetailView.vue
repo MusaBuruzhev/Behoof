@@ -96,123 +96,129 @@
           </button>
           <button class="cart-btn" @click="openOrderModal">Заказать</button>
         </div>
+      </div>
+    </div>
 
-        <div class="reviews-section">
-          <div class="reviews-header">
-            <h3>Отзывы</h3>
-            <button class="review-btn large-btn" @click="toggleReviewForm">
-              {{
-                showReviewForm
-                  ? 'Скрыть форму'
-                  : ownReview
-                    ? 'Редактировать отзыв'
-                    : 'Оставить отзыв'
-              }}
-            </button>
+    <!-- ОТДЕЛЬНЫЙ БЛОК ОТЗЫВОВ -->
+    <div class="reviews-page-section">
+      <div class="container">
+        <div class="reviews-block">
+          <div class="reviews-block-header">
+            <h2>Отзывы покупателей</h2>
+            <span class="reviews-total">{{ reviewsCount }} отзывов</span>
           </div>
 
-          <p class="reviews-count">Всего отзывов: {{ reviewsCount }}</p>
+          <button
+            class="write-review-btn"
+            @click="toggleReviewForm"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            {{ ownReview ? 'Редактировать отзыв' : 'Написать отзыв' }}
+          </button>
 
-          <div v-if="showReviewForm" class="review-form">
-            <h4>
-              {{
-                ownReview ? 'Редактирование отзыва' : 'Оцените характеристики (можно пропустить)'
-              }}
-            </h4>
-            <div class="review-traits-grid">
-              <div v-for="trait in categoryTraits" :key="trait" class="review-trait-item">
-                <span class="trait-name">{{ trait }}</span>
-                <div class="star-picker">
-                  <button
-                    v-for="i in 5"
-                    :key="`${trait}-${i}`"
-                    type="button"
-                    class="star-btn"
-                    :class="{ active: (reviewForm.traitRatings[trait] || 0) >= i }"
-                    @click="setTraitRating(trait, i)"
-                  >
-                    ★
-                  </button>
-                  <button type="button" class="clear-rating-btn" @click="clearTraitRating(trait)">
-                    очистить
-                  </button>
+          <!-- Форма отзыва -->
+          <div v-if="showReviewForm" class="review-form-new">
+            <div class="review-form-header">
+              <h3>{{ ownReview ? 'Редактировать отзыв' : 'Новый отзыв' }}</h3>
+              <button class="close-form-btn" @click="showReviewForm = false">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="review-traits-section">
+              <p class="traits-label">Оцените характеристики:</p>
+              <div class="traits-grid">
+                <div v-for="trait in categoryTraits" :key="trait" class="trait-rating">
+                  <span class="trait-name">{{ trait }}</span>
+                  <div class="stars">
+                    <button
+                      v-for="i in 5"
+                      :key="`${trait}-${i}`"
+                      type="button"
+                      class="star"
+                      :class="{ active: (reviewForm.traitRatings[trait] || 0) >= i }"
+                      @click="setTraitRating(trait, i)"
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
 
             <textarea
               v-model="reviewForm.text"
-              class="review-textarea"
+              class="review-textarea-new"
               maxlength="2000"
-              placeholder="Поделитесь впечатлениями о товаре"
+              placeholder="Поделитесь своими впечатлениями о товаре: качество, удобство использования, соотношение цена-качество и т.д."
             ></textarea>
-            <div class="review-form-footer">
-              <span>{{ reviewForm.text.length }}/2000</span>
+
+            <div class="review-form-actions">
+              <span class="char-count">{{ reviewForm.text.length }}/2000</span>
               <button
-                class="review-btn large-btn"
+                class="submit-review-btn"
                 @click="submitReview"
-                :disabled="isSubmittingReview"
+                :disabled="isSubmittingReview || !reviewForm.text.trim()"
               >
-                {{
-                  isSubmittingReview
-                    ? 'Отправка...'
-                    : ownReview
-                      ? 'Сохранить изменения'
-                      : 'Отправить отзыв'
-                }}
+                {{ isSubmittingReview ? 'Отправка...' : (ownReview ? 'Сохранить' : 'Отправить отзыв') }}
               </button>
             </div>
           </div>
 
-          <div v-if="sortedReviews.length === 0" class="no-reviews">
-            Пока нет отзывов — будьте первым 👋
+          <!-- Список отзывов -->
+          <div v-if="sortedReviews.length === 0" class="no-reviews-new">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <p>Пока никто не оставил отзыв</p>
+            <span>Будьте первым, кто поделится впечатлениями!</span>
           </div>
 
-          <div v-else class="reviews-list">
-            <article v-for="review in sortedReviews" :key="review.id" class="review-card">
-              <div class="review-card-head">
-                <img
-                  :src="getAvatarUrl(review.userAvatar, review.userName)"
-                  alt="avatar"
-                  class="review-avatar"
-                />
-                <div>
-                  <p class="review-author">{{ review.userName || 'Пользователь' }}</p>
-                  <p class="review-date">{{ formatReviewDate(review.createdAt) }}</p>
+          <div v-else class="reviews-grid">
+            <article v-for="review in sortedReviews" :key="review.id" class="review-card-new">
+              <div class="review-header">
+                <div class="review-author-info">
+                  <img
+                    :src="getAvatarUrl(review.userAvatar, review.userName)"
+                    alt="avatar"
+                    class="review-avatar-new"
+                  />
+                  <div>
+                    <p class="review-author-name">{{ review.userName || 'Покупатель' }}</p>
+                    <p class="review-date-new">{{ formatReviewDate(review.createdAt) }}</p>
+                  </div>
                 </div>
                 <button
                   v-if="canDeleteReview(review)"
-                  type="button"
                   class="delete-review-btn"
                   @click="removeReview(review.id)"
+                  title="Удалить отзыв"
                 >
-                  Удалить
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  </svg>
                 </button>
               </div>
 
-              <div
-                v-if="review.traitRatings && Object.keys(review.traitRatings).length"
-                class="review-traits"
-              >
-                <div
-                  v-for="(rating, trait) in review.traitRatings"
-                  :key="`${review.id}-${trait}`"
-                  class="review-trait-row"
-                >
-                  <span class="trait-name">{{ trait }}</span>
-                  <div class="rating-segments">
-                    <span
-                      v-for="i in 5"
-                      :key="i"
-                      :class="{ filled: i <= rating }"
-                      class="segment"
-                    ></span>
+              <div v-if="review.traitRatings && Object.keys(review.traitRatings).length" class="review-ratings">
+                <div v-for="(rating, trait) in review.traitRatings" :key="`${review.id}-${trait}`" class="review-rating-item">
+                  <span class="rating-trait">{{ trait }}</span>
+                  <div class="rating-stars">
+                    <span v-for="i in 5" :key="i" :class="['star-filled', { active: i <= rating }]">★</span>
                   </div>
-                  <span class="rating-value">{{ rating }}/5</span>
                 </div>
               </div>
 
-              <p class="review-text">{{ review.text }}</p>
+              <p class="review-content">{{ review.text }}</p>
             </article>
           </div>
         </div>
@@ -300,7 +306,7 @@ export default {
   async mounted() {
     // Скролл наверх при загрузке страницы
     window.scrollTo(0, 0)
-    
+
     const productId = this.$route.params.id
     try {
       this.product = await getProduct(productId)
@@ -609,7 +615,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all0.3s;
+  transition: all 0.3s;
   z-index: 10;
 }
 
@@ -826,6 +832,83 @@ export default {
   margin-bottom: 30px;
 }
 
+/* Табы для разделов */
+.detail-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 30px 0 20px;
+  padding: 6px;
+  background: #f5f7fa;
+  border-radius: 12px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.tab-btn:hover {
+  background: #fff;
+  color: #263141;
+}
+
+.tab-btn.active {
+  background: #fff;
+  color: #ff4d4d;
+  box-shadow: 0 2px 8px rgba(255, 77, 77, 0.15);
+}
+
+.reviews-badge {
+  background: #ff4d4d;
+  color: white;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+/* Стили для кнопок */
+.review-btn {
+  border: none;
+  border-radius: 8px;
+  background: #ff4d4d;
+  color: #fff;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.review-btn:hover {
+  background: #e63939;
+  transform: translateY(-2px);
+}
+
+.review-btn.large-btn {
+  padding: 14px 28px;
+  font-size: 15px;
+  border-radius: 10px;
+}
+
+.review-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .reviews-header {
   display: flex;
   align-items: center;
@@ -941,7 +1024,7 @@ export default {
   max-height: 400px;
   overflow-y: auto;
   padding-right: 8px;
-  
+
   /* Красивый скролл */
   scrollbar-width: thin;
   scrollbar-color: #ff4d4d #f0f0f0;
@@ -1029,7 +1112,7 @@ export default {
 .order-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1037,36 +1120,428 @@ export default {
 }
 
 .order-modal-content {
-  width: min(520px, 92vw);
+  width: min(600px, 92vw);
   background: #fff;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 20px;
+  padding: 32px;
+}
+
+.order-modal-content h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #263141;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.order-modal-content p {
+  font-size: 18px;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #666;
+}
+
+.order-modal-content p strong {
+  color: #263141;
+  font-size: 20px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #263141;
 }
 
 .form-group input,
 .form-group textarea {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #ff4d4d;
+}
+
+.form-group input[type="datetime-local"] {
+  font-family: inherit;
 }
 
 .order-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 28px;
 }
 
 .secondary-btn {
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
   background: #fff;
-  padding: 10px16px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.secondary-btn:hover {
+  border-color: #ff4d4d;
+  color: #ff4d4d;
+}
+
+/* ============ НОВЫЙ БЛОК ОТЗЫВОВ ============ */
+.reviews-page-section {
+  width: 100%;
+  background: #fff;
+  padding: 40px 0 60px;
+  margin-top: 40px;
+}
+
+.reviews-page-section .container {
+  width: 85%;
+  margin: 0 auto;
+}
+
+.reviews-block {
+  margin: 0 auto;
+}
+
+.reviews-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.reviews-block-header h2 {
+  font-size: 28px;
+  color: #263141;
+  margin: 0;
+}
+
+.reviews-total {
+  background: #f5f7fa;
+  color: #666;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.write-review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 24px;
+}
+
+.write-review-btn:hover {
+  background: #e63939;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
+}
+
+/* Форма отзыва */
+.review-form-new {
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.review-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.review-form-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #263141;
+}
+
+.close-form-btn {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.close-form-btn:hover {
+  background: #eee;
+  color: #333;
+}
+
+.review-traits-section {
+  margin-bottom: 20px;
+}
+
+.traits-label {
+  color: #666;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.traits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.trait-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.trait-rating .trait-name {
+  font-weight: 500;
+  color: #333;
+  text-transform: capitalize;
+}
+
+.trait-rating .stars {
+  display: flex;
+  gap: 2px;
+}
+
+.trait-rating .star {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  color: #ddd;
+  transition: color 0.2s;
+}
+
+.trait-rating .star.active {
+  color: #ffb300;
+}
+
+.trait-rating .star:hover {
+  transform: scale(1.1);
+}
+
+.review-textarea-new {
+  width: 100%;
+  min-height: 140px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 15px;
+  resize: vertical;
+  font-family: inherit;
+  margin-bottom: 16px;
+}
+
+.review-textarea-new:focus {
+  outline: none;
+  border-color: #ff4d4d;
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.1);
+}
+
+.review-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-count {
+  color: #999;
+  font-size: 14px;
+}
+
+.submit-review-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.submit-review-btn:hover:not(:disabled) {
+  background: #e63939;
+  transform: translateY(-2px);
+}
+
+.submit-review-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Нет отзывов */
+.no-reviews-new {
+  text-align: center;
+  padding: 60px 20px;
+  background: #fafafa;
+  border-radius: 16px;
+}
+
+.no-reviews-new svg {
+  margin-bottom: 16px;
+}
+
+.no-reviews-new p {
+  font-size: 18px;
+  color: #333;
+  margin: 0 0 8px;
+}
+
+.no-reviews-new span {
+  color: #999;
+}
+
+/* Список отзывов */
+.reviews-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.review-card-new {
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  padding: 20px;
+  transition: box-shadow 0.3s;
+}
+
+.review-card-new:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.review-author-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar-new {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #f5f7fa;
+}
+
+.review-author-name {
+  font-weight: 600;
+  color: #263141;
+  margin: 0 0 4px;
+}
+
+.review-date-new {
+  color: #999;
+  font-size: 13px;
+  margin: 0;
+}
+
+.review-card-new .delete-review-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.review-card-new .delete-review-btn:hover {
+  background: #fff0f0;
+  color: #ff4d4d;
+}
+
+/* Рейтинги характеристик в отзыве */
+.review-ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.review-rating-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f5f7fa;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.rating-trait {
+  font-size: 13px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.rating-stars {
+  display: flex;
+}
+
+.star-filled {
+  color: #ddd;
+  font-size: 14px;
+}
+
+.star-filled.active {
+  color: #ffb300;
+}
+
+.review-content {
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
 }
 </style>

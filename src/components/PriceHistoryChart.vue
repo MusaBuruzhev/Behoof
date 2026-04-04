@@ -1,11 +1,6 @@
 <template>
   <div v-if="hasEnoughData" class="price-history-chart">
-    <apexchart
-      type="area"
-      :options="chartOptions"
-      :series="series"
-      height="300"
-    ></apexchart>
+    <apexchart type="area" :options="chartOptions" :series="series" height="300"></apexchart>
   </div>
 </template>
 
@@ -21,23 +16,23 @@ export default {
   computed: {
     sortedHistory() {
       if (!this.priceHistory || this.priceHistory.length === 0) {
-        return [];
+        return []
       }
-      return this.priceHistory
-        .slice()
-        .sort((a, b) => new Date(a.date) - new Date(b.date));
+      return this.priceHistory.slice().sort((a, b) => new Date(a.date) - new Date(b.date))
     },
     hasEnoughData() {
-      return this.sortedHistory.length >= 5;
+      return this.sortedHistory.length >= 5
     },
     categories() {
-      return this.sortedHistory.map(item => this.formatDate(new Date(item.date)));
+      return this.sortedHistory.map((item) => this.formatDate(new Date(item.date)))
     },
     series() {
-      return [{
-        name: 'Цена',
-        data: this.sortedHistory.map(item => item.price)
-      }];
+      return [
+        {
+          name: 'Цена',
+          data: this.sortedHistory.map((item) => item.price),
+        },
+      ]
     },
     chartOptions() {
       return {
@@ -45,14 +40,14 @@ export default {
           type: 'area',
           height: 300,
           toolbar: {
-            show: false
+            show: false,
           },
-          background: 'transparent'
+          background: 'transparent',
         },
         stroke: {
           curve: 'smooth',
           width: 3,
-          colors: ['#ff4d4d']
+          colors: ['#ff4d4d'],
         },
         fill: {
           type: 'gradient',
@@ -64,8 +59,8 @@ export default {
             inverseColors: false,
             opacityFrom: 0.8,
             opacityTo: 0.1,
-            stops: [0, 100]
-          }
+            stops: [0, 100],
+          },
         },
         markers: {
           size: 5,
@@ -73,11 +68,11 @@ export default {
           strokeColors: '#fff',
           strokeWidth: 2,
           hover: {
-            size: 7
-          }
+            size: 7,
+          },
         },
         dataLabels: {
-          enabled: false
+          enabled: false,
         },
         xaxis: {
           type: 'category',
@@ -85,60 +80,60 @@ export default {
           labels: {
             style: {
               colors: '#666',
-              fontSize: '12px'
-            }
+              fontSize: '12px',
+            },
           },
           axisBorder: {
-            show: false
+            show: false,
           },
           axisTicks: {
-            show: false
-          }
+            show: false,
+          },
         },
         yaxis: {
           labels: {
-            show: false
+            show: false,
           },
           axisBorder: {
-            show: false
+            show: false,
           },
           axisTicks: {
-            show: false
-          }
+            show: false,
+          },
         },
         grid: {
-          show: false
+          show: false,
         },
         annotations: {
-          points: this.getTrendAnnotations()
+          points: this.getTrendAnnotations(),
         },
         tooltip: {
           theme: 'light',
           x: {
             formatter: (value, { dataPointIndex }) => {
-              return this.categories[dataPointIndex];
-            }
+              return this.categories[dataPointIndex]
+            },
           },
           y: {
             formatter: (value) => {
-              return `${value.toLocaleString()} ₽`;
-            }
-          }
-        }
-      };
-    }
+              return `${value.toLocaleString()} ₽`
+            },
+          },
+        },
+      }
+    },
   },
   methods: {
     formatDate(date) {
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      return `${day}.${month}`;
+      const day = String(date.getDate()).padStart(2, '0')
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      return `${day}.${month}`
     },
     getTrendAnnotations() {
-      return [];
+      return []
     },
   },
-};
+}
 </script>
 
 <style scoped>
@@ -152,7 +147,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .tooltip-date {

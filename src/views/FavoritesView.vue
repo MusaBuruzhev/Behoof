@@ -24,9 +24,7 @@
       <img src="/iconHed/heart.svg" alt="Избранное" class="empty-icon-img" />
       <h2>Избранное пусто</h2>
       <p>Добавьте товары в избранное, чтобы они появились здесь</p>
-      <router-link to="/catalog" class="go-catalog-btn">
-        Перейти в каталог
-      </router-link>
+      <router-link to="/catalog" class="go-catalog-btn"> Перейти в каталог </router-link>
     </div>
 
     <div v-else class="favorites-grid">
@@ -49,16 +47,16 @@
 </template>
 
 <script>
-import ProductCard from '@/components/ProductCard.vue';
-import CompareSelectModal from '@/components/CompareSelectModal.vue';
-import favoritesAPI from '@/api/favorites.js';
-import catalogAPI from '@/api/catalog.js';
+import ProductCard from '@/components/ProductCard.vue'
+import CompareSelectModal from '@/components/CompareSelectModal.vue'
+import favoritesAPI from '@/api/favorites.js'
+import catalogAPI from '@/api/catalog.js'
 
 export default {
   name: 'FavoritesView',
   components: {
     ProductCard,
-    CompareSelectModal
+    CompareSelectModal,
   },
   data() {
     return {
@@ -67,75 +65,72 @@ export default {
       loading: true,
       categories: [],
       compareModalOpen: false,
-      compareProduct: null
-    };
+      compareProduct: null,
+    }
   },
   methods: {
     async loadFavorites() {
       try {
-        this.loading = true;
-        const token = localStorage.getItem('token');
+        this.loading = true
+        const token = localStorage.getItem('token')
         if (!token) {
-          this.$router.push('/login');
-          return;
+          this.$router.push('/login')
+          return
         }
 
         // Получить список избранных товаров
-        const favoriteIds = await favoritesAPI.getFavorites();
+        const favoriteIds = await favoritesAPI.getFavorites()
 
         // Получить все товары
-        const allProducts = await catalogAPI.fetchProducts({ limit: 1000 });
+        const allProducts = await catalogAPI.fetchProducts({ limit: 1000 })
 
         // Фильтровать только избранные товары
-        this.favorites = allProducts.products.filter(p =>
-          favoriteIds.favorites.includes(p.id)
-        );
+        this.favorites = allProducts.products.filter((p) => favoriteIds.favorites.includes(p.id))
 
         // Загрузить категории для отображения имён
-        const catalog = await catalogAPI.fetchCatalog();
-        this.categories = catalog.categories;
-
+        const catalog = await catalogAPI.fetchCatalog()
+        this.categories = catalog.categories
       } catch (error) {
-        console.error('Ошибка загрузки избранного:', error);
+        console.error('Ошибка загрузки избранного:', error)
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
     getCategoryName(categoryId) {
-      const category = this.categories.find(c => c.id === categoryId);
-      return category?.name || 'Категория не найдена';
+      const category = this.categories.find((c) => c.id === categoryId)
+      return category?.name || 'Категория не найдена'
     },
     removeProduct(productId) {
-      this.favorites = this.favorites.filter(p => p.id !== productId);
+      this.favorites = this.favorites.filter((p) => p.id !== productId)
     },
     async clearAll() {
       if (!confirm('Вы уверены? Это удалит все товары из избранного')) {
-        return;
+        return
       }
 
       try {
-        const promises = this.favorites.map(product =>
-          favoritesAPI.removeFromFavorites(product.id)
-        );
-        await Promise.all(promises);
-        this.favorites = [];
+        const promises = this.favorites.map((product) =>
+          favoritesAPI.removeFromFavorites(product.id),
+        )
+        await Promise.all(promises)
+        this.favorites = []
       } catch (error) {
-        console.error('Ошибка очистки избранного:', error);
+        console.error('Ошибка очистки избранного:', error)
       }
     },
     openCompareModal(product) {
-      this.compareProduct = product;
-      this.compareModalOpen = true;
+      this.compareProduct = product
+      this.compareModalOpen = true
     },
     closeCompareModal() {
-      this.compareModalOpen = false;
-      this.compareProduct = null;
-    }
+      this.compareModalOpen = false
+      this.compareProduct = null
+    },
   },
   mounted() {
-    this.loadFavorites();
-  }
-};
+    this.loadFavorites()
+  },
+}
 </script>
 
 <style scoped>
@@ -240,7 +235,9 @@ export default {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state {
@@ -265,8 +262,13 @@ export default {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .empty-state h2 {

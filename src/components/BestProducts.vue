@@ -1,100 +1,120 @@
 <template>
   <div class="best-products">
     <div class="best-products-cont">
-    <h2>Лучший выбор</h2>
+      <h2>Лучший выбор</h2>
 
-    <div class="category-nav">
-      <button
-        v-for="category in categories"
-        :key="category.id"
-        @click="selectCategory(category.id)"
-        :class="{ active: selectedCategoryId === category.id }"
-        class="category-btn"
-      >
-        <img :src="getCategoryIcon(category.name)" :alt="category.name" class="category-icon" />
-        <span class="category-text">{{ category.name }}</span>
-      </button>
-    </div>
-
-    <div v-if="selectedCategoryId" class="trait-tags">
-      <button
-        v-for="trait in availableTraits"
-        :key="trait"
-        @click="toggleTrait(trait)"
-        :class="{ active: selectedTraits.includes(trait) }"
-        class="trait-tag"
-      >
-        {{ trait }}
-      </button>
-    </div>
-
-
-    <div v-if="selectedCategoryId && paginatedProducts.length" class="products-grid">
-      <button @click="prevPage" :disabled="currentPage === 0" class="nav-arrow left-arrow">‹</button>
-
-      <div class="products-container">
-        <div
-          v-for="product in paginatedProducts"
-          :key="product.id"
-          class="product-card"
-          @click="goToProductDetail(product.id)"
+      <div class="category-nav">
+        <button
+          v-for="category in categories"
+          :key="category.id"
+          @click="selectCategory(category.id)"
+          :class="{ active: selectedCategoryId === category.id }"
+          class="category-btn"
         >
-          <div class="product-header">
-            <h3>{{ product.name }}</h3>
-            <div class="actions">
-              <button class="action-btn favorite" @click.stop="toggleFavorite(product)" :class="{ active: isFavorite(product.id) }">
-                <img src="/iconHed/heart.svg" alt="Избранное" class="btn-icon" />
-              </button>
-              <button class="action-btn compare" @click.stop="addToCompare(product)" title="Сравнить">
-                <img src="/iconHed/comparison.svg" alt="Сравнить" class="btn-icon" />
-              </button>
-            </div>
-          </div>
+          <img :src="getCategoryIcon(category.name)" :alt="category.name" class="category-icon" />
+          <span class="category-text">{{ category.name }}</span>
+        </button>
+      </div>
 
-          <div class="product-content">
-            <div class="product-image">
-              <!-- Show first image if available -->
-              <img v-if="product.images && product.images.length > 0" :src="product.images[0]" :alt="product.name" class="product-img" />
-              <div v-else class="image-placeholder">
-                <img src="/profIcon/l1.png" alt="Изображение недоступно" class="placeholder-img" />
+      <div v-if="selectedCategoryId" class="trait-tags">
+        <button
+          v-for="trait in availableTraits"
+          :key="trait"
+          @click="toggleTrait(trait)"
+          :class="{ active: selectedTraits.includes(trait) }"
+          class="trait-tag"
+        >
+          {{ trait }}
+        </button>
+      </div>
+
+      <div v-if="selectedCategoryId && paginatedProducts.length" class="products-grid">
+        <button @click="prevPage" :disabled="currentPage === 0" class="nav-arrow left-arrow">
+          ‹
+        </button>
+
+        <div class="products-container">
+          <div
+            v-for="product in paginatedProducts"
+            :key="product.id"
+            class="product-card"
+            @click="goToProductDetail(product.id)"
+          >
+            <div class="product-header">
+              <h3>{{ product.name }}</h3>
+              <div class="actions">
+                <button
+                  class="action-btn favorite"
+                  @click.stop="toggleFavorite(product)"
+                  :class="{ active: isFavorite(product.id) }"
+                >
+                  <img src="/iconHed/heart.svg" alt="Избранное" class="btn-icon" />
+                </button>
+                <button
+                  class="action-btn compare"
+                  @click.stop="addToCompare(product)"
+                  title="Сравнить"
+                >
+                  <img src="/iconHed/comparison.svg" alt="Сравнить" class="btn-icon" />
+                </button>
               </div>
             </div>
 
-            <div class="product-traits">
-              <div
-                v-for="trait in availableTraits"
-                :key="trait"
-                class="trait-item"
-              >
-                <span class="trait-name">{{ trait }}</span>
-                <div class="rating-segments">
-                  <span
-                    v-for="i in 5"
-                    :key="i"
-                    :class="{ filled: i <= (product.traitRatings[trait] || 0) }"
-                    class="segment"
-                  ></span>
+            <div class="product-content">
+              <div class="product-image">
+                <!-- Show first image if available -->
+                <img
+                  v-if="product.images && product.images.length > 0"
+                  :src="product.images[0]"
+                  :alt="product.name"
+                  class="product-img"
+                />
+                <div v-else class="image-placeholder">
+                  <img
+                    src="/profIcon/l1.png"
+                    alt="Изображение недоступно"
+                    class="placeholder-img"
+                  />
+                </div>
+              </div>
+
+              <div class="product-traits">
+                <div v-for="trait in availableTraits" :key="trait" class="trait-item">
+                  <span class="trait-name">{{ trait }}</span>
+                  <div class="rating-segments">
+                    <span
+                      v-for="i in 5"
+                      :key="i"
+                      :class="{ filled: i <= (product.traitRatings[trait] || 0) }"
+                      class="segment"
+                    ></span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+
+        <button
+          @click="nextPage"
+          :disabled="currentPage >= totalPages - 1"
+          class="nav-arrow right-arrow"
+        >
+          ›
+        </button>
       </div>
 
-      <button @click="nextPage" :disabled="currentPage >= totalPages - 1" class="nav-arrow right-arrow">›</button>
+      <div v-else-if="selectedCategoryId" class="no-products">
+        Нет товаров в выбранной категории
+      </div>
     </div>
-
-    <div v-else-if="selectedCategoryId" class="no-products">
-      Нет товаров в выбранной категории
-    </div>
-  </div>
   </div>
 </template>
 
 <script>
-import { fetchCatalog } from '@/api/catalog.js';
-import favoritesAPI from '@/api/favorites.js';
-import comparisonAPI from '@/api/comparison.js';
+import { fetchCatalog } from '@/api/catalog.js'
+import favoritesAPI from '@/api/favorites.js'
+import comparisonAPI from '@/api/comparison.js'
 
 const CATEGORY_TRAITS = {
   cat1: ['дизайн', 'батарея', 'дисплей', 'камера', 'отзыв', 'портативность'],
@@ -105,7 +125,7 @@ const CATEGORY_TRAITS = {
   cat6: ['графика', 'производительность', 'цена', 'портативность', 'энергоэффективность'],
   cat7: ['звук', 'батарея', 'портативность', 'дизайн', 'функциональность'],
   cat8: ['дизайн', 'качество', 'функциональность', 'цена', 'совместимость'],
-};
+}
 
 export default {
   name: 'BestProducts',
@@ -115,7 +135,7 @@ export default {
       catalogData: {
         categories: [],
         subcategories: {},
-        products: {}
+        products: {},
       },
       selectedCategoryId: null,
       selectedTraits: [],
@@ -127,190 +147,193 @@ export default {
 
   async mounted() {
     try {
-      const data = await fetchCatalog();
-      this.catalogData = data;
-      console.log('BestProducts: loaded catalog data:', data);
+      const data = await fetchCatalog()
+      this.catalogData = data
+      console.log('BestProducts: loaded catalog data:', data)
 
       // Загружаем избранное
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('token')
         if (token) {
-          const favData = await favoritesAPI.getFavorites();
-          this.favoriteIds = favData.favorites || [];
+          const favData = await favoritesAPI.getFavorites()
+          this.favoriteIds = favData.favorites || []
         }
       } catch (e) {
-        console.log('Не удалось загрузить избранное:', e);
+        console.log('Не удалось загрузить избранное:', e)
       }
 
       // Default to first category
       if (this.categories.length > 0) {
-        this.selectCategory(this.categories[0].id);
+        this.selectCategory(this.categories[0].id)
       }
     } catch (error) {
-      console.error('Ошибка загрузки каталога:', error);
+      console.error('Ошибка загрузки каталога:', error)
     }
   },
 
   computed: {
     categories() {
-      return this.catalogData.categories || [];
+      return this.catalogData.categories || []
     },
 
     availableTraits() {
-      if (!this.selectedCategoryId) return [];
-      return CATEGORY_TRAITS[this.selectedCategoryId] || [];
+      if (!this.selectedCategoryId) return []
+      return CATEGORY_TRAITS[this.selectedCategoryId] || []
     },
 
     filteredProducts() {
-      if (!this.selectedCategoryId) return [];
+      if (!this.selectedCategoryId) return []
 
-      const category = this.categories.find(cat => cat.id === this.selectedCategoryId);
+      const category = this.categories.find((cat) => cat.id === this.selectedCategoryId)
       if (!category || !category.subcategoryIds) {
-        console.log('BestProducts: no category or subcategoryIds', { category });
-        return [];
+        console.log('BestProducts: no category or subcategoryIds', { category })
+        return []
       }
 
-      console.log('BestProducts: category subcategories', category.subcategoryIds);
+      console.log('BestProducts: category subcategories', category.subcategoryIds)
 
       // Соберем все товары из всех подкатегорий категории
-      let allProducts = [];
+      let allProducts = []
 
-      category.subcategoryIds.forEach(subId => {
-        const sub = this.catalogData.subcategories[subId];
+      category.subcategoryIds.forEach((subId) => {
+        const sub = this.catalogData.subcategories[subId]
         if (sub && sub.productIds) {
-          console.log('BestProducts: subcategory', subId, 'has products:', sub.productIds);
-          sub.productIds.forEach(prodId => {
-            const product = this.catalogData.products[prodId];
+          console.log('BestProducts: subcategory', subId, 'has products:', sub.productIds)
+          sub.productIds.forEach((prodId) => {
+            const product = this.catalogData.products[prodId]
             if (product) {
-              allProducts.push(product);
+              allProducts.push(product)
             }
-          });
+          })
         }
-      });
+      })
 
-      console.log('BestProducts: all products found', allProducts.length, allProducts);
+      console.log('BestProducts: all products found', allProducts.length, allProducts)
 
       // Убираем дубликаты товаров (если товар есть в нескольких подкатегориях)
-      const uniqueProducts = allProducts.filter((product, index, self) =>
-        index === self.findIndex(p => p.id === product.id)
-      );
+      const uniqueProducts = allProducts.filter(
+        (product, index, self) => index === self.findIndex((p) => p.id === product.id),
+      )
 
-      console.log('BestProducts: unique products', uniqueProducts.length);
+      console.log('BestProducts: unique products', uniqueProducts.length)
 
-      let products = uniqueProducts;
+      let products = uniqueProducts
 
       // Filter by selected traits (if any selected, only products with those traits rated)
       if (this.selectedTraits.length > 0) {
-        products = products.filter(product => {
-          return this.selectedTraits.every(trait => product.traitRatings && product.traitRatings[trait] !== undefined);
-        });
-        console.log('BestProducts: after trait filter', products.length);
+        products = products.filter((product) => {
+          return this.selectedTraits.every(
+            (trait) => product.traitRatings && product.traitRatings[trait] !== undefined,
+          )
+        })
+        console.log('BestProducts: after trait filter', products.length)
       }
 
       // Sort by average rating of selected traits (or all if none selected)
-      const traitsToSort = this.selectedTraits.length > 0 ? this.selectedTraits : this.availableTraits;
+      const traitsToSort =
+        this.selectedTraits.length > 0 ? this.selectedTraits : this.availableTraits
       products.sort((a, b) => {
-        const avgA = this.getAverageRating(a, traitsToSort);
-        const avgB = this.getAverageRating(b, traitsToSort);
-        return avgB - avgA; // descending
-      });
+        const avgA = this.getAverageRating(a, traitsToSort)
+        const avgB = this.getAverageRating(b, traitsToSort)
+        return avgB - avgA // descending
+      })
 
-      console.log('BestProducts: final products', products.length);
+      console.log('BestProducts: final products', products.length)
 
-      return products;
+      return products
     },
 
     paginatedProducts() {
-      const start = this.currentPage * this.itemsPerPage;
-      return this.filteredProducts.slice(start, start + this.itemsPerPage);
+      const start = this.currentPage * this.itemsPerPage
+      return this.filteredProducts.slice(start, start + this.itemsPerPage)
     },
 
     totalPages() {
-      return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
+      return Math.ceil(this.filteredProducts.length / this.itemsPerPage)
     },
   },
 
   methods: {
     selectCategory(categoryId) {
-      this.selectedCategoryId = categoryId;
-      this.selectedTraits = [];
-      this.currentPage = 0;
+      this.selectedCategoryId = categoryId
+      this.selectedTraits = []
+      this.currentPage = 0
     },
 
     toggleTrait(trait) {
-      const index = this.selectedTraits.indexOf(trait);
+      const index = this.selectedTraits.indexOf(trait)
       if (index > -1) {
-        this.selectedTraits.splice(index, 1);
+        this.selectedTraits.splice(index, 1)
       } else {
-        this.selectedTraits.push(trait);
+        this.selectedTraits.push(trait)
       }
-      this.currentPage = 0; // reset page
+      this.currentPage = 0 // reset page
     },
 
     getAverageRating(product, traits) {
-      if (!product.traitRatings || traits.length === 0) return 0;
-      const ratings = traits.map(trait => product.traitRatings[trait] || 0).filter(r => r > 0);
-      if (ratings.length === 0) return 0;
-      return ratings.reduce((sum, r) => sum + r, 0) / ratings.length;
+      if (!product.traitRatings || traits.length === 0) return 0
+      const ratings = traits.map((trait) => product.traitRatings[trait] || 0).filter((r) => r > 0)
+      if (ratings.length === 0) return 0
+      return ratings.reduce((sum, r) => sum + r, 0) / ratings.length
     },
 
     prevPage() {
       if (this.currentPage > 0) {
-        this.currentPage--;
+        this.currentPage--
       }
     },
 
     nextPage() {
       if (this.currentPage < this.totalPages - 1) {
-        this.currentPage++;
+        this.currentPage++
       }
     },
 
     getCategoryIcon(name) {
       const icons = {
-        'Смартфоны': '/categoryIcons/smartphones.svg',
-        'Ноутбуки': '/categoryIcons/laptops.svg',
-        'Планшеты': '/categoryIcons/tablets.svg',
-        'Наушники': '/categoryIcons/headphones.svg',
+        Смартфоны: '/categoryIcons/smartphones.svg',
+        Ноутбуки: '/categoryIcons/laptops.svg',
+        Планшеты: '/categoryIcons/tablets.svg',
+        Наушники: '/categoryIcons/headphones.svg',
         'Умные часы': '/categoryIcons/smartwatches.svg',
         'Игровые приставки': '/categoryIcons/gaming.svg',
         'Портативные колонки': '/categoryIcons/speakers.svg',
-        'Аксессуары': '/categoryIcons/accessories.svg',
-      };
-      return icons[name] || '/categoryIcons/default.svg';
+        Аксессуары: '/categoryIcons/accessories.svg',
+      }
+      return icons[name] || '/categoryIcons/default.svg'
     },
 
     goToProductDetail(productId) {
-      this.$router.push(`/product/${productId}`);
+      this.$router.push(`/product/${productId}`)
     },
 
     isFavorite(productId) {
-      return this.favoriteIds.includes(productId);
+      return this.favoriteIds.includes(productId)
     },
 
     async toggleFavorite(product) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       if (!token) {
-        this.$router.push('/login');
-        return;
+        this.$router.push('/login')
+        return
       }
 
       try {
         if (this.isFavorite(product.id)) {
-          await favoritesAPI.removeFromFavorites(product.id);
-          this.favoriteIds = this.favoriteIds.filter(id => id !== product.id);
+          await favoritesAPI.removeFromFavorites(product.id)
+          this.favoriteIds = this.favoriteIds.filter((id) => id !== product.id)
         } else {
-          await favoritesAPI.addToFavorites(product.id);
-          this.favoriteIds.push(product.id);
+          await favoritesAPI.addToFavorites(product.id)
+          this.favoriteIds.push(product.id)
         }
       } catch (error) {
-        console.error('Ошибка изменения избранного:', error);
+        console.error('Ошибка изменения избранного:', error)
       }
     },
 
     addToCompare(product) {
-      comparisonAPI.addToComparison(product.id);
-      this.$router.push('/comparison');
+      comparisonAPI.addToComparison(product.id)
+      this.$router.push('/comparison')
     },
   },
 }
@@ -345,14 +368,14 @@ export default {
 
 .best-products {
   width: 100%;
-  background-color: #F2F5F9;
-  padding: 30px 0 50px 0 ;
+  background-color: #f2f5f9;
+  padding: 30px 0 50px 0;
   margin-top: 30px;
 }
-.best-products-cont{
+.best-products-cont {
   width: 85%;
-    margin: 0 auto;
-    box-sizing: border-box;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Заголовок */
@@ -365,13 +388,12 @@ export default {
 
 /* Навигация по категориям */
 .category-nav {
-display: flex
-;
-    justify-content: space-around;
-    gap: 2%;
-    margin-bottom: 3%;
-    flex-wrap: wrap;
-    width: 100%;
+  display: flex;
+  justify-content: space-around;
+  gap: 2%;
+  margin-bottom: 3%;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .category-btn {
@@ -411,11 +433,11 @@ display: flex
 /* Теги характеристик */
 .trait-tags {
   display: flex;
-    justify-content: flex-start;
-    gap: 1%;
-    margin-bottom: 5%;
-    flex-wrap: wrap;
-    width: 100%;
+  justify-content: flex-start;
+  gap: 1%;
+  margin-bottom: 5%;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .trait-tag {
@@ -429,8 +451,8 @@ display: flex
   white-space: nowrap;
 }
 
-.trait-tag:hover{
-    background: #ff4d4d4f;
+.trait-tag:hover {
+  background: #ff4d4d4f;
   color: white;
   border-color: #ff4d4d;
 }
@@ -490,13 +512,10 @@ display: flex
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background: white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 4%;
   box-sizing: border-box;
-
 }
-
-
 
 .product-header {
   display: flex;
@@ -522,8 +541,7 @@ display: flex
 
 .action-btn {
   width: 85%;
-  
- 
+
   aspect-ratio: 1;
   border: none;
   border-radius: 50%;
@@ -602,7 +620,6 @@ display: flex
   align-items: center;
   margin-bottom: 3%;
   width: 100%;
-
 }
 
 .trait-name {
@@ -618,7 +635,7 @@ display: flex
   gap: 2px;
   flex-shrink: 0;
   width: 100%;
-  margin: 10px 0 0 0 ;
+  margin: 10px 0 0 0;
 }
 
 .segment {
@@ -638,6 +655,4 @@ display: flex
   color: #666;
   font-size: 18px;
 }
-
-
 </style>

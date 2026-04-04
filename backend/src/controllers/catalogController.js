@@ -5,6 +5,8 @@ import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
+import { createNotification } from './notificationsController.js'
+import User from '../models/User.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -313,7 +315,12 @@ export const getProducts = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { name, price, brand, model, categoryId, description, characteristics } = req.body
+    let { name, price, brand, model, categoryId, description, characteristics } = req.body
+
+    // Преобразуем price в число если это строка
+    if (typeof price === 'string') {
+      price = parseFloat(price);
+    }
 
     let parsedCharacteristics;
     try {
@@ -422,6 +429,23 @@ export const addProduct = async (req, res) => {
     if (allSubcategory) {
       allSubcategory.productIds.push(productId)
       await allSubcategory.save()
+    }
+
+    // Отправляем уведомление о новом товаре всем пользователям
+    try {
+      const users = await User.find({ role: 'user' }).select('_id');
+      for (const user of users) {
+        await createNotification(
+          user._id,
+          'new_product',
+          'Новый товар',
+          `Поступил в продажу: ${name} за ${price} руб.`,
+          productId,
+          'product'
+        );
+      }
+    } catch (notifyError) {
+      console.error('Ошибка отправки уведомлений о новом товаре:', notifyError);
     }
 
     res.status(201).json({

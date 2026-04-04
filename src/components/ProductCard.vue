@@ -3,128 +3,137 @@
     <img :src="product.images[0]" :alt="product.name" />
     <div class="product-card-div">
       <p class="category">{{ categoryName }}</p>
-    <h3>{{ product.name }}</h3>
-    <div class="price-block">
-      <div class="price-info">
-        <div class="price-info_b">
-          <p>Цена</p>
-          <span class="change" :class="{ 'up': changePercent > 0, 'down': changePercent < 0 }">
-          {{ changePercent > 0 ? '⯅' : '⯆' }} {{ Math.abs(changePercent) }}%
-        </span>
+      <h3>{{ product.name }}</h3>
+      <div class="price-block">
+        <div class="price-info">
+          <div class="price-info_b">
+            <p>Цена</p>
+            <span class="change" :class="{ up: changePercent > 0, down: changePercent < 0 }">
+              {{ changePercent > 0 ? '⯅' : '⯆' }} {{ Math.abs(changePercent) }}%
+            </span>
+          </div>
+
+          <span class="current-price">{{ currentPrice }}</span>
         </div>
-
-        <span class="current-price">{{ currentPrice }}</span>
-
+        <div class="buttons">
+          <button
+            @click.stop="toggleFavorite"
+            class="action-btn favorite"
+            :class="{ active: isFavorite }"
+            :disabled="isLoading"
+            title="Добавить в избранное"
+          >
+            ♥
+          </button>
+          <button @click.stop="openCompareModal" class="action-btn compare" title="Сравнить">
+            <img src="../../public/iconHed/chart.svg" alt="Сравнить" />
+          </button>
+        </div>
       </div>
-      <div class="buttons">
-        <button @click.stop="toggleFavorite" class="action-btn favorite" :class="{ 'active': isFavorite }" :disabled="isLoading" title="Добавить в избранное">♥</button>
-        <button @click.stop="openCompareModal" class="action-btn compare" title="Сравнить"><img src="../../public/iconHed/chart.svg" alt="Сравнить"></button>
-      </div>
-    </div>
     </div>
   </div>
 </template>
 
 <script>
-import favoritesAPI from '@/api/favorites.js';
+import favoritesAPI from '@/api/favorites.js'
 
 export default {
   name: 'ProductCard',
   props: {
     product: {
       type: Object,
-      required: true
+      required: true,
     },
     categoryName: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   inject: ['showToast'],
   emits: ['open-compare-modal'],
   data() {
     return {
       isFavorite: false,
-      isLoading: false
-    };
+      isLoading: false,
+    }
   },
-computed: {
- sortedPrices() {
-      return [...this.product.priceHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+  computed: {
+    sortedPrices() {
+      return [...this.product.priceHistory].sort((a, b) => new Date(b.date) - new Date(a.date))
     },
     currentPrice() {
-      const prices = this.sortedPrices;
-      if (prices.length === 0) return 0;
-      return prices[0].price;
+      const prices = this.sortedPrices
+      if (prices.length === 0) return 0
+      return prices[0].price
     },
     changePercent() {
-      const prices = this.sortedPrices;
-      if (prices.length < 2) return 0;
-      const current = prices[0].price;
-      const previous = prices[1].price;
-      return Math.round((current - previous) / previous * 100);
-    }
+      const prices = this.sortedPrices
+      if (prices.length < 2) return 0
+      const current = prices[0].price
+      const previous = prices[1].price
+      return Math.round(((current - previous) / previous) * 100)
+    },
   },
   methods: {
     goToProductDetail() {
-      this.$router.push(`/product/${this.product.id}`);
+      this.$router.push(`/product/${this.product.id}`)
     },
     async toggleFavorite() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       if (!token) {
-        this.showToast('Войдите в аккаунт для добавления в избранное', 'warning');
-        this.$router.push('/login');
-        return;
+        this.showToast('Войдите в аккаунт для добавления в избранное', 'warning')
+        this.$router.push('/login')
+        return
       }
 
-      this.isLoading = true;
+      this.isLoading = true
       try {
         if (this.isFavorite) {
-          await favoritesAPI.removeFromFavorites(this.product.id);
-          this.isFavorite = false;
-          this.showToast(`${this.product.name} удалён из избранного`, 'info');
-          this.$emit('removed', this.product.id);
+          await favoritesAPI.removeFromFavorites(this.product.id)
+          this.isFavorite = false
+          this.showToast(`${this.product.name} удалён из избранного`, 'info')
+          this.$emit('removed', this.product.id)
         } else {
-          await favoritesAPI.addToFavorites(this.product.id);
-          this.isFavorite = true;
-          this.showToast(`${this.product.name} добавлен в избранное ❤️`, 'heart');
+          await favoritesAPI.addToFavorites(this.product.id)
+          this.isFavorite = true
+          this.showToast(`${this.product.name} добавлен в избранное ❤️`, 'heart')
         }
       } catch (error) {
-        console.error('Ошибка при изменении избранного:', error);
-        this.showToast('Ошибка при сохранении', 'error');
+        console.error('Ошибка при изменении избранного:', error)
+        this.showToast('Ошибка при сохранении', 'error')
       } finally {
-        this.isLoading = false;
+        this.isLoading = false
       }
     },
     openCompareModal() {
       // Открываем модальное окно выбора товара для сравнения
-      this.$emit('open-compare-modal', this.product);
+      this.$emit('open-compare-modal', this.product)
     },
     async loadFavoriteStatus() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token')
       if (!token) {
-        this.isFavorite = false;
-        return;
+        this.isFavorite = false
+        return
       }
 
       try {
-        const data = await favoritesAPI.getFavorites();
-        this.isFavorite = data.favorites.includes(this.product.id);
+        const data = await favoritesAPI.getFavorites()
+        this.isFavorite = data.favorites.includes(this.product.id)
       } catch (error) {
-        console.error('Ошибка при загрузке избранного:', error);
-        this.isFavorite = false;
+        console.error('Ошибка при загрузке избранного:', error)
+        this.isFavorite = false
       }
-    }
+    },
   },
   mounted() {
-    this.loadFavoriteStatus();
-  }
+    this.loadFavoriteStatus()
+  },
 }
 </script>
 
 <style scoped>
 .product-card {
-  background-color: #F6F7FA;
+  background-color: #f6f7fa;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -137,7 +146,6 @@ computed: {
 
 .product-card:hover {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-
 }
 
 .product-card img {
@@ -149,12 +157,12 @@ computed: {
 }
 
 .buttons button.active {
- background-color: #ffcccc;
- transform: scale(1.05);
+  background-color: #ffcccc;
+  transform: scale(1.05);
 }
 
 .buttons button.active img {
- filter: brightness(0.8);
+  filter: brightness(0.8);
 }
 
 .buttons button:disabled {
@@ -260,9 +268,9 @@ computed: {
 }
 
 .action-btn img {
-    margin-top: 0;
-    width: 20px;
-    height: 20px;
+  margin-top: 0;
+  width: 20px;
+  height: 20px;
 }
 
 @media (max-width: 768px) {

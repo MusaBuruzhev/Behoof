@@ -10,6 +10,7 @@ import FavoritesView from '@/views/FavoritesView.vue'
 import ComparisonView from '@/views/ComparisonView.vue'
 import OrdersView from '@/views/OrdersView.vue'
 import AdminPanelView from '@/views/AdminPanelView.vue'
+import NotificationsView from '@/views/NotificationsView.vue'
 import authAPI from '@/api/auth.js'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -86,7 +87,8 @@ const routes = [
   {
     path: '/notifications',
     name: 'notifications',
-    component: { template: '<div style="padding: 40px; text-align: center;"><h1>🔔 Уведомления</h1><p>Раздел в разработке</p></div>' },
+    component: NotificationsView,
+    meta: { requiresAuth: true },
   },
   {
     path: '/forgot-password',

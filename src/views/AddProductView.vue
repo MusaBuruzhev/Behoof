@@ -1,11 +1,11 @@
 <template>
- <div class="product-management">
- <div v-if="!isAdmin" class="forbidden container">
- <h2>Доступ запрещён</h2>
- <p>Управление товарами доступно только администраторам.</p>
- <router-link to="/">Вернуться на главную</router-link>
- </div>
- <div v-else class="container">
+  <div class="product-management">
+    <div v-if="!isAdmin" class="forbidden container">
+      <h2>Доступ запрещён</h2>
+      <p>Управление товарами доступно только администраторам.</p>
+      <router-link to="/">Вернуться на главную</router-link>
+    </div>
+    <div v-else class="container">
       <div class="header-section">
         <h1>Управление товарами</h1>
         <p>Добавляйте, обновляйте и удаляйте товары в каталоге</p>
@@ -37,7 +37,7 @@
                 type="text"
                 required
                 placeholder="Введите название товара"
-              >
+              />
             </div>
 
             <div class="form-group">
@@ -50,7 +50,7 @@
                 step="0.01"
                 required
                 placeholder="0.00"
-              >
+              />
             </div>
           </div>
 
@@ -59,11 +59,7 @@
               <label for="category">Категория:</label>
               <select id="category" v-model="addForm.categoryId" required>
                 <option value="">Выберите категорию</option>
-                <option
-                  v-for="category in categories"
-                  :key="category.id"
-                  :value="category.id"
-                >
+                <option v-for="category in categories" :key="category.id" :value="category.id">
                   {{ category.name }}
                 </option>
               </select>
@@ -75,11 +71,7 @@
               <label for="brand">Бренд:</label>
               <select id="brand" v-model="addForm.brand" required>
                 <option value="">Выберите бренд</option>
-                <option
-                  v-for="brand in availableBrands"
-                  :key="brand"
-                  :value="brand"
-                >
+                <option v-for="brand in availableBrands" :key="brand" :value="brand">
                   {{ brand }}
                 </option>
                 <option value="new_brand">Добавить новый бренд</option>
@@ -90,18 +82,14 @@
                 type="text"
                 placeholder="Введите новый бренд"
                 required
-              >
+              />
             </div>
 
             <div class="form-group">
               <label for="model">Модель:</label>
               <select id="model" v-model="addForm.model" required>
                 <option value="">Выберите модель</option>
-                <option
-                  v-for="model in availableModels"
-                  :key="model"
-                  :value="model"
-                >
+                <option v-for="model in availableModels" :key="model" :value="model">
                   {{ model }}
                 </option>
                 <option value="new_model">Добавить новую модель</option>
@@ -112,7 +100,7 @@
                 type="text"
                 placeholder="Введите новую модель"
                 required
-              >
+              />
             </div>
           </div>
 
@@ -136,7 +124,7 @@
                     v-for="char in availableCharacteristics"
                     :key="char"
                     :value="char"
-                    :disabled="addForm.characteristics.some(c => c.trait === char)"
+                    :disabled="addForm.characteristics.some((c) => c.trait === char)"
                   >
                     {{ char }}
                   </option>
@@ -151,14 +139,24 @@
                 </button>
               </div>
               <div v-if="addForm.characteristics.length > 0" class="characteristics-list">
-                <div v-for="(char, index) in addForm.characteristics" :key="index" class="characteristic-item">
+                <div
+                  v-for="(char, index) in addForm.characteristics"
+                  :key="index"
+                  class="characteristic-item"
+                >
                   <label class="trait-label">{{ char.trait }}:</label>
                   <input
                     v-model="char.value"
                     type="text"
                     :placeholder="`Введите значение для ${char.trait}`"
+                  />
+                  <button
+                    type="button"
+                    @click="removeCharacteristic('add', index)"
+                    class="remove-char-btn"
                   >
-                  <button type="button" @click="removeCharacteristic('add', index)" class="remove-char-btn">×</button>
+                    ×
+                  </button>
                 </div>
               </div>
             </div>
@@ -178,22 +176,22 @@
               ref="addFileInput"
               required
               class="file-input"
-            >
+            />
             <div v-if="addSelectedFiles.length > 0" class="selected-files">
               <p class="files-count">Выбрано файлов: {{ addSelectedFiles.length }} / от 3 до 10</p>
               <div class="image-previews">
                 <div v-for="(file, index) in addSelectedFiles" :key="index" class="preview-item">
                   <div class="preview-image-wrapper">
-                    <img :src="getPreviewUrl(file)" :alt="file.name" class="preview-image">
-                    <button type="button" class="remove-preview-btn" @click="removeFile(index)">×</button>
+                    <img :src="getPreviewUrl(file)" :alt="file.name" class="preview-image" />
+                    <button type="button" class="remove-preview-btn" @click="removeFile(index)">
+                      ×
+                    </button>
                   </div>
                   <span class="preview-name">{{ file.name }}</span>
                 </div>
               </div>
             </div>
-            <small class="hint">
-              Выберите от 3 до 10 изображений товара (JPEG, PNG, WebP)
-            </small>
+            <small class="hint"> Выберите от 3 до 10 изображений товара (JPEG, PNG, WebP) </small>
           </div>
 
           <div class="form-actions">
@@ -212,11 +210,7 @@
           <label for="productSelect">Выберите товар:</label>
           <select id="productSelect" v-model="selectedProductId" @change="loadProductForUpdate">
             <option value="">Выберите товар</option>
-            <option
-              v-for="product in productsList"
-              :key="product.id"
-              :value="product.id"
-            >
+            <option v-for="product in productsList" :key="product.id" :value="product.id">
               {{ product.name }} - {{ product.price }} руб.
             </option>
           </select>
@@ -232,7 +226,7 @@
                 type="text"
                 required
                 placeholder="Введите название товара"
-              >
+              />
             </div>
 
             <div class="form-group">
@@ -245,8 +239,10 @@
                 step="0.01"
                 required
                 placeholder="0.00"
+              />
+              <small class="hint"
+                >При изменении цены будет добавлена новая запись в историю цен</small
               >
-              <small class="hint">При изменении цены будет добавлена новая запись в историю цен</small>
             </div>
           </div>
 
@@ -259,17 +255,13 @@
                 type="text"
                 required
                 placeholder="Введите бренд"
-              >
+              />
             </div>
 
             <div class="form-group">
               <label for="updateCategory">Категория:</label>
               <select id="updateCategory" v-model="updateForm.categoryId" required disabled>
-                <option
-                  v-for="category in categories"
-                  :key="category.id"
-                  :value="category.id"
-                >
+                <option v-for="category in categories" :key="category.id" :value="category.id">
                   {{ category.name }}
                 </option>
               </select>
@@ -290,21 +282,32 @@
           <div class="form-group">
             <label>Характеристики:</label>
             <div class="characteristics-list">
-              <div v-for="(char, index) in updateForm.characteristics" :key="index" class="characteristic-item">
+              <div
+                v-for="(char, index) in updateForm.characteristics"
+                :key="index"
+                class="characteristic-item"
+              >
                 <label class="trait-label">{{ char.trait }}:</label>
                 <input
                   v-model="char.value"
                   type="text"
                   :placeholder="`Введите значение для ${char.trait}`"
-                >
+                />
               </div>
             </div>
           </div>
 
-          <div v-if="updateForm.priceHistory && updateForm.priceHistory.length > 0" class="price-history">
+          <div
+            v-if="updateForm.priceHistory && updateForm.priceHistory.length > 0"
+            class="price-history"
+          >
             <h3>История цен:</h3>
             <div class="history-list">
-              <div v-for="(entry, index) in updateForm.priceHistory.slice().reverse()" :key="index" class="history-item">
+              <div
+                v-for="(entry, index) in updateForm.priceHistory.slice().reverse()"
+                :key="index"
+                class="history-item"
+              >
                 <span>{{ new Date(entry.date).toLocaleDateString() }}</span>
                 <span>{{ entry.price }} руб.</span>
               </div>
@@ -327,18 +330,18 @@
           <label for="deleteProductSelect">Выберите товар для удаления:</label>
           <select id="deleteProductSelect" v-model="selectedDeleteProductId">
             <option value="">Выберите товар</option>
-            <option
-              v-for="product in productsList"
-              :key="product.id"
-              :value="product.id"
-            >
+            <option v-for="product in productsList" :key="product.id" :value="product.id">
               {{ product.name }} - {{ product.price }} руб.
             </option>
           </select>
         </div>
 
         <div v-if="selectedDeleteProductId" class="delete-confirmation">
-          <p>Вы уверены, что хотите удалить товар <strong>{{ getProductName(selectedDeleteProductId) }}</strong>?</p>
+          <p>
+            Вы уверены, что хотите удалить товар
+            <strong>{{ getProductName(selectedDeleteProductId) }}</strong
+            >?
+          </p>
           <p class="warning">Это действие нельзя отменить.</p>
           <div class="form-actions">
             <button @click="confirmDelete" :disabled="deleteSubmitting" class="delete-btn">
@@ -356,8 +359,14 @@
 </template>
 
 <script>
-import { fetchCatalog, addProduct, updateProduct, deleteProduct, getProduct } from '@/api/catalog.js';
-import authAPI from '@/api/auth.js';
+import {
+  fetchCatalog,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  getProduct,
+} from '@/api/catalog.js'
+import authAPI from '@/api/auth.js'
 
 const PRODUCT_CHARACTERISTICS = {
   cat1: [
@@ -369,7 +378,7 @@ const PRODUCT_CHARACTERISTICS = {
     'Фронтальная камера',
     'Аккумулятор',
     'Операционная система',
-    'Степень защиты'
+    'Степень защиты',
   ],
   cat2: [
     'Процессор',
@@ -379,7 +388,7 @@ const PRODUCT_CHARACTERISTICS = {
     'Графический процессор',
     'Вес',
     'Клавиатура',
-    'Время работы'
+    'Время работы',
   ],
   cat3: [
     'Экран',
@@ -390,7 +399,7 @@ const PRODUCT_CHARACTERISTICS = {
     'Фронтальная камера',
     'Аккумулятор',
     'Операционная система',
-    'Вес'
+    'Вес',
   ],
   cat4: [
     'Тип',
@@ -400,7 +409,7 @@ const PRODUCT_CHARACTERISTICS = {
     'Частотный диапазон',
     'Чувствительность',
     'Импеданс',
-    'Вес'
+    'Вес',
   ],
   cat5: [
     'Экран',
@@ -410,7 +419,7 @@ const PRODUCT_CHARACTERISTICS = {
     'Аккумулятор',
     'Датчики',
     'Водонепроницаемость',
-    'Совместимость'
+    'Совместимость',
   ],
   cat6: [
     'Процессор',
@@ -419,7 +428,7 @@ const PRODUCT_CHARACTERISTICS = {
     'Графический процессор',
     'Поддержка 4K',
     'Жесткий диск',
-    'Количество игроков'
+    'Количество игроков',
   ],
   cat7: [
     'Мощность',
@@ -428,30 +437,22 @@ const PRODUCT_CHARACTERISTICS = {
     'Водонепроницаемость',
     'Частотный диапазон',
     'Вес',
-    'Bluetooth версия'
+    'Bluetooth версия',
   ],
-  cat8: [
-    'Тип',
-    'Совместимость',
-    'Материал',
-    'Цвет',
-    'Размеры',
-    'Вес',
-    'Дополнительные функции'
-  ],
-};
+  cat8: ['Тип', 'Совместимость', 'Материал', 'Цвет', 'Размеры', 'Вес', 'Дополнительные функции'],
+}
 
 export default {
   name: 'AddProductView',
 
- data() {
- return {
- isAdmin: false,
- activeTab: 'add',
+  data() {
+    return {
+      isAdmin: false,
+      activeTab: 'add',
       tabs: [
         { id: 'add', name: 'Добавить товар', icon: '➕' },
         { id: 'update', name: 'Обновить товар', icon: '✏️' },
-        { id: 'delete', name: 'Удалить товар', icon: '🗑️' }
+        { id: 'delete', name: 'Удалить товар', icon: '🗑️' },
       ],
       categories: [],
       subcategories: {},
@@ -470,7 +471,7 @@ export default {
         model: '',
         categoryId: '',
         description: '',
-        characteristics: []
+        characteristics: [],
       },
       addSubmitting: false,
 
@@ -491,69 +492,71 @@ export default {
   computed: {
     availableCharacteristics() {
       if (this.addForm.categoryId && PRODUCT_CHARACTERISTICS[this.addForm.categoryId]) {
-        return PRODUCT_CHARACTERISTICS[this.addForm.categoryId];
+        return PRODUCT_CHARACTERISTICS[this.addForm.categoryId]
       }
-      return [];
+      return []
     },
 
     availableBrands() {
-      if (!this.addForm.categoryId) return [];
-      const category = this.categories.find(cat => cat.id === this.addForm.categoryId);
-      if (!category || !category.subcategoryIds) return [];
+      if (!this.addForm.categoryId) return []
+      const category = this.categories.find((cat) => cat.id === this.addForm.categoryId)
+      if (!category || !category.subcategoryIds) return []
       return category.subcategoryIds
-        .map(id => this.subcategories[id]?.name)
-        .filter(name => name);
+        .map((id) => this.subcategories[id]?.name)
+        .filter((name) => name)
     },
 
     availableModels() {
       if (!this.addForm.brand || this.addForm.brand === 'new_brand' || !this.addForm.categoryId) {
-        return [];
+        return []
       }
-      const subcategory = Object.values(this.subcategories).find(sub => sub.name === this.addForm.brand && sub.categoryId === this.addForm.categoryId);
+      const subcategory = Object.values(this.subcategories).find(
+        (sub) => sub.name === this.addForm.brand && sub.categoryId === this.addForm.categoryId,
+      )
       if (!subcategory) {
-        return [];
+        return []
       }
       const models = Object.values(this.models)
-        .filter(model => model.subcategoryId === subcategory.id)
-        .map(model => model.name);
-      return models;
-    }
+        .filter((model) => model.subcategoryId === subcategory.id)
+        .map((model) => model.name)
+      return models
+    },
   },
 
- async mounted() {
- this.isAdmin = authAPI.isAdmin();
- if (!this.isAdmin) return;
- await this.loadData();
- },
+  async mounted() {
+    this.isAdmin = authAPI.isAdmin()
+    if (!this.isAdmin) return
+    await this.loadData()
+  },
 
   methods: {
     async loadData() {
       try {
-        const data = await fetchCatalog();
-        this.categories = data.categories || [];
-        this.subcategories = data.subcategories || {};
-        this.models = data.models || {};
-        this.productsList = Object.values(data.products || {});
+        const data = await fetchCatalog()
+        this.categories = data.categories || []
+        this.subcategories = data.subcategories || {}
+        this.models = data.models || {}
+        this.productsList = Object.values(data.products || {})
       } catch (error) {
-        console.error('Ошибка загрузки данных:', error);
-        this.showMessage('Ошибка загрузки данных', true);
+        console.error('Ошибка загрузки данных:', error)
+        this.showMessage('Ошибка загрузки данных', true)
       }
     },
 
     showMessage(message, error = false) {
-      this.message = message;
-      this.error = error;
+      this.message = message
+      this.error = error
       setTimeout(() => {
-        this.message = '';
-        this.error = false;
-      }, 5000);
+        this.message = ''
+        this.error = false
+      }, 5000)
     },
 
     addCharacteristic(formType) {
       if (formType === 'add') {
-        this.addForm.characteristics.push('');
+        this.addForm.characteristics.push('')
       } else if (formType === 'update' && this.updateForm) {
-        this.updateForm.characteristics.push('');
+        this.updateForm.characteristics.push('')
       }
     },
 
@@ -561,110 +564,110 @@ export default {
       if (formType === 'add' && this.selectedCharacteristic) {
         this.addForm.characteristics.push({
           trait: this.selectedCharacteristic,
-          value: ''
-        });
-        this.selectedCharacteristic = '';
+          value: '',
+        })
+        this.selectedCharacteristic = ''
       }
     },
 
     removeCharacteristic(formType, index) {
       if (formType === 'add') {
-        this.addForm.characteristics.splice(index, 1);
+        this.addForm.characteristics.splice(index, 1)
       } else if (formType === 'update' && this.updateForm) {
-        this.updateForm.characteristics.splice(index, 1);
+        this.updateForm.characteristics.splice(index, 1)
       }
     },
 
     handleFileSelect(formType) {
-      const event = formType === 'add' ? this.$refs.addFileInput : null;
-      if (!event) return;
+      const event = formType === 'add' ? this.$refs.addFileInput : null
+      if (!event) return
 
-      const files = Array.from(event.files);
+      const files = Array.from(event.files)
 
       if (files.length < 3 || files.length > 10) {
-        this.showMessage('Выберите от 3 до 10 изображений', true);
+        this.showMessage('Выберите от 3 до 10 изображений', true)
         if (formType === 'add') {
-          this.addSelectedFiles = [];
-          event.value = '';
+          this.addSelectedFiles = []
+          event.value = ''
         }
-        return;
+        return
       }
 
       // Проверяем типы файлов
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      const invalidFiles = files.filter(file => !allowedTypes.includes(file.type));
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+      const invalidFiles = files.filter((file) => !allowedTypes.includes(file.type))
 
       if (invalidFiles.length > 0) {
-        this.showMessage('Разрешены только изображения JPEG, PNG, WebP', true);
+        this.showMessage('Разрешены только изображения JPEG, PNG, WebP', true)
         if (formType === 'add') {
-          this.addSelectedFiles = [];
-          event.value = '';
+          this.addSelectedFiles = []
+          event.value = ''
         }
-        return;
+        return
       }
 
       // Проверяем размер файлов (макс 5MB каждый)
-      const maxSize = 5 * 1024 * 1024; // 5MB
-      const oversizedFiles = files.filter(file => file.size > maxSize);
+      const maxSize = 5 * 1024 * 1024 // 5MB
+      const oversizedFiles = files.filter((file) => file.size > maxSize)
 
       if (oversizedFiles.length > 0) {
-        this.showMessage('Максимальный размер файла - 5MB', true);
+        this.showMessage('Максимальный размер файла - 5MB', true)
         if (formType === 'add') {
-          this.addSelectedFiles = [];
-          event.value = '';
+          this.addSelectedFiles = []
+          event.value = ''
         }
-        return;
+        return
       }
 
       if (formType === 'add') {
-        this.addSelectedFiles = files;
+        this.addSelectedFiles = files
       }
-      this.message = '';
-      this.error = false;
+      this.message = ''
+      this.error = false
     },
 
     getPreviewUrl(file) {
-      return URL.createObjectURL(file);
+      return URL.createObjectURL(file)
     },
 
     removeFile(index) {
-      this.addSelectedFiles.splice(index, 1);
+      this.addSelectedFiles.splice(index, 1)
       // Also clear the file input to allow re-selecting the same files
-      this.$refs.addFileInput.value = '';
+      this.$refs.addFileInput.value = ''
     },
 
     async submitAddForm() {
       if (this.addSelectedFiles.length < 3 || this.addSelectedFiles.length > 10) {
-        this.showMessage('Необходимо выбрать от 3 до 10 изображений', true);
-        return;
+        this.showMessage('Необходимо выбрать от 3 до 10 изображений', true)
+        return
       }
 
-      this.addSubmitting = true;
-      this.message = '';
-      this.error = false;
+      this.addSubmitting = true
+      this.message = ''
+      this.error = false
 
       try {
-        const finalBrand = this.addForm.brand === 'new_brand' ? this.newBrand : this.addForm.brand;
-        const finalModel = this.addForm.model === 'new_model' ? this.newModel : this.addForm.model;
+        const finalBrand = this.addForm.brand === 'new_brand' ? this.newBrand : this.addForm.brand
+        const finalModel = this.addForm.model === 'new_model' ? this.newModel : this.addForm.model
 
-        const formData = new FormData();
-        formData.append('name', this.addForm.name);
-        formData.append('price', this.addForm.price.toString());
-        formData.append('brand', finalBrand);
-        formData.append('model', finalModel);
-        formData.append('categoryId', this.addForm.categoryId);
-        formData.append('description', this.addForm.description);
-        formData.append('characteristics', JSON.stringify(this.addForm.characteristics));
+        const formData = new FormData()
+        formData.append('name', this.addForm.name)
+        formData.append('price', this.addForm.price.toString())
+        formData.append('brand', finalBrand)
+        formData.append('model', finalModel)
+        formData.append('categoryId', this.addForm.categoryId)
+        formData.append('description', this.addForm.description)
+        formData.append('characteristics', JSON.stringify(this.addForm.characteristics))
 
         // Добавляем файлы
         this.addSelectedFiles.forEach((file) => {
-          formData.append('images', file);
-        });
+          formData.append('images', file)
+        })
 
-        await addProduct(formData);
+        await addProduct(formData)
 
-        this.showMessage('Товар успешно добавлен!');
-        this.error = false;
+        this.showMessage('Товар успешно добавлен!')
+        this.error = false
 
         // Сброс формы
         this.addForm = {
@@ -674,49 +677,53 @@ export default {
           model: '',
           categoryId: '',
           description: '',
-          characteristics: []
-        };
-        this.newBrand = '';
-        this.newModel = '';
-        this.selectedCharacteristic = '';
-        this.addSelectedFiles = [];
-        this.$refs.addFileInput.value = '';
+          characteristics: [],
+        }
+        this.newBrand = ''
+        this.newModel = ''
+        this.selectedCharacteristic = ''
+        this.addSelectedFiles = []
+        this.$refs.addFileInput.value = ''
 
         // Обновляем список товаров
-        await this.loadData();
-
+        await this.loadData()
       } catch (error) {
-        console.error('Ошибка добавления товара:', error);
-        this.showMessage(error.response?.data?.error || 'Ошибка добавления товара', true);
+        console.error('Ошибка добавления товара:', error)
+        const response = error.response?.data
+        let message = response?.error || 'Ошибка добавления товара'
+        if (response?.details) {
+          message += ': ' + response.details.map((d) => d.message).join(', ')
+        }
+        this.showMessage(message, true)
       } finally {
-        this.addSubmitting = false;
+        this.addSubmitting = false
       }
     },
 
     async loadProductForUpdate() {
       if (!this.selectedProductId) {
-        this.updateForm = null;
-        return;
+        this.updateForm = null
+        return
       }
 
       try {
-        const product = await getProduct(this.selectedProductId);
+        const product = await getProduct(this.selectedProductId)
         this.updateForm = {
           ...product,
-          characteristics: product.characteristics.length > 0 ? product.characteristics : ['']
-        };
+          characteristics: product.characteristics.length > 0 ? product.characteristics : [''],
+        }
       } catch (error) {
-        console.error('Ошибка загрузки товара:', error);
-        this.showMessage('Ошибка загрузки товара', true);
+        console.error('Ошибка загрузки товара:', error)
+        this.showMessage('Ошибка загрузки товара', true)
       }
     },
 
     async submitUpdateForm() {
-      if (!this.updateForm) return;
+      if (!this.updateForm) return
 
-      this.updateSubmitting = true;
-      this.message = '';
-      this.error = false;
+      this.updateSubmitting = true
+      this.message = ''
+      this.error = false
 
       try {
         const updateData = {
@@ -724,57 +731,55 @@ export default {
           price: this.updateForm.price,
           brand: this.updateForm.brand,
           description: this.updateForm.description,
-          characteristics: this.updateForm.characteristics.filter(char => {
+          characteristics: this.updateForm.characteristics.filter((char) => {
             if (typeof char === 'string') {
-              return char.trim();
+              return char.trim()
             }
-            return char && char.value && char.value.trim();
-          })
-        };
+            return char && char.value && char.value.trim()
+          }),
+        }
 
-        await updateProduct(this.selectedProductId, updateData);
+        await updateProduct(this.selectedProductId, updateData)
 
-        this.showMessage('Товар успешно обновлен!');
-        this.error = false;
+        this.showMessage('Товар успешно обновлен!')
+        this.error = false
 
         // Обновляем список товаров
-        await this.loadData();
-
+        await this.loadData()
       } catch (error) {
-        console.error('Ошибка обновления товара:', error);
-        this.showMessage(error.response?.data?.error || 'Ошибка обновления товара', true);
+        console.error('Ошибка обновления товара:', error)
+        this.showMessage(error.response?.data?.error || 'Ошибка обновления товара', true)
       } finally {
-        this.updateSubmitting = false;
+        this.updateSubmitting = false
       }
     },
 
     getProductName(productId) {
-      const product = this.productsList.find(p => p.id === productId);
-      return product ? product.name : '';
+      const product = this.productsList.find((p) => p.id === productId)
+      return product ? product.name : ''
     },
 
     async confirmDelete() {
-      if (!this.selectedDeleteProductId) return;
+      if (!this.selectedDeleteProductId) return
 
-      this.deleteSubmitting = true;
-      this.message = '';
-      this.error = false;
+      this.deleteSubmitting = true
+      this.message = ''
+      this.error = false
 
       try {
-        await deleteProduct(this.selectedDeleteProductId);
+        await deleteProduct(this.selectedDeleteProductId)
 
-        this.showMessage('Товар успешно удален!');
-        this.error = false;
+        this.showMessage('Товар успешно удален!')
+        this.error = false
 
         // Обновляем список товаров
-        await this.loadData();
-        this.selectedDeleteProductId = '';
-
+        await this.loadData()
+        this.selectedDeleteProductId = ''
       } catch (error) {
-        console.error('Ошибка удаления товара:', error);
-        this.showMessage(error.response?.data?.error || 'Ошибка удаления товара', true);
+        console.error('Ошибка удаления товара:', error)
+        this.showMessage(error.response?.data?.error || 'Ошибка удаления товара', true)
       } finally {
-        this.deleteSubmitting = false;
+        this.deleteSubmitting = false
       }
     },
   },

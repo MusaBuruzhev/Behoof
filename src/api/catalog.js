@@ -158,6 +158,19 @@ export const deleteProduct = async (productId) => {
  }
 };
 
+/**
+ * Получить все товары (для банера)
+ */
+export const getAll = async () => {
+  try {
+    const response = await api.get('/products?limit=100');
+    return response.data;
+  } catch (error) {
+    console.error('Ошибка получения всех товаров:', error);
+    throw error;
+  }
+};
+
 export default {
   fetchCatalog,
   fetchProducts,
@@ -167,5 +180,6 @@ export default {
   addProductReview,
   deleteProductReview,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getAll
 };

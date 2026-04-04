@@ -24,7 +24,9 @@
         <div class="banner-content">
           <h2><span class="highlight">Топ-10</span> смартфонов {{ currentYear }} года</h2>
           <p></p>
-          <router-link to="/catalog?sort=rating-desc&categoryId=smartphones" class="btn">Смотреть</router-link>
+          <router-link to="/catalog?sort=rating-desc&categoryId=smartphones" class="btn"
+            >Смотреть</router-link
+          >
         </div>
       </div>
     </div>
@@ -32,7 +34,7 @@
 </template>
 
 <script>
-import catalogAPI from '@/api/catalog.js';
+import catalogAPI from '@/api/catalog.js'
 
 export default {
   name: 'BannerComponent',
@@ -40,38 +42,38 @@ export default {
     return {
       productCount: 0,
       shopCount: 2272,
-      loading: true
-    };
+      loading: true,
+    }
   },
   computed: {
     currentYear() {
-      return new Date().getFullYear();
+      return new Date().getFullYear()
     },
     productCountText() {
       if (this.productCount >= 1000000) {
-        return (this.productCount / 1000000).toFixed(1) + ' млн';
+        return (this.productCount / 1000000).toFixed(1) + ' млн'
       } else if (this.productCount >= 1000) {
-        return (this.productCount / 1000).toFixed(0) + ' тыс';
+        return (this.productCount / 1000).toFixed(0) + ' тыс'
       }
-      return this.productCount;
-    }
+      return this.productCount
+    },
   },
   async mounted() {
-    await this.loadProductCount();
+    await this.loadProductCount()
   },
   methods: {
     async loadProductCount() {
       try {
-        const response = await catalogAPI.getAll();
+        const response = await catalogAPI.getAll()
         if (response.products) {
-          this.productCount = response.products.length;
+          this.productCount = response.products.length
         }
       } catch (error) {
-        console.error('Ошибка загрузки количества товаров:', error);
-        this.productCount = 1800000; // fallback значение
+        console.error('Ошибка загрузки количества товаров:', error)
+        this.productCount = 1800000 // fallback значение
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

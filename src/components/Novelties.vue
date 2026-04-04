@@ -19,38 +19,38 @@
 <script>
 import ProductCard from './ProductCard.vue'
 import { fetchCatalog } from '@/api/catalog.js'
-import comparisonAPI from '@/api/comparison.js';
+import comparisonAPI from '@/api/comparison.js'
 
 export default {
   name: 'NoveltiesSection',
   components: {
-    ProductCard
+    ProductCard,
   },
   data() {
     return {
       products: [],
-      categories: []
+      categories: [],
     }
   },
   async mounted() {
     try {
-      const data = await fetchCatalog();
-      this.categories = data.categories;
-      this.products = Object.values(data.products).slice(-10);
+      const data = await fetchCatalog()
+      this.categories = data.categories
+      this.products = Object.values(data.products).slice(-10)
     } catch (error) {
-      console.error('Error fetching catalog:', error);
+      console.error('Error fetching catalog:', error)
     }
   },
   methods: {
     getCategoryName(categoryId) {
-      const cat = this.categories.find(c => c.id === categoryId);
-      return cat ? cat.name : '';
+      const cat = this.categories.find((c) => c.id === categoryId)
+      return cat ? cat.name : ''
     },
     openCompareModal(product) {
-      comparisonAPI.addToComparison(product.id);
-      this.$router.push('/comparison');
-    }
-  }
+      comparisonAPI.addToComparison(product.id)
+      this.$router.push('/comparison')
+    },
+  },
 }
 </script>
 
@@ -68,17 +68,16 @@ export default {
   gap: 50px;
 }
 
-.novelties{
+.novelties {
   width: 85%;
   margin-left: auto;
   margin-right: auto;
   margin-top: 50px;
 }
 
-.header a{
+.header a {
   text-decoration: none;
-  color: #FF4D4D;
+  color: #ff4d4d;
   font-size: 20px;
 }
-
 </style>

@@ -1,33 +1,33 @@
 <template>
   <div class="reviews">
-     <div class="header">
+    <div class="header">
       <h1>Обзоры</h1>
       <a href="/reviews">К обзорам ></a>
     </div>
     <div class="cont">
       <div class="reviews_card">
-        <img src="../../public/a1/1.png" alt="">
-          <h1>Обзор устаревших смартфонов</h1>
-          <p>Lorem ipsum dolor sit amet consectetur.</p>
-          <a href="/novelties">Смотреть ></a>
+        <img src="../../public/a1/1.png" alt="" />
+        <h1>Обзор устаревших смартфонов</h1>
+        <p>Lorem ipsum dolor sit amet consectetur.</p>
+        <a href="/novelties">Смотреть ></a>
       </div>
       <div class="reviews_card">
-          <img src="../../public/a1/2.png" alt="">
-          <h1>Обзор устаревших смартфонов</h1>
-          <p>Lorem ipsum dolor sit amet consectetur.</p>
-          <a href="/novelties">Смотреть ></a>
+        <img src="../../public/a1/2.png" alt="" />
+        <h1>Обзор устаревших смартфонов</h1>
+        <p>Lorem ipsum dolor sit amet consectetur.</p>
+        <a href="/novelties">Смотреть ></a>
       </div>
       <div class="reviews_card">
-          <img src="../../public/a1/3.png" alt="">
-          <h1>Обзор устаревших смартфонов</h1>
-          <p>Lorem ipsum dolor sit amet consectetur.</p>
-          <a href="/novelties">Смотреть ></a>
+        <img src="../../public/a1/3.png" alt="" />
+        <h1>Обзор устаревших смартфонов</h1>
+        <p>Lorem ipsum dolor sit amet consectetur.</p>
+        <a href="/novelties">Смотреть ></a>
       </div>
       <div class="reviews_card">
-          <img src="../../public/a1/4.png" alt="">
-          <h1>Обзор устаревших смартфонов</h1>
-          <p>Lorem ipsum dolor sit amet consectetur.</p>
-          <a href="/novelties">Смотреть ></a>
+        <img src="../../public/a1/4.png" alt="" />
+        <h1>Обзор устаревших смартфонов</h1>
+        <p>Lorem ipsum dolor sit amet consectetur.</p>
+        <a href="/novelties">Смотреть ></a>
       </div>
     </div>
   </div>
@@ -35,18 +35,17 @@
 
 <script>
 export default {
-  name: 'ProductReviews'
+  name: 'ProductReviews',
 }
 </script>
 
 <style scoped>
-
-.header a{
+.header a {
   text-decoration: none;
-  color: #FF4D4D;
+  color: #ff4d4d;
   font-size: 20px;
 }
-.reviews{
+.reviews {
   width: 85%;
   margin: 100px auto 0 auto;
 }
@@ -57,21 +56,20 @@ export default {
   margin-bottom: 20px;
 }
 
-.cont{
+.cont {
   display: flex;
   justify-content: space-between;
 }
 
-.reviews_card{
-    width: 24%;
-    /* height: 500px; */
-    background-color: #F6F7FA;
-    /* padding: 10px; */
-    box-sizing: border-box;
-    border-radius: 20px;
-      min-height: 710px;
+.reviews_card {
+  width: 24%;
+  /* height: 500px; */
+  background-color: #f6f7fa;
+  /* padding: 10px; */
+  box-sizing: border-box;
+  border-radius: 20px;
+  min-height: 710px;
 }
-
 
 .reviews_card img {
   width: 100%;
@@ -94,15 +92,14 @@ export default {
   margin-left: 15px;
 }
 
-.reviews_card a{
+.reviews_card a {
   width: 85%;
 
   margin-top: 20px;
 
   text-decoration: none;
-  color: #FF4D4D;
+  color: #ff4d4d;
   font-size: 20px;
   margin-left: 20px;
-  ;
 }
 </style>

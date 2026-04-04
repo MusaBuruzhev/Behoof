@@ -33,10 +33,26 @@ const orderSchema = new mongoose.Schema(
  type: String,
  default: '',
  },
+ isDeleted: {
+ type: Boolean,
+ default: false,
+ },
+ deletedAt: {
+ type: Date,
+ default: null,
+ },
  },
  {
  timestamps: true,
  }
 );
+
+// Виртуальное поле для определения активного заказа
+orderSchema.virtual('isActive').get(function() {
+ return ['pending', 'confirmed', 'ready'].includes(this.status) && !this.isDeleted;
+});
+
+orderSchema.set('toJSON', { virtuals: true });
+orderSchema.set('toObject', { virtuals: true });
 
 export default mongoose.model('Order', orderSchema);
