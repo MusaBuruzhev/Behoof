@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import { fetchProducts } from '@/api/catalog.js'
+import { fetchCatalog } from '@/api/catalog.js'
 import comparisonAPI from '@/api/comparison.js'
 import CompareSelectModal from '@/components/CompareSelectModal.vue'
 
@@ -169,8 +169,8 @@ export default {
           return
         }
 
-        const data = await fetchProducts({ limit: 1000 })
-        this.allProducts = data.products || []
+        const catalogData = await fetchCatalog()
+        this.allProducts = Object.values(catalogData.products || {})
 
         this.products = compareIds
           .map((id) => this.allProducts.find((p) => p.id === id))

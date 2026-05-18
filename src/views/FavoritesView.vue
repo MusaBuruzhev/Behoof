@@ -50,7 +50,7 @@
 import ProductCard from '@/components/ProductCard.vue'
 import CompareSelectModal from '@/components/CompareSelectModal.vue'
 import favoritesAPI from '@/api/favorites.js'
-import catalogAPI from '@/api/catalog.js'
+import { fetchCatalog } from '@/api/catalog.js'
 
 export default {
   name: 'FavoritesView',
@@ -58,6 +58,7 @@ export default {
     ProductCard,
     CompareSelectModal,
   },
+  inject: ['showToast'],
   data() {
     return {
       favorites: [],
@@ -79,19 +80,30 @@ export default {
         }
 
         // Получить список избранных товаров
-        const favoriteIds = await favoritesAPI.getFavorites()
+        const favoriteIdsData = await favoritesAPI.getFavorites()
+        console.log('Избранные ID:', favoriteIdsData.favorites)
 
-        // Получить все товары
-        const allProducts = await catalogAPI.fetchProducts({ limit: 1000 })
+        // Получить все товары через каталог (без пагинации)
+        const catalogData = await fetchCatalog()
+        const allProducts = Object.values(catalogData.products || {})
+        console.log('Все товары:', allProducts.length)
 
         // Фильтровать только избранные товары
-        this.favorites = allProducts.products.filter((p) => favoriteIds.favorites.includes(p.id))
+        this.favorites = allProducts.filter((p) => {
+          const isFavorite = favoriteIdsData.favorites.includes(p.id)
+          if (isFavorite) {
+            console.log('Найден избранный товар:', p.name, p.id)
+          }
+          return isFavorite
+        })
 
-        // Загрузить категории для отображения имён
-        const catalog = await catalogAPI.fetchCatalog()
-        this.categories = catalog.categories
+        console.log('Отфильтрованные избранные товары:', this.favorites.length)
+
+        // Загрузить категории для отображения имён (используем уже загруженный каталог)
+        this.categories = catalogData.categories
       } catch (error) {
         console.error('Ошибка загрузки избранного:', error)
+        this.showToast('Ошибка загрузки избранного', 'error')
       } finally {
         this.loading = false
       }

@@ -6,7 +6,7 @@ const options = {
     info: {
       title: 'Behoof API',
       version: '1.0.0',
-      description: 'API для платформы сравнения цен и характеристик электроники',
+      description: 'API для интернет-магазина электроники с возможностью сравнения товаров и оформления предзаказов (самовывоза)',
       contact: {
         name: 'API Support',
         email: 'support@behoof.local',

@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import { fetchProducts } from '@/api/catalog.js'
+import { fetchCatalog } from '@/api/catalog.js'
 import favoritesAPI from '@/api/favorites.js'
 import comparisonAPI from '@/api/comparison.js'
 
@@ -110,8 +110,9 @@ export default {
           return
         }
 
-        const productsData = await fetchProducts({ limit: 1000 })
-        const allProducts = productsData.products || []
+        // Используем fetchCatalog, который возвращает все товары без пагинации
+        const catalogData = await fetchCatalog()
+        const allProducts = Object.values(catalogData.products || {})
 
         this.favorites = favoriteIds
           .map((id) => allProducts.find((p) => p.id === id))

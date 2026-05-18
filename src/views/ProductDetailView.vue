@@ -669,9 +669,10 @@ export default {
 .product-info {
   flex: 0.9;
   background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 02px10px rgba(0, 0, 0, 0.1);
+  padding: 35px;
+  border-radius: 24px;
+  border: 2px solid #ff4d4d;
+  box-shadow: 0 8px 32px rgba(255, 77, 77, 0.12);
 }
 
 .product-info h1 {
@@ -772,49 +773,72 @@ export default {
 
 .favorite-btn,
 .cart-btn {
-  padding: 15px30px;
+  padding: 16px 32px;
   border: none;
   display: flex;
   align-items: center;
   gap: 10px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .favorite-btn {
-  background-color: #f2f5f9;
-  color: #666;
-  border: 2px solid #e0e0e0;
+  background-color: #ffffff;
+  color: #ff4d4d;
+  border: 2px solid #ff4d4d;
 }
 
-.favorite-btn:hover:not(:disabled),
+.favorite-btn:hover:not(:disabled) {
+  background-color: #ff4d4d;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 77, 77, 0.3);
+}
+
 .favorite-btn.active {
   background-color: #ff4d4d;
   color: white;
   border-color: #ff4d4d;
+  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.25);
 }
 
 .heart-icon {
   width: 20px;
   height: 20px;
   object-fit: contain;
+  transition: transform 0.3s;
+}
+
+.favorite-btn:hover:not(:disabled) .heart-icon {
+  transform: scale(1.2);
 }
 
 .favorite-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
-}
-
-.favorite-btn:hover {
-  background-color: #e9ecef;
+  transform: none;
+  box-shadow: none;
 }
 
 .cart-btn {
-  background-color: #ff4d4d;
+  background: linear-gradient(135deg, #ff4d4d 0%, #e63939 100%);
   color: white;
+  border: 2px solid transparent;
 }
 
 .cart-btn:hover {
-  background-color: #e63939;
+  background: linear-gradient(135deg, #e63939 0%, #d32f2f 100%);
   transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 77, 77, 0.35);
+}
+
+.cart-btn:active,
+.favorite-btn:active:not(:disabled) {
+  transform: translateY(0px);
 }
 
 .loading,

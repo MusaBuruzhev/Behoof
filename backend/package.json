@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Backend API для интернет-магазина электроники с возможностью сравнения товаров и оформления предзаказов (самовывоза)",
   "type": "module",
   "dependencies": {
     "bcrypt": "^5.1.1",
