@@ -1,15 +1,13 @@
 <template>
   <div class="favorites-container">
     <div class="favorites-header">
-      <h1><img src="/iconHed/heart.svg" alt="Избранное" class="header-icon" /> Избранные товары</h1>
+      <h1>Избранные товары</h1>
       <p class="favorites-count">{{ favorites.length }} товаров в избранном</p>
       <div class="header-actions">
         <router-link v-if="favorites.length > 1" to="/comparison" class="compare-link">
-          <img src="/iconHed/comparison.svg" alt="Сравнить" class="action-icon" />
           Сравнить товары
         </router-link>
         <button v-if="favorites.length > 0" @click="clearAll" class="clear-btn">
-          <img src="/profIcon/l6.png" alt="Очистить" class="action-icon" />
           Очистить избранное
         </button>
       </div>

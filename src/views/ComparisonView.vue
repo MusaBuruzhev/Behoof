@@ -2,7 +2,7 @@
   <div class="comparison-page">
     <div class="container">
       <h1>
-        <img src="/iconHed/comparison.svg" alt="Сравнение" class="page-icon" /> Сравнение товаров
+       Сравнение товаров
       </h1>
 
       <div v-if="loading" class="loading">Загрузка товаров...</div>
@@ -450,8 +450,8 @@ h1 {
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 24px;
-  height: 24px;
+  width: 25px;
+  height: 25px;
   border: none;
   background: #dc3545;
   color: #fff;

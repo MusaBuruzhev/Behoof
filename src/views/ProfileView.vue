@@ -12,7 +12,7 @@
             </div>
           </div>
         </div>
-        <button @click="goBack" class="back-button">← Назад</button>
+        <button @click="goBack" class="back-button">Назад</button>
       </div>
 
  <div class="quick-actions">
@@ -464,7 +464,7 @@ export default {
   height: 100px;
   border-radius: 50%;
   background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%);
-  color: rgb(0, 0, 0);
+  color: rgb(243, 243, 243);
   display: flex;
   align-items: center;
   justify-content: center;
