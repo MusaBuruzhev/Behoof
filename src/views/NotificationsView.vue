@@ -17,7 +17,7 @@
         </div>
       </div>
 
-      <!-- Фильтры -->
+
       <div class="filters">
         <button
           v-for="filter in filters"
@@ -99,7 +99,7 @@
         </article>
       </div>
 
-      <!-- Пагинация -->
+
       <div v-if="totalPages > 1" class="pagination">
         <button :disabled="currentPage === 1" @click="changePage(currentPage - 1)" class="page-btn">
           Предыдущая
@@ -229,14 +229,14 @@ export default {
         }
       }
 
-      // Проверяем роль пользователя
+
       const userStr = localStorage.getItem('user')
       const user = userStr ? JSON.parse(userStr) : null
       const isAdmin = user?.role === 'admin'
 
-      // Переход по связанному объекту
+
       if (notification.relatedType === 'order') {
-        // Для админа - в админ-панель на заказы, для пользователя - к своим заказам
+
         if (isAdmin) {
           this.$router.push('/admin?tab=orders')
         } else {
@@ -268,7 +268,7 @@ export default {
     },
 
     getTypeIcon(type) {
-      // Возвращаем компонент для иконки
+
       return {
         template: `
  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

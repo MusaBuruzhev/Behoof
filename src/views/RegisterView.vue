@@ -270,7 +270,6 @@ export default {
 <style scoped>
 .auth-container {
   min-height: 100vh;
-  /* фон-изображение вместо сплошного градиента */
   background-image: url('../../public/fon/authFon.jpg');
   background-size: cover;
   background-position: center;
@@ -285,11 +284,11 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  background: rgba(255,255,255,0.15); /* слегка прозрачный фон для glass-эффекта */
+  background: rgba(255,255,255,0.15); 
   backdrop-filter: blur(12px);
   border-radius: 20px;
   overflow: hidden;
-  max-width: 1400px; /* увеличенный размер */
+  max-width: 1400px;
   width: 90%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }

@@ -468,7 +468,7 @@ h1 {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
-/* Users */
+
 .users-list {
   display: flex;
   flex-direction: column;
@@ -573,7 +573,7 @@ h1 {
   color: white;
 }
 
-/* Orders */
+
 .orders-list {
   display: flex;
   flex-direction: column;
@@ -750,7 +750,7 @@ h1 {
   font-size: 18px;
 }
 
-/* Settings */
+
 .settings-section {
   display: flex;
   flex-direction: column;

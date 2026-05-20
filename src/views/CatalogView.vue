@@ -11,7 +11,7 @@
         }}
       </h1>
 
-      <!-- Filters Sidebar -->
+
       <div class="catalog-content">
         <aside class="filters-sidebar">
           <div class="filter-group">
@@ -64,7 +64,7 @@
           <button @click="clearFilters" class="clear-filters-btn">Сбросить фильтры</button>
         </aside>
 
-        <!-- Products Grid -->
+
         <main class="products-section">
           <div class="search-bar">
             <input
@@ -94,7 +94,7 @@
             @close="closeCompareModal"
           />
 
-          <!-- Pagination -->
+
           <div v-if="totalPages > 1" class="pagination">
             <button @click="currentPage--" :disabled="currentPage === 1" class="page-btn">‹</button>
             <span>{{ currentPage }} из {{ totalPages }}</span>
@@ -161,13 +161,13 @@ export default {
       const brands = [...new Set(this.allProducts.map((p) => p.brand))]
       return brands.filter((b) => b)
     },
-    // products already paginated by server
+
     displayedProducts() {
       return this.products
     },
   },
   mounted() {
-    // Установить сортировку по умолчанию если передан defaultSortBy
+
     if (this.defaultSortBy) {
       this.filters.sortBy = this.defaultSortBy
     }
@@ -220,7 +220,7 @@ export default {
         const data = await fetchCatalog()
         this.catalogData = data
 
-        // Устанавливаем categoryName если передан categoryId
+
         if (this.categoryId && !this.modelId) {
           const category = this.catalogData.categories.find((cat) => cat.id === this.categoryId)
           this.categoryName = category ? category.name : ''
@@ -238,12 +238,12 @@ export default {
             this.categoryName = category ? category.name : ''
           }
 
-          // Get products for this model
+
           this.allProducts = model.productIds
             .map((id) => this.catalogData.products[id])
             .filter((p) => p)
         } else if (this.categoryId) {
-          // Get products for this category
+
           const subcategories = Object.values(this.catalogData.subcategories).filter(
             (sub) => sub.categoryId === this.categoryId,
           )
@@ -259,7 +259,7 @@ export default {
             .map((id) => this.catalogData.products[id])
             .filter((p) => p)
         } else {
-          // Show all products if no model or category selected
+
           this.allProducts = Object.values(this.catalogData.products)
         }
 
@@ -271,7 +271,7 @@ export default {
       }
     },
     async applyFilters() {
-      // reset to first page when filters/search change
+
       this.currentPage = 1
       await this.loadPage()
     },

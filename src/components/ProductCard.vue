@@ -96,7 +96,7 @@ export default {
         } else {
           await favoritesAPI.addToFavorites(this.product.id)
           this.isFavorite = true
-          this.showToast(`${this.product.name} добавлен в избранное ❤️`, 'heart')
+          this.showToast(`${this.product.name} добавлен в избранное`, 'heart')
         }
       } catch (error) {
         console.error('Ошибка при изменении избранного:', error)

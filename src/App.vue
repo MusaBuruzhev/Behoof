@@ -4,7 +4,6 @@
     <main>
       <router-view />
     </main>
-    <!-- не показываем футер на экранах логина/регистрации -->
     <FooterComponent v-if="!isAuthRoute" />
     <Toast
       :message="toastMessage"

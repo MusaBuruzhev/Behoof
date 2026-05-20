@@ -36,9 +36,9 @@ export default {
       const icons = {
         success: '✓',
         error: '✕',
-        info: 'ℹ',
-        warning: '⚠',
-        heart: '❤️',
+        info: 'i',
+        warning: '!',
+        heart: '♥',
       }
       return icons[this.type] || '✓'
     },

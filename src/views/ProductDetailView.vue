@@ -99,7 +99,7 @@
       </div>
     </div>
 
-    <!-- ОТДЕЛЬНЫЙ БЛОК ОТЗЫВОВ -->
+
     <div class="reviews-page-section">
       <div class="container">
         <div class="reviews-block">
@@ -119,7 +119,7 @@
             {{ ownReview ? 'Редактировать отзыв' : 'Написать отзыв' }}
           </button>
 
-          <!-- Форма отзыва -->
+
           <div v-if="showReviewForm" class="review-form-new">
             <div class="review-form-header">
               <h3>{{ ownReview ? 'Редактировать отзыв' : 'Новый отзыв' }}</h3>
@@ -173,7 +173,7 @@
             </div>
           </div>
 
-          <!-- Список отзывов -->
+
           <div v-if="sortedReviews.length === 0" class="no-reviews-new">
             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -304,7 +304,7 @@ export default {
     }
   },
   async mounted() {
-    // Скролл наверх при загрузке страницы
+
     window.scrollTo(0, 0)
 
     const productId = this.$route.params.id
@@ -401,7 +401,7 @@ export default {
         } else {
           await favoritesAPI.addToFavorites(this.product.id)
           this.isFavorite = true
-          this.showToast(`${this.product.name} добавлен в избранное ❤️`, 'heart')
+          this.showToast(`${this.product.name} добавлен в избранное`, 'heart')
         }
       } catch (error) {
         console.error('Ошибка при изменении избранного:', error)
@@ -440,7 +440,7 @@ export default {
           contactPhone: this.orderForm.contactPhone,
           comment: this.orderForm.comment,
         })
-        this.showToast('Заказ успешно оформлен! 🎉', 'success')
+        this.showToast('Заказ успешно оформлен!', 'success')
         this.closeOrderModal()
         this.$router.push('/orders')
       } catch (error) {
@@ -856,7 +856,7 @@ export default {
   margin-bottom: 30px;
 }
 
-/* Табы для разделов */
+
 .detail-tabs {
   display: flex;
   gap: 8px;
@@ -903,7 +903,7 @@ export default {
   font-weight: 700;
 }
 
-/* Стили для кнопок */
+
 .review-btn {
   border: none;
   border-radius: 8px;
@@ -1049,7 +1049,7 @@ export default {
   overflow-y: auto;
   padding-right: 8px;
 
-  /* Красивый скролл */
+
   scrollbar-width: thin;
   scrollbar-color: #ff4d4d #f0f0f0;
 }
@@ -1226,7 +1226,7 @@ export default {
   color: #ff4d4d;
 }
 
-/* ============ НОВЫЙ БЛОК ОТЗЫВОВ ============ */
+
 .reviews-page-section {
   width: 100%;
   background: #fff;
@@ -1289,7 +1289,7 @@ export default {
   box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
 }
 
-/* Форма отзыва */
+
 .review-form-new {
   background: #fafafa;
   border: 1px solid #e8e8e8;
@@ -1435,7 +1435,7 @@ export default {
   cursor: not-allowed;
 }
 
-/* Нет отзывов */
+
 .no-reviews-new {
   text-align: center;
   padding: 60px 20px;
@@ -1457,7 +1457,7 @@ export default {
   color: #999;
 }
 
-/* Список отзывов */
+
 .reviews-grid {
   display: flex;
   flex-direction: column;
@@ -1524,7 +1524,7 @@ export default {
   color: #ff4d4d;
 }
 
-/* Рейтинги характеристик в отзыве */
+
 .review-ratings {
   display: flex;
   flex-wrap: wrap;

@@ -11,7 +11,7 @@
         <p>Добавляйте, обновляйте и удаляйте товары в каталоге</p>
       </div>
 
-      <!-- Tabs -->
+
       <div class="tabs">
         <button
           v-for="tab in tabs"
@@ -24,7 +24,7 @@
         </button>
       </div>
 
-      <!-- Add Product Tab -->
+
       <div v-if="activeTab === 'add'" class="tab-content">
         <h2>Добавить товар</h2>
         <form @submit.prevent="submitAddForm" class="product-form">
@@ -171,7 +171,7 @@
               id="images"
               type="file"
               multiple
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               @change="handleFileSelect('add')"
               ref="addFileInput"
               required
@@ -202,7 +202,7 @@
         </form>
       </div>
 
-      <!-- Update Product Tab -->
+
       <div v-if="activeTab === 'update'" class="tab-content">
         <h2>Обновить товар</h2>
 
@@ -322,7 +322,7 @@
         </form>
       </div>
 
-      <!-- Delete Product Tab -->
+
       <div v-if="activeTab === 'delete'" class="tab-content">
         <h2>Удалить товар</h2>
 
@@ -450,16 +450,16 @@ export default {
       isAdmin: false,
       activeTab: 'add',
       tabs: [
-        { id: 'add', name: 'Добавить товар', icon: '➕' },
-        { id: 'update', name: 'Обновить товар', icon: '✏️' },
-        { id: 'delete', name: 'Удалить товар', icon: '🗑️' },
+        { id: 'add', name: 'Добавить товар', icon: '+' },
+        { id: 'update', name: 'Обновить товар', icon: '✎' },
+        { id: 'delete', name: 'Удалить товар', icon: '✕' },
       ],
       categories: [],
       subcategories: {},
       models: {},
       productsList: [],
 
-      // Add form
+
       addSelectedFiles: [],
       selectedCharacteristic: '',
       newBrand: '',
@@ -475,12 +475,12 @@ export default {
       },
       addSubmitting: false,
 
-      // Update form
+
       selectedProductId: '',
       updateForm: null,
       updateSubmitting: false,
 
-      // Delete
+
       selectedDeleteProductId: '',
       deleteSubmitting: false,
 
@@ -593,7 +593,7 @@ export default {
         return
       }
 
-      // Проверяем типы файлов
+
       const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
       const invalidFiles = files.filter((file) => !allowedTypes.includes(file.type))
 
@@ -606,8 +606,7 @@ export default {
         return
       }
 
-      // Проверяем размер файлов (макс 5MB каждый)
-      const maxSize = 5 * 1024 * 1024 // 5MB
+      const maxSize = 5 * 1024 * 1024
       const oversizedFiles = files.filter((file) => file.size > maxSize)
 
       if (oversizedFiles.length > 0) {
@@ -632,7 +631,7 @@ export default {
 
     removeFile(index) {
       this.addSelectedFiles.splice(index, 1)
-      // Also clear the file input to allow re-selecting the same files
+
       this.$refs.addFileInput.value = ''
     },
 
@@ -659,7 +658,7 @@ export default {
         formData.append('description', this.addForm.description)
         formData.append('characteristics', JSON.stringify(this.addForm.characteristics))
 
-        // Добавляем файлы
+
         this.addSelectedFiles.forEach((file) => {
           formData.append('images', file)
         })
@@ -669,7 +668,7 @@ export default {
         this.showMessage('Товар успешно добавлен!')
         this.error = false
 
-        // Сброс формы
+
         this.addForm = {
           name: '',
           price: null,

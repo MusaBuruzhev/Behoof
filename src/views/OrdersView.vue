@@ -3,7 +3,7 @@
     <div class="container">
       <h1>Мои заказы</h1>
 
-      <!-- Фильтры -->
+
       <div class="filters">
         <button
           :class="['filter-btn', { active: activeFilter === 'active' }]"
@@ -88,11 +88,11 @@
                   >
                     Подробнее
                   </router-link>
-                  <!-- Кнопка отмены для активных заказов -->
+
                   <button v-if="canCancel(order)" class="cancel-btn" @click="cancelOrder(order.id)">
                     Отменить
                   </button>
-                  <!-- Кнопка удаления в историю для неактивных -->
+
                   <button v-if="canDelete(order)" class="delete-btn" @click="deleteOrder(order.id)">
                     В историю
                   </button>

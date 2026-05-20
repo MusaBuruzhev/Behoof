@@ -8,7 +8,7 @@
             <h1>{{ user?.firstName }} {{ user?.lastName }}</h1>
             <p>{{ user?.email }}</p>
             <div class="member-badge">
-              👤 Участник с {{ formatDate(user?.createdAt) }}
+              Участник с {{ formatDate(user?.createdAt) }}
             </div>
           </div>
         </div>
@@ -62,7 +62,7 @@
           <div class="section-header">
             <h2>Основная информация</h2>
             <button v-if="!isEditing" @click="isEditing = true" class="edit-button">
-              ✏️ Редактировать
+               Редактировать
             </button>
           </div>
 
@@ -142,7 +142,7 @@
 
             <div class="form-actions">
               <button type="submit" class="save-button" :disabled="isSaving">
-                {{ isSaving ? 'Сохранение...' : '💾 Сохранить' }}
+                {{ isSaving ? 'Сохранение...' : 'Сохранить' }}
               </button>
               <button type="button" class="cancel-button" @click="cancelEdit">
                 ✕ Отменить
@@ -195,7 +195,6 @@
               <p>Эта операция необратима. Все ваши данные будут удалены.</p>
             </div>
             <button @click="openDeleteModal" class="delete-button">
-              <img src="/profIcon/l6.png" alt="Удалить" class="delete-icon" />
               Удалить профиль
             </button>
           </div>

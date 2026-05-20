@@ -93,7 +93,7 @@ const routes = [
   {
     path: '/forgot-password',
     name: 'forgot-password',
-    component: { template: '<div style="padding: 40px; text-align: center;"><h1>🔑 Восстановление пароля</h1><p>Раздел в разработке</p><router-link to="/login" style="color: #ff4d4d;">Вернуться к входу</router-link></div>' },
+    component: { template: '<div style="padding: 40px; text-align: center;"><h1>Восстановление пароля</h1><p>Раздел в разработке</p><router-link to="/login" style="color: #ff4d4d;">Вернуться к входу</router-link></div>' },
   },
 ]
 

@@ -39,7 +39,7 @@
             </div>
           </div>
 
-          <!-- Характеристики -->
+
           <div class="table-section">
             <div class="section-title">Характеристики</div>
             <div class="table-body">
@@ -57,7 +57,7 @@
             </div>
           </div>
 
-          <!-- Рейтинги -->
+
           <div v-if="hasRatings" class="table-section">
             <div class="section-title">Оценки характеристик</div>
             <div class="table-body">
@@ -81,7 +81,7 @@
             </div>
           </div>
 
-          <!-- Описание -->
+
           <div class="table-section">
             <div class="section-title">Описание</div>
             <div class="table-body">
@@ -94,7 +94,7 @@
             </div>
           </div>
 
-          <!-- Действия -->
+
           <div class="table-section actions-section">
             <div class="table-row">
               <div class="cell label"></div>
@@ -204,7 +204,7 @@ export default {
       return char?.value || '—'
     },
 
-    // Определяем числовые характеристики, которые можно сравнить
+
     isNumericTrait(trait) {
       const numericTraits = [
         'емкость',
@@ -236,7 +236,7 @@ export default {
 
       const currentValue = this.getCharacteristicValue(product, trait)
 
-      // Для числовых значений сравниваем
+
       if (this.isNumericTrait(trait)) {
         const currentNum = this.parseNumericValue(currentValue)
         if (currentNum === null) return ''
@@ -250,7 +250,7 @@ export default {
         const minVal = Math.min(...allValues)
         const maxVal = Math.max(...allValues)
 
-        // Для некоторых характеристик меньше = лучше (например, вес)
+  
         const inverseTraits = ['вес', 'толщина', 'ширина', 'высота']
         const isInverse = inverseTraits.some((t) => trait.toLowerCase().includes(t))
 
@@ -494,7 +494,7 @@ h1 {
   color: #dc3545;
 }
 
-/* Подсветка лучшего/худшего значения */
+
 .cell.best {
   background: rgba(40, 167, 69, 0.15);
   color: #28a745;

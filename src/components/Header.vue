@@ -31,9 +31,6 @@
       </div>
 
       <nav class="headerNav">
-        <router-link v-if="isAdmin" to="/add-product" class="add-product-link">
-          <button title="Добавить товар">➕</button>
-        </router-link>
         <div class="auth-section">
           <button
             v-if="!isAuthenticated"
@@ -66,6 +63,9 @@
               </router-link>
               <router-link v-if="isAdmin" to="/admin" class="profile-link">
                 <span><img src="../../public/profIcon/l4.png" alt="" /> Админ-панель</span>
+              </router-link>
+              <router-link v-if="isAdmin" to="/add-product" class="profile-link">
+                <span><img src="../../public/profIcon/plus.png" alt="" /> Добавить товар</span>
               </router-link>
               <router-link to="/favorites" class="profile-link">
                 <span><img src="../../public/profIcon/l1.png" alt="" /> Избранное</span>
@@ -137,7 +137,6 @@
             {{ getCategoryName(selectedCategoryId) }}
           </h1>
           <div class="catalogContDiv">
-            <!-- Кнопка "Все [Категория]" -->
             <button @click="goToCategoryCatalog(selectedCategoryId)" class="all-category-btn">
               <div class="catalogButtom" :class="{ active: !selectedSubcategoryId }">
                 <div :class="{ active: !selectedSubcategoryId }"></div>
@@ -194,7 +193,6 @@
         </div>
         <div class="t2" v-else-if="selectedCategoryId"></div>
 
-        <!-- В будущем при выборе модели перейти на страницу каталога -->
         <div class="catalogContRight" v-if="selectedModelId">
           <h1>
             {{ getModelName(selectedModelId) }}
@@ -604,7 +602,7 @@ header {
 }
 .headerLogoInfo {
   cursor: pointer;
-  width: 22%;
+  width: 20%;
   display: flex;
   align-items: center;
 }
@@ -630,7 +628,7 @@ header {
 }
 
 .headerBtnCategory {
-  width: 12%;
+  width: 11%;
   display: flex;
   align-items: center;
   margin-left: auto;
@@ -668,7 +666,7 @@ header {
 }
 
 .searchCont {
-  width: 48%;
+  width: 40%;
   height: 76px;
   display: flex;
   align-items: center;
@@ -694,26 +692,39 @@ header {
 }
 
 .headerNav {
-  width: 12%;
+  width: 18%;
   height: 76px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 0 0 40px;
+  justify-content: flex-end;
+  padding: 0 0 0 16px;
+  gap: 8px;
 }
 .headerNav button,
 .headerNav a {
   background-color: #f2f5f9;
-  height: 52px;
+  height: 44px;
   border: none;
   border-radius: 8px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
+  margin-left: 10px;
+  padding: 0;
+  min-width: 44px;
 }
 
-.headerNav a:hover {
+.headerNav a:hover,
+.headerNav button:hover,
+.header-icon-btn:hover,
+.notifications-link:hover {
   background-color: #e0e5f0;
+}
+
+.headerNav a img,
+.headerNav button img,
+.header-icon-btn img {
+  width: 24px;
+  height: 24px;
 }
 
 .headerNav a img,
@@ -730,11 +741,20 @@ header {
   background-color: #e0e5f0;
 }
 
-.notifications-link {
-  position: relative;
+.header-icon-btn {
+  width: 44px;
+  height: 44px;
+  background-color: #f2f5f9;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.notifications-link {
+  position: relative;
   width: 44px;
   height: 44px;
   background-color: #f2f5f9;
@@ -767,21 +787,6 @@ header {
   justify-content: center;
   padding: 0 4px;
   border: 2px solid white;
-}
-
-.add-product-link {
-  text-decoration: none;
-}
-
-.add-product-link button {
-  background-color: #28a745;
-  color: white;
-  width: 36px;
-  height: 36px;
-}
-
-.add-product-link button:hover {
-  background-color: #218838;
 }
 
 .catalog-block {
@@ -1004,8 +1009,8 @@ header {
 
 .auth-button {
   background-color: #f2f5f9;
-  height: 52px;
-  width: 52px;
+  height: 44px;
+  width: 44px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -1025,31 +1030,27 @@ header {
 }
 
 .profile-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  height: 52px;
-  width: 52px;
+  background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%);
+  height: 44px;
+  width: 44px;
   border: none;
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   padding: 0;
-  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 3px 10px rgba(255, 77, 77, 0.3);
 }
 
 .profile-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4);
 }
 
 .profile-button:active {
   transform: translateY(0);
-}
-
-.profile-button:hover {
-  background-color: #764ba2;
 }
 
 .profile-avatar {
@@ -1087,7 +1088,7 @@ header {
 
 .profile-info {
   padding: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%);
 }
 
 .profile-info-name {
@@ -1122,14 +1123,14 @@ header {
   top: 0;
   height: 100%;
   width: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%);
   transform: scaleY(0);
   transition: transform 0.3s ease;
 }
 
 .profile-link:hover {
   background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
-  color: #667eea;
+  color: #ff4d4d;
   padding-left: 28px;
 }
 
@@ -1151,7 +1152,7 @@ header {
 }
 
 .profile-link:hover img {
-  filter: grayscale(0) brightness(0.6) sepia(1) hue-rotate(180deg) saturate(3);
+  filter: grayscale(0) brightness(0.6) sepia(1) hue-rotate(0deg) saturate(3);
 }
 
 .logout-button {
@@ -1199,78 +1200,5 @@ header {
 .logout-button img {
   width: 22px;
   height: 22px;
-}
-
-.profile-info {
-  padding: 16px;
-  border-bottom: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-.profile-info-name {
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 14px;
-  margin-bottom: 4px;
-}
-
-.profile-info-email {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.profile-link {
-  display: block;
-  padding: 12px 16px;
-  color: #374151;
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.profile-link:hover {
-  background-color: #f3f4f6;
-  color: #667eea;
-  padding-left: 20px;
-}
-
-.profile-link span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.profile-link img {
-  width: 20px;
-  height: 20px;
-}
-
-.logout-button {
-  width: 100%;
-  padding: 12px 16px;
-  background: none;
-  border: none;
-  text-align: left;
-  color: #dc2626;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.logout-button:hover {
-  background-color: #fee2e2;
-  padding-left: 20px;
-}
-
-.logout-button span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logout-button img {
-  width: 20px;
-  height: 20px;
 }
 </style>

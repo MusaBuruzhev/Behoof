@@ -79,16 +79,16 @@ export default {
           return
         }
 
-        // Получить список избранных товаров
+
         const favoriteIdsData = await favoritesAPI.getFavorites()
         console.log('Избранные ID:', favoriteIdsData.favorites)
 
-        // Получить все товары через каталог (без пагинации)
+
         const catalogData = await fetchCatalog()
         const allProducts = Object.values(catalogData.products || {})
         console.log('Все товары:', allProducts.length)
 
-        // Фильтровать только избранные товары
+
         this.favorites = allProducts.filter((p) => {
           const isFavorite = favoriteIdsData.favorites.includes(p.id)
           if (isFavorite) {
@@ -99,7 +99,7 @@ export default {
 
         console.log('Отфильтрованные избранные товары:', this.favorites.length)
 
-        // Загрузить категории для отображения имён (используем уже загруженный каталог)
+
         this.categories = catalogData.categories
       } catch (error) {
         console.error('Ошибка загрузки избранного:', error)
