@@ -569,6 +569,7 @@ export default {
   margin: 0 auto;
   display: flex;
   gap: 40px;
+  margin-top: 90px;
   align-items: flex-start;
 }
 
@@ -648,6 +649,7 @@ export default {
 .thumbnail-images {
   display: flex;
   gap: 10px;
+  margin-top: 50px;
   flex-wrap: wrap;
 }
 

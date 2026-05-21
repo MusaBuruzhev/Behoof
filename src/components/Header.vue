@@ -206,7 +206,8 @@
         <div class="t3" v-else-if="selectedSubcategoryId"></div>
 
         <div class="abc">
-          <img src="../../public/iconHed/abc.png" alt="" />
+          <h1>Тут могла бы быть ваша реклама(</h1>
+          <!-- <img src="../../public/iconHed/abc.png" alt="" /> -->
         </div>
       </div>
     </div>
@@ -648,8 +649,8 @@ header {
   padding-right: 30px;
 }
 .headerBtnCategoryButtom div {
-  margin-top: -19px;
-  margin-left: 155px;
+  margin-top: -18px;
+  margin-left: 175px;
   position: absolute;
 }
 
@@ -952,7 +953,7 @@ header {
 
 .t1.anim1 {
   width: 48%;
-  height: 400px;
+  height: 480px;
   margin-left: 2%;
   margin-top: 25px;
   position: relative;
@@ -987,8 +988,11 @@ header {
   border-radius: 10px;
   overflow: hidden;
   display: flex;
+  margin-bottom: 30px;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
+  border: 2px dashed #ff4d4d;
+  align-items: center;
 }
 .abc img {
   width: 100%;

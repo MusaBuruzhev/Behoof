@@ -993,11 +993,12 @@ export default {
 
 .add-char-btn {
   padding: 8px 16px;
-  background: #28a745;
+  background: #dc3545;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  height: 44px;
   font-size: 14px;
   align-self: flex-start;
   transition: background-color 0.3s ease;
