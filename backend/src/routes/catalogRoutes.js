@@ -7,6 +7,7 @@ import {
   getProduct,
   updateProduct,
   deleteProduct,
+  getProductsByIds,
   uploadImages,
   addReview,
   deleteReview,
@@ -238,6 +239,40 @@ router.post('/products/:id/reviews', authenticate, validate(reviewSchema), addRe
  */
 router.put('/products/:id', authenticate, requireAdmin, validate(updateProductSchema), updateProduct)
 router.delete('/products/:id', authenticate, requireAdmin, deleteProduct)
+
+/**
+ * @swagger
+ * /api/products/by-ids:
+ *   post:
+ *     tags: [Products]
+ *     summary: Получить товары по списку ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ids
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Список товаров
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ */
+router.post('/products/by-ids', getProductsByIds)
 
 /**
  * @swagger

@@ -636,6 +636,33 @@ export const deleteProduct = async (req, res) => {
   }
 }
 
+export const getProductsByIds = async (req, res) => {
+  try {
+    const { ids } = req.body
+    
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: 'Необходимо передать массив ID товаров' })
+    }
+    
+    const products = await Product.find({ id: { $in: ids } })
+    
+    const formattedProducts = products.map(product => {
+      const currentPrice = product.priceHistory?.length > 0
+        ? product.priceHistory.reduce((max, curr) => new Date(curr.date) > new Date(max.date) ? curr : max).price
+        : 0
+      return {
+        ...mapProductResponse(product),
+        price: currentPrice,
+      }
+    })
+    
+    res.json({ products: formattedProducts })
+  } catch (error) {
+    console.error('Ошибка получения товаров по ID:', error)
+    res.status(500).json({ error: 'Ошибка получения товаров' })
+  }
+}
+
 export const initializeData = async (req, res) => {
   try {
     // Очищаем существующие данные
