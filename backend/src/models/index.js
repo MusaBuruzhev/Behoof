@@ -5,6 +5,8 @@ import Model from './Model.js';
 import Counter from './Counter.js';
 import Order from './Order.js';
 import Notification from './Notification.js';
+import Cart from './Cart.js';
+import Brand from './Brand.js';
 
 export {
  Category,
@@ -13,5 +15,7 @@ export {
  Model,
  Counter,
  Order,
- Notification
+ Notification,
+ Cart,
+ Brand
 };

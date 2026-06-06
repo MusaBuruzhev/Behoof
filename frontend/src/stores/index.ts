@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
-import type { User } from '@/types'
+import api from '@/api/axios'
+import type { User, Cart, CartItem } from '@/types'
 
 // Auth store - управление состоянием авторизации
 export const useAuthStore = defineStore('auth', {
@@ -120,11 +121,142 @@ export const useFavoritesStore = defineStore('favorites', {
   },
 })
 
-// Cart store - корзина (если понадобится в будущем)
+// Cart store - корзина
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: [] as any[],
+    items: [] as CartItem[],
+    totalAmount: 0,
+    itemCount: 0,
+    id: null as string | null,
+    isLoading: false,
+    isInitialized: false,
   }),
+
+  getters: {
+    isEmpty: (state) => state.items.length === 0,
+    cartItemsCount: (state) => state.itemCount,
+    formattedTotal: (state) => state.totalAmount.toLocaleString('ru-RU'),
+    getItemQuantity: (state) => (productId: string) => {
+      const item = state.items.find(item => item.productId === productId)
+      return item ? item.quantity : 0
+    },
+    isInCart: (state) => (productId: string) => {
+      return state.items.some(item => item.productId === productId)
+    },
+  },
+
+  actions: {
+    setCart(cart: Cart) {
+      this.items = cart.items
+      this.totalAmount = cart.totalAmount
+      this.itemCount = cart.itemCount
+      this.id = cart.id
+      this.isInitialized = true
+    },
+
+    updateItem(productId: string, quantity: number) {
+      const item = this.items.find(item => item.productId === productId)
+      if (item) {
+        item.quantity = quantity
+      }
+      this.recalculateTotals()
+    },
+
+    removeItem(productId: string) {
+      this.items = this.items.filter(item => item.productId !== productId)
+      this.recalculateTotals()
+    },
+
+    addItem(item: CartItem) {
+      const existingItem = this.items.find(i => i.productId === item.productId)
+      if (existingItem) {
+        existingItem.quantity += item.quantity
+      } else {
+        this.items.push(item)
+      }
+      this.recalculateTotals()
+    },
+
+    clear() {
+      this.items = []
+      this.totalAmount = 0
+      this.itemCount = 0
+      this.id = null
+    },
+
+    recalculateTotals() {
+      this.itemCount = this.items.reduce((sum, item) => sum + item.quantity, 0)
+      this.totalAmount = this.items.reduce((sum, item) => sum + item.subtotal, 0)
+    },
+
+    async fetchCart() {
+      this.isLoading = true
+      try {
+        const response = await api.get('/cart')
+        this.setCart(response.data)
+      } catch (error) {
+        console.error('Failed to fetch cart:', error)
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async addToCart(productId: string, quantity: number = 1) {
+      this.isLoading = true
+      try {
+        const response = await api.post('/cart/items', { productId, quantity })
+        this.setCart(response.data)
+        return response.data
+      } catch (error) {
+        console.error('Failed to add to cart:', error)
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async updateQuantity(productId: string, quantity: number) {
+      this.isLoading = true
+      try {
+        const response = await api.put(`/cart/items/${productId}`, { quantity })
+        this.setCart(response.data)
+        return response.data
+      } catch (error) {
+        console.error('Failed to update quantity:', error)
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async removeFromCart(productId: string) {
+      this.isLoading = true
+      try {
+        const response = await api.delete(`/cart/items/${productId}`)
+        this.setCart(response.data)
+        return response.data
+      } catch (error) {
+        console.error('Failed to remove from cart:', error)
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async clearCart() {
+      this.isLoading = true
+      try {
+        const response = await api.delete('/cart')
+        this.setCart(response.data)
+        return response.data
+      } catch (error) {
+        console.error('Failed to clear cart:', error)
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
+  },
 })
 
 // Orders store - заказы
@@ -206,6 +338,264 @@ export const useComparisonStore = defineStore('comparison', {
     },
     clearCompare() {
       this.productIds = []
+    },
+  },
+})
+
+// Admin store - админ-панель
+export const useAdminStore = defineStore('admin', {
+  state: () => ({
+    stats: {
+      totalProducts: 0,
+      totalUsers: 0,
+      totalOrders: 0,
+      totalCategories: 0,
+      totalBrands: 0,
+      recentOrders: [] as any[],
+      recentUsers: [] as any[],
+      recentProducts: [] as any[],
+    },
+    products: {
+      items: [] as any[],
+      total: 0,
+      page: 1,
+      limit: 20,
+      isLoading: false,
+    },
+    users: {
+      items: [] as any[],
+      total: 0,
+      page: 1,
+      limit: 20,
+      isLoading: false,
+    },
+    orders: {
+      items: [] as any[],
+      total: 0,
+      page: 1,
+      limit: 20,
+      isLoading: false,
+    },
+    categories: {
+      items: [] as any[],
+      isLoading: false,
+    },
+    brands: {
+      items: [] as any[],
+      isLoading: false,
+    },
+  }),
+
+  getters: {
+    totalPages: (state) => ({
+      products: Math.ceil(state.products.total / state.products.limit),
+      users: Math.ceil(state.users.total / state.users.limit),
+      orders: Math.ceil(state.orders.total / state.orders.limit),
+    }),
+  },
+
+  actions: {
+    // Stats
+    setStats(stats: any) {
+      this.stats = {
+        totalProducts: stats.totalProducts || 0,
+        totalUsers: stats.totalUsers || 0,
+        totalOrders: stats.totalOrders || 0,
+        totalCategories: stats.totalCategories || 0,
+        totalBrands: stats.totalBrands || 0,
+        recentOrders: stats.recentOrders || [],
+        recentUsers: stats.recentUsers || [],
+        recentProducts: stats.recentProducts || [],
+      }
+    },
+
+    async fetchStats() {
+      try {
+        const response = await api.get('/admin/stats')
+        this.setStats(response.data)
+      } catch (error) {
+        console.error('Failed to fetch admin stats:', error)
+      }
+    },
+
+    // Products
+    setProducts(data: any) {
+      this.products.items = data.items
+      this.products.total = data.total
+    },
+
+    async fetchProducts(page: number = 1) {
+      this.products.isLoading = true
+      try {
+        const response = await api.get('/products', {
+          params: { page, limit: this.products.limit },
+        })
+        this.setProducts(response.data)
+        this.products.page = page
+      } catch (error) {
+        console.error('Failed to fetch products:', error)
+      } finally {
+        this.products.isLoading = false
+      }
+    },
+
+    async addProduct(productData: any) {
+      try {
+        await api.post('/products', productData)
+        await this.fetchProducts(1)
+      } catch (error) {
+        console.error('Failed to add product:', error)
+        throw error
+      }
+    },
+
+    async updateProduct(productId: string, productData: any) {
+      try {
+        await api.put(`/products/${productId}`, productData)
+        await this.fetchProducts(this.products.page)
+      } catch (error) {
+        console.error('Failed to update product:', error)
+        throw error
+      }
+    },
+
+    async deleteProduct(productId: string) {
+      try {
+        await api.delete(`/products/${productId}`)
+        await this.fetchProducts(this.products.page)
+      } catch (error) {
+        console.error('Failed to delete product:', error)
+        throw error
+      }
+    },
+
+    // Users
+    setUsers(data: any) {
+      this.users.items = data.users || data.items
+      this.users.total = data.total || data.users?.length || 0
+    },
+
+    async fetchUsers(page: number = 1) {
+      this.users.isLoading = true
+      try {
+        const response = await api.get('/admin/users', {
+          params: { page, limit: this.users.limit },
+        })
+        this.setUsers(response.data)
+        this.users.page = page
+      } catch (error) {
+        console.error('Failed to fetch users:', error)
+      } finally {
+        this.users.isLoading = false
+      }
+    },
+
+    async updateUserRole(userId: string, role: string) {
+      try {
+        await api.put(`/admin/users/${userId}/role`, { role })
+        await this.fetchUsers(this.users.page)
+      } catch (error) {
+        console.error('Failed to update user role:', error)
+        throw error
+      }
+    },
+
+    async deleteUser(userId: string) {
+      try {
+        await api.delete(`/admin/users/${userId}`)
+        await this.fetchUsers(this.users.page)
+      } catch (error) {
+        console.error('Failed to delete user:', error)
+        throw error
+      }
+    },
+
+    // Orders
+    setOrders(data: any) {
+      this.orders.items = data.orders || data.items
+      this.orders.total = data.total || data.orders?.length || 0
+    },
+
+    async fetchOrders(page: number = 1) {
+      this.orders.isLoading = true
+      try {
+        const response = await api.get('/admin/orders', {
+          params: { page, limit: this.orders.limit },
+        })
+        this.setOrders(response.data)
+        this.orders.page = page
+      } catch (error) {
+        console.error('Failed to fetch orders:', error)
+      } finally {
+        this.orders.isLoading = false
+      }
+    },
+
+    async updateOrderStatus(orderId: string, status: string) {
+      try {
+        await api.put(`/admin/orders/${orderId}/status`, { status })
+        await this.fetchOrders(this.orders.page)
+      } catch (error) {
+        console.error('Failed to update order status:', error)
+        throw error
+      }
+    },
+
+    async deleteOrder(orderId: string) {
+      try {
+        await api.delete(`/admin/orders/${orderId}`)
+        await this.fetchOrders(this.orders.page)
+      } catch (error) {
+        console.error('Failed to delete order:', error)
+        throw error
+      }
+    },
+
+    // Categories
+    setCategories(items: any[]) {
+      this.categories.items = items
+    },
+
+    async fetchCategories() {
+      this.categories.isLoading = true
+      try {
+        const response = await api.get('/admin/categories')
+        this.setCategories(response.data.categories || response.data || [])
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      } finally {
+        this.categories.isLoading = false
+      }
+    },
+
+    async createCategory(categoryData: any) {
+      try {
+        await api.post('/admin/categories', categoryData)
+        await this.fetchCategories()
+      } catch (error) {
+        console.error('Failed to create category:', error)
+        throw error
+      }
+    },
+
+    async updateCategory(categoryId: string, categoryData: any) {
+      try {
+        await api.put(`/admin/categories/${categoryId}`, categoryData)
+        await this.fetchCategories()
+      } catch (error) {
+        console.error('Failed to update category:', error)
+        throw error
+      }
+    },
+
+    async deleteCategory(categoryId: string) {
+      try {
+        await api.delete(`/admin/categories/${categoryId}`)
+        await this.fetchCategories()
+      } catch (error) {
+        console.error('Failed to delete category:', error)
+        throw error
+      }
     },
   },
 })

@@ -10,45 +10,59 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import AppHeader from '@/components/common/AppHeader.vue'
-import { useAuthStore, useFavoritesStore, useNotificationsStore } from '@/stores'
+import { useAuthStore, useFavoritesStore, useNotificationsStore, useCartStore } from '@/stores'
 
 const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
 const notificationsStore = useNotificationsStore()
+const cartStore = useCartStore()
 
 onMounted(async () => {
   // Инициализация авторизации
   await authStore.initializeAuth()
   
-  // Загрузка избранных товаров
-  try {
-    const response = await fetch('/api/favorites', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    })
-    if (response.ok) {
-      const data = await response.json()
-      favoritesStore.setFavorites(data.productIds || [])
+  // Загрузка корзины
+  if (authStore.isAuthenticated) {
+    try {
+      await cartStore.fetchCart()
+    } catch (error) {
+      console.error('Failed to load cart:', error)
     }
-  } catch (error) {
-    console.error('Failed to load favorites:', error)
+  }
+  
+  // Загрузка избранных товаров
+  if (authStore.isAuthenticated) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/favorites`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        favoritesStore.setFavorites(data.productIds || [])
+      }
+    } catch (error) {
+      console.error('Failed to load favorites:', error)
+    }
   }
   
   // Загрузка уведомлений
-  try {
-    const response = await fetch('/api/notifications', {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+  if (authStore.isAuthenticated) {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      if (response.ok) {
+        const data = await response.json()
+        notificationsStore.setNotifications(data.notifications || [])
+        notificationsStore.setUnreadCount(data.unreadCount || 0)
       }
-    })
-    if (response.ok) {
-      const data = await response.json()
-      notificationsStore.setNotifications(data.notifications || [])
-      notificationsStore.setUnreadCount(data.unreadCount || 0)
+    } catch (error) {
+      console.error('Failed to load notifications:', error)
     }
-  } catch (error) {
-    console.error('Failed to load notifications:', error)
   }
 })
 </script>

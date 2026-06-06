@@ -142,6 +142,29 @@ export interface FavoritesResponse {
   favorites: string[]
 }
 
+// ==================== Корзина ====================
+
+export interface CartItem {
+  productId: string
+  quantity: number
+  product: Product | null
+  subtotal: number
+}
+
+export interface Cart {
+  id: string
+  userId: string
+  items: CartItem[]
+  totalAmount: number
+  itemCount: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CartResponse extends Cart {
+  message?: string
+}
+
 // ==================== Админ ====================
 
 export interface AdminStats {

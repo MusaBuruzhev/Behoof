@@ -15,6 +15,8 @@ import catalogRoutes from './src/routes/catalogRoutes.js';
 import authRoutes from './src/routes/authRoutes.js';
 import ordersRoutes from './src/routes/ordersRoutes.js';
 import notificationsRoutes from './src/routes/notificationsRoutes.js';
+import cartRoutes from './src/routes/cartRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
 import swaggerSpec from './src/config/swagger.js';
 import logger from './src/utils/logger.js';
 
@@ -143,6 +145,8 @@ app.use('/api', catalogRoutes);
 app.use('/api', authRoutes);
 app.use('/api', ordersRoutes);
 app.use('/api', notificationsRoutes);
+app.use('/api', cartRoutes);
+app.use('/api', adminRoutes);
 
 // ============ 404 ============
 

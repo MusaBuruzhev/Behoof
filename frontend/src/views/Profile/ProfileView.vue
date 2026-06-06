@@ -310,7 +310,7 @@ const resetForm = () => {
 // Load stats
 const loadStats = async () => {
   try {
-    const ordersResponse = await fetch('/api/orders/my', {
+    const ordersResponse = await fetch(`${import.meta.env.VITE_API_URL}/orders/my`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
     if (ordersResponse.ok) {

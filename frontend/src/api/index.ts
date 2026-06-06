@@ -174,3 +174,51 @@ export const deleteOrderAdmin = (orderId: string) =>
 /** Получить все уведомления (только админ) */
 export const getAllNotificationsAdmin = () =>
   api.get('/admin/notifications')
+
+/** Получить все бренды (только админ) */
+export const getBrands = () => api.get('/admin/brands')
+
+/** Создать бренд (только админ) */
+export const createBrand = (data: { name: string; description?: string }) =>
+  api.post('/admin/brands', data)
+
+/** Обновить бренд (только админ) */
+export const updateBrand = (id: string, data: { name?: string; description?: string }) =>
+  api.put(`/admin/brands/${id}`, data)
+
+/** Удалить бренд (только админ) */
+export const deleteBrand = (id: string) => api.delete(`/admin/brands/${id}`)
+
+/** Получить все категории (только админ) */
+export const getCategories = () => api.get('/admin/categories')
+
+/** Создать категорию (только админ) */
+export const createCategory = (data: { name: string; description?: string }) =>
+  api.post('/admin/categories', data)
+
+/** Обновить категорию (только админ) */
+export const updateCategory = (id: string, data: { name?: string; description?: string }) =>
+  api.put(`/admin/categories/${id}`, data)
+
+/** Удалить категорию (только админ) */
+export const deleteCategory = (id: string) => api.delete(`/admin/categories/${id}`)
+
+// ==================== Корзина ====================
+
+/** Получить корзину пользователя */
+export const getCart = () => api.get('/cart')
+
+/** Добавить товар в корзину */
+export const addToCart = (data: { productId: string; quantity?: number }) =>
+  api.post('/cart/items', data)
+
+/** Обновить количество товара в корзине */
+export const updateCartItem = (productId: string, quantity: number) =>
+  api.put(`/cart/items/${productId}`, { quantity })
+
+/** Удалить товар из корзины */
+export const removeFromCart = (productId: string) =>
+  api.delete(`/cart/items/${productId}`)
+
+/** Очистить корзину */
+export const clearCart = () => api.delete('/cart')

@@ -89,6 +89,12 @@ const router = createRouter({
       component: () => import('@/views/Comparison/ComparisonView.vue'),
     },
     {
+      path: '/cart',
+      name: 'cart',
+      component: () => import('@/views/Cart/CartView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/orders',
       name: 'orders',
       component: () => import('@/views/Order/OrdersView.vue'),
@@ -102,9 +108,50 @@ const router = createRouter({
     },
     {
       path: '/admin',
-      name: 'admin',
-      component: () => import('@/views/Admin/AdminDashboard.vue'),
+      component: () => import('@/layouts/AdminLayout.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
+      children: [
+        {
+          path: '',
+          name: 'admin-dashboard',
+          component: () => import('@/views/Admin/AdminDashboard.vue'),
+        },
+        {
+          path: 'products',
+          name: 'admin-products',
+          component: () => import('@/views/Admin/ProductsAdmin.vue'),
+        },
+        {
+          path: 'products/:id',
+          name: 'admin-product-edit',
+          component: () => import('@/views/Admin/ProductEditAdmin.vue'),
+        },
+        {
+          path: 'users',
+          name: 'admin-users',
+          component: () => import('@/views/Admin/UsersAdmin.vue'),
+        },
+        {
+          path: 'orders',
+          name: 'admin-orders',
+          component: () => import('@/views/Admin/OrdersAdmin.vue'),
+        },
+        {
+          path: 'categories',
+          name: 'admin-categories',
+          component: () => import('@/views/Admin/CategoriesAdmin.vue'),
+        },
+        {
+          path: 'brands',
+          name: 'admin-brands',
+          component: () => import('@/views/Admin/BrandsAdmin.vue'),
+        },
+        {
+          path: 'notifications',
+          name: 'admin-notifications',
+          component: () => import('@/views/Admin/NotificationsAdmin.vue'),
+        },
+      ],
     },
   ],
 })

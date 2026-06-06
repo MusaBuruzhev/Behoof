@@ -57,6 +57,15 @@
       
       <!-- Правая часть: Действия -->
       <div class="header-right">
+        <router-link to="/cart" class="action-btn" title="Корзина">
+          <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <path d="M16 10a4 4 0 0 1-8 0"/>
+          </svg>
+          <span v-if="cartCount > 0" class="action-badge">{{ cartCount }}</span>
+        </router-link>
+        
         <router-link to="/comparison" class="action-btn" title="Сравнение">
           <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
@@ -150,7 +159,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCatalog } from '@/api'
-import { useAuthStore, useFavoritesStore, useNotificationsStore, useComparisonStore } from '@/stores'
+import { useAuthStore, useFavoritesStore, useNotificationsStore, useComparisonStore, useCartStore } from '@/stores'
 import type { Category } from '@/types'
 
 import MegaMenu from './MegaMenu.vue'
@@ -161,6 +170,7 @@ const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
 const notificationsStore = useNotificationsStore()
 const comparisonStore = useComparisonStore()
+const cartStore = useCartStore()
 
 const isScrolled = ref(false)
 const searchQuery = ref('')
@@ -171,6 +181,7 @@ const categories = ref<Category[]>([])
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const favoritesCount = computed(() => favoritesStore.favoritesCount)
+const cartCount = computed(() => cartStore.cartItemsCount)
 const unreadCount = computed(() => notificationsStore.unreadCount)
 const compareCount = computed(() => comparisonStore.compareCount)
 const userInitials = computed(() => {

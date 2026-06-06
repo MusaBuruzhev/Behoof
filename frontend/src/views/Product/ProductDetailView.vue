@@ -140,6 +140,21 @@
             <div class="action-buttons">
               <button
                 class="btn btn-outline btn-icon"
+                :class="{ active: isInCart }"
+                @click="handleAddToCart"
+                :disabled="isAddingToCart"
+                title="Добавить в корзину"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+                <span>{{ isInCart ? 'В корзине' : 'В корзину' }}</span>
+              </button>
+              
+              <button
+                class="btn btn-outline btn-icon"
                 :class="{ active: isFavorite }"
                 @click="toggleFavorite"
                 title="В избранное"
@@ -199,7 +214,7 @@
             <span class="analytics-value">{{ priceChangeLabel }}</span>
           </div>
         </div>
-        
+          
         <div class="price-chart-wrapper">
           <svg
             :viewBox="`0 0 ${chartWidth} ${chartHeight}`"
@@ -567,7 +582,7 @@
 import { ref, computed, onMounted, onUnmounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getProduct, addReview, deleteReview, createOrder, addToFavorites, removeFromFavorites } from '@/api'
-import { useAuthStore, useFavoritesStore, useComparisonStore } from '@/stores'
+import { useAuthStore, useFavoritesStore, useComparisonStore, useCartStore } from '@/stores'
 import type { Product, Review } from '@/types'
 
 import ProductCard from '@/components/catalog/ProductCard.vue'
@@ -577,6 +592,7 @@ const router = useRouter()
 const authStore = useAuthStore()
 const favoritesStore = useFavoritesStore()
 const comparisonStore = useComparisonStore()
+const cartStore = useCartStore()
 
 const product = ref<Product | null>(null)
 const relatedProducts = ref<Product[]>([])
@@ -587,6 +603,7 @@ const showOrderModal = ref(false)
 const isSubmitting = ref(false)
 const isOrderSubmitting = ref(false)
 const showStickyBar = ref(false)
+const isAddingToCart = ref(false)
 
 // Zoom
 const mainImageRef = ref<HTMLImageElement | null>(null)
@@ -606,6 +623,7 @@ const orderForm = reactive({
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isInCompare = computed(() => comparisonStore.isInCompare(product.value?.id || ''))
+const isInCart = computed(() => cartStore.isInCart(product.value?.id || ''))
 
 const allImages = computed(() => {
   if (!product.value) return []
@@ -853,6 +871,19 @@ const toggleCompare = () => {
     } else {
       alert('Максимум 4 товара для сравнения')
     }
+  }
+}
+
+const handleAddToCart = async () => {
+  if (!product.value || isInCart.value) return
+  
+  isAddingToCart.value = true
+  try {
+    await cartStore.addToCart(product.value.id, 1)
+  } catch (error) {
+    console.error('Failed to add to cart:', error)
+  } finally {
+    isAddingToCart.value = false
   }
 }
 

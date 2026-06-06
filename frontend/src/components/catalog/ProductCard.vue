@@ -12,6 +12,19 @@
         <div class="product-actions">
           <button
             type="button"
+            class="action-btn cart-btn"
+            :class="{ active: isInCart }"
+            @click.stop.prevent="handleAddToCart"
+            title="В корзину"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </button>
+          <button
+            type="button"
             class="action-btn"
             :class="{ active: isFavorite }"
             @click.stop.prevent="toggleFavorite"
@@ -77,7 +90,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useComparisonStore } from '@/stores'
+import { useComparisonStore, useCartStore } from '@/stores'
 import type { Product } from '@/types'
 
 const props = defineProps<{
@@ -89,9 +102,12 @@ const emit = defineEmits<{
 }>()
 
 const comparisonStore = useComparisonStore()
+const cartStore = useCartStore()
 const isFavorite = ref(false)
+const isAddingToCart = ref(false)
 
 const isInCompare = computed(() => comparisonStore.isInCompare(props.product.id))
+const isInCart = computed(() => cartStore.isInCart(props.product.id))
 
 const productImage = computed(() => {
   if (props.product.images && props.product.images.length > 0) {
@@ -154,6 +170,19 @@ const toggleCompare = () => {
     } else {
       alert('Максимум 4 товара для сравнения')
     }
+  }
+}
+
+const handleAddToCart = async () => {
+  if (isInCart.value) return
+  
+  isAddingToCart.value = true
+  try {
+    await cartStore.addToCart(props.product.id, 1)
+  } catch (error) {
+    console.error('Failed to add to cart:', error)
+  } finally {
+    isAddingToCart.value = false
   }
 }
 </script>
@@ -255,6 +284,16 @@ const toggleCompare = () => {
   height: 18px;
   stroke: var(--color-text-secondary);
   transition: stroke var(--transition-fast);
+}
+
+.cart-btn.active {
+  background: #059669;
+  border-color: #059669;
+}
+
+.cart-btn.active svg {
+  stroke: var(--color-text-inverse);
+  fill: none;
 }
 
 .price-badge {

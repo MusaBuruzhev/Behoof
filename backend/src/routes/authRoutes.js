@@ -194,6 +194,8 @@ router.get('/admin/stats', authenticate, requireAdmin, getAdminStats);
 router.put('/admin/users/:id/role', authenticate, requireAdmin, updateUserRole);
 router.delete('/admin/users/:id', authenticate, requireAdmin, deleteUserByAdmin);
 
+// Маршруты для бренда (удалено, перенесено в adminRoutes)
+
 // Маршруты для избранного
 router.post('/favorites/add', addToFavorites);
 router.post('/favorites/remove', removeFromFavorites);

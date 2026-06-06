@@ -3,6 +3,8 @@
 import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
+import Category from '../models/Category.js';
+import Brand from '../models/Brand.js';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
@@ -250,20 +252,36 @@ export const deleteUserByAdmin = async (req, res) => {
 
 export const getAdminStats = async (req, res) => {
  try {
- const [usersCount, adminsCount, productsCount, ordersCount, pendingOrdersCount] = await Promise.all([
+ const [totalUsers, adminsCount, totalProducts, totalOrders, pendingOrdersCount, totalCategories, brandsCount, recentOrders, recentUsers, recentProducts] = await Promise.all([
  User.countDocuments({}),
  User.countDocuments({ role: 'admin' }),
  Product.countDocuments({}),
  Order.countDocuments({}),
  Order.countDocuments({ status: 'pending' }),
+ Category.countDocuments({}),
+ Brand.countDocuments({}),
+ Order.find({}).sort({ createdAt: -1 }).limit(5),
+ User.find({}).sort({ createdAt: -1 }).limit(5),
+ Product.find({}).sort({ createdAt: -1 }).limit(5),
  ]);
 
+ const productBrands = await Product.distinct('brand');
+ const totalBrands = Math.max(brandsCount, productBrands.length);
+
  res.json({
- usersCount,
+ totalUsers,
+ usersCount: totalUsers,
  adminsCount,
- productsCount,
- ordersCount,
+ totalProducts,
+ productsCount: totalProducts,
+ totalOrders,
+ ordersCount: totalOrders,
  pendingOrdersCount,
+ totalCategories,
+ totalBrands,
+ recentOrders,
+ recentUsers: recentUsers.map((user) => user.toJSON()),
+ recentProducts: recentProducts.map((product) => product.toJSON()),
  });
  } catch (err) {
  res.status(500).json({ error: err.message || 'Ошибка получения статистики' });
