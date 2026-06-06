@@ -10,11 +10,11 @@
             </svg>
             <span class="logo-text">Behoof</span>
           </router-link>
-          <h1 class="auth-title">Вход в аккаунт</h1>
-          <p class="auth-subtitle">Введите свои данные для продолжения</p>
+          <h1 class="auth-title">Забыли пароль?</h1>
+          <p class="auth-subtitle">Введите email для восстановления доступа</p>
         </div>
 
-        <form @submit.prevent="handleSubmit" class="auth-form">
+        <div v-if="!isSubmitted" class="auth-form">
           <div class="form-group">
             <label for="email" class="form-label">Email</label>
             <input
@@ -30,61 +30,16 @@
             <span v-if="errors.email" class="form-error">{{ errors.email }}</span>
           </div>
 
-          <div class="form-group">
-            <label for="password" class="form-label">Пароль</label>
-            <div class="password-input-wrapper">
-              <input
-                id="password"
-                v-model="formData.password"
-                :type="showPassword ? 'text' : 'password'"
-                class="form-input"
-                :class="{ error: errors.password }"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                :disabled="isSubmitting"
-              />
-              <button
-                type="button"
-                class="password-toggle"
-                @click="showPassword = !showPassword"
-                tabindex="-1"
-              >
-                <svg v-if="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
-                </svg>
-              </button>
-            </div>
-            <span v-if="errors.password" class="form-error">{{ errors.password }}</span>
-          </div>
-
-          <div class="form-options">
-            <label class="checkbox-wrapper">
-              <input
-                v-model="formData.rememberMe"
-                type="checkbox"
-                :disabled="isSubmitting"
-              />
-              <span class="checkbox-label">Запомнить меня</span>
-            </label>
-            <router-link to="/auth/forgot-password" class="forgot-link">
-              Забыли пароль?
-            </router-link>
-          </div>
-
           <button
             type="submit"
             class="btn btn-primary btn-submit"
             :disabled="isSubmitting"
+            @click="handleSubmit"
           >
-            <span v-if="!isSubmitting">Войти</span>
+            <span v-if="!isSubmitting">Отправить инструкцию</span>
             <span v-else class="submit-loading">
               <span class="spinner"></span>
-              Вход...
+              Отправка...
             </span>
           </button>
 
@@ -96,13 +51,34 @@
             </svg>
             {{ serverError }}
           </div>
-        </form>
 
-        <div class="auth-footer">
-          <p>Нет аккаунта?</p>
-          <router-link to="/auth/register" class="link-primary">
-            Создать аккаунт
-          </router-link>
+          <div class="auth-footer">
+            <p>Вспомнили пароль?</p>
+            <router-link to="/auth/login" class="link-primary">
+              Вернуться ко входу
+            </router-link>
+          </div>
+        </div>
+
+        <div v-else class="success-message">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <h2 class="success-title">Письмо отправлено</h2>
+          <p class="success-text">
+            Если аккаунт с email <strong>{{ formData.email }}</strong> существует, 
+            вы получите инструкцию по восстановлению пароля.
+          </p>
+          <div class="success-actions">
+            <router-link to="/auth/login" class="btn btn-primary">
+              Вернуться ко входу
+            </router-link>
+            <button class="btn btn-outline" @click="isSubmitted = false">
+              Попробовать другой email
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -110,32 +86,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores'
-import { login } from '@/api'
-import type { User } from '@/types'
-
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
+import { ref, reactive } from 'vue'
 
 const formData = reactive({
   email: '',
-  password: '',
-  rememberMe: false,
 })
 
-const showPassword = ref(false)
 const isSubmitting = ref(false)
+const isSubmitted = ref(false)
 const serverError = ref('')
 const errors = reactive<Record<string, string>>({})
-
-interface LoginResponse {
-  user: User
-  token: string
-  message?: string
-}
 
 const validateEmail = (email: string): string | null => {
   if (!email) return 'Email обязателен'
@@ -144,52 +104,30 @@ const validateEmail = (email: string): string | null => {
   return null
 }
 
-const validatePassword = (password: string): string | null => {
-  if (!password) return 'Пароль обязателен'
-  if (password.length < 6) return 'Пароль должен содержать минимум 6 символов'
-  return null
-}
-
-const validateForm = (): boolean => {
-  errors.email = ''
-  errors.password = ''
-  
-  const emailError = validateEmail(formData.email)
-  if (emailError) errors.email = emailError
-  
-  const passwordError = validatePassword(formData.password)
-  if (passwordError) errors.password = passwordError
-  
-  return !errors.email && !errors.password
-}
-
 const handleSubmit = async () => {
   serverError.value = ''
+  errors.email = ''
   
-  if (!validateForm()) return
+  const emailError = validateEmail(formData.email)
+  if (emailError) {
+    errors.email = emailError
+    return
+  }
   
   isSubmitting.value = true
   
   try {
-    const response = await login({
-      email: formData.email,
-      password: formData.password,
-    })
+    // TODO: Реализовать endpoint forgot password на backend
+    // const response = await forgotPassword({ email: formData.email })
     
-    const { user, token } = response.data as LoginResponse
-    authStore.setAuth(user, token)
+    // Имитация успешного ответа (backend может вернуть заглушку)
+    await new Promise(resolve => setTimeout(resolve, 1000))
     
-    // Redirect to intended page or profile
-    const redirect = route.query.redirect as string || '/profile'
-    router.push(redirect)
+    isSubmitted.value = true
   } catch (error: any) {
-    console.error('Login error:', error)
+    console.error('Forgot password error:', error)
     
-    if (error.response?.status === 401) {
-      serverError.value = 'Неверный email или пароль'
-    } else if (error.response?.status === 403) {
-      serverError.value = 'Аккаунт заблокирован'
-    } else if (error.response?.data?.error) {
+    if (error.response?.data?.error) {
       serverError.value = error.response.data.error
     } else {
       serverError.value = 'Ошибка подключения. Попробуйте позже.'
@@ -198,14 +136,6 @@ const handleSubmit = async () => {
     isSubmitting.value = false
   }
 }
-
-onMounted(() => {
-  // If already logged in, redirect to profile
-  if (authStore.isAuthenticated) {
-    const redirect = route.query.redirect as string || '/profile'
-    router.push(redirect)
-  }
-})
 </script>
 
 <style scoped>
@@ -310,74 +240,9 @@ onMounted(() => {
   opacity: 0.6;
 }
 
-.password-input-wrapper {
-  position: relative;
-}
-
-.password-toggle {
-  position: absolute;
-  right: var(--spacing-3);
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  padding: var(--spacing-2);
-  cursor: pointer;
-  color: var(--color-text-tertiary);
-  transition: color var(--transition-fast);
-}
-
-.password-toggle:hover {
-  color: var(--color-text-primary);
-}
-
-.password-toggle svg {
-  width: 20px;
-  height: 20px;
-}
-
 .form-error {
   font-size: var(--font-size-small);
   color: var(--color-error);
-}
-
-/* Options */
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.checkbox-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  cursor: pointer;
-}
-
-.checkbox-wrapper input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  accent-color: var(--color-primary);
-}
-
-.checkbox-label {
-  font-size: var(--font-size-small);
-  color: var(--color-text-secondary);
-  user-select: none;
-}
-
-.forgot-link {
-  font-size: var(--font-size-small);
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
-}
-
-.forgot-link:hover {
-  color: var(--color-primary-hover);
 }
 
 /* Button */
@@ -434,8 +299,8 @@ onMounted(() => {
 /* Footer */
 .auth-footer {
   text-align: center;
-  margin-top: var(--spacing-8);
-  padding-top: var(--spacing-8);
+  margin-top: var(--spacing-6);
+  padding-top: var(--spacing-6);
   border-top: 1px solid var(--color-border-light);
 }
 
@@ -456,6 +321,57 @@ onMounted(() => {
   color: var(--color-primary-hover);
 }
 
+/* Success Message */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--spacing-6) 0;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: rgba(5, 150, 105, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.success-icon svg {
+  width: 40px;
+  height: 40px;
+  color: #059669;
+}
+
+.success-title {
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-3) 0;
+}
+
+.success-text {
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--spacing-8) 0;
+}
+
+.success-text strong {
+  color: var(--color-text-primary);
+}
+
+.success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+  width: 100%;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .auth-card {
@@ -466,11 +382,8 @@ onMounted(() => {
     font-size: var(--font-size-h3);
   }
   
-  .form-options {
+  .success-actions {
     flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-3);
   }
 }
 </style>
-

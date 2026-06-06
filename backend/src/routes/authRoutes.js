@@ -5,6 +5,7 @@ import {
  getProfile,
  updateProfile,
  verifyToken,
+ logout,
  deleteProfile,
  authenticate,
  requireAdmin,
@@ -160,6 +161,7 @@ router.delete('/auth/profile', authenticate, deleteProfile);
  *         description: Токен валиден
  */
 router.get('/auth/verify', authenticate, verifyToken);
+router.post('/auth/logout', logout);
 
 /**
  * @swagger

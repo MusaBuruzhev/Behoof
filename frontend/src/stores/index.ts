@@ -1,36 +1,70 @@
 import { defineStore } from 'pinia'
+import type { User } from '@/types'
 
 // Auth store - управление состоянием авторизации
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null as null | {
-      id: string
-      email: string
-      firstName: string
-      lastName: string
-      role: 'user' | 'admin'
-      avatar: string | null
-    },
+    user: null as User | null,
     token: null as string | null,
     isLoading: false,
+    initialized: false,
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.token && !!state.user,
     isAdmin: (state) => state.user?.role === 'admin',
-    userName: (state) => state.user ? `${state.user.firstName} ${state.user.lastName}` : '',
+    userName: (state) => {
+      if (!state.user) return ''
+      return `${state.user.firstName} ${state.user.lastName}`.trim() || state.user.email
+    },
+    userInitials: (state) => {
+      if (!state.user) return ''
+      const name = `${state.user.firstName} ${state.user.lastName}`.trim() || state.user.email
+      return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)
+    },
   },
 
   actions: {
-    setAuth(user: any, token: string) {
+    setAuth(user: User, token: string) {
       this.user = user
       this.token = token
       localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user))
     },
+
     logout() {
       this.user = null
       this.token = null
+      this.initialized = true
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
+    },
+
+    async initializeAuth() {
+      if (this.initialized) return
+      
+      const token = localStorage.getItem('token')
+      const userStr = localStorage.getItem('user')
+      
+      if (token && userStr) {
+        try {
+          const user = JSON.parse(userStr) as User
+          this.user = user
+          this.token = token
+          this.initialized = true
+        } catch {
+          this.logout()
+        }
+      } else {
+        this.initialized = true
+      }
+    },
+
+    updateUser(user: Partial<User>) {
+      if (this.user) {
+        this.user = { ...this.user, ...user }
+        localStorage.setItem('user', JSON.stringify(this.user))
+      }
     },
   },
 })

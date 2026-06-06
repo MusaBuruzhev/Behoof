@@ -168,6 +168,11 @@ export const verifyToken = async (req, res) => {
  });
 };
 
+export const logout = async (req, res) => {
+ // На клиенте удаляем токен
+ res.json({ message: 'Выход успешен' });
+};
+
 export const deleteProfile = async (req, res) => {
  try {
  const user = await User.findByIdAndDelete(req.user._id);

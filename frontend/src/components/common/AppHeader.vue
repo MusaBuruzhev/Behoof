@@ -175,7 +175,8 @@ const unreadCount = computed(() => notificationsStore.unreadCount)
 const compareCount = computed(() => comparisonStore.compareCount)
 const userInitials = computed(() => {
   if (!authStore.user) return ''
-  return `${authStore.user.firstName[0]}${authStore.user.lastName[0]}`.toUpperCase()
+  const name = `${authStore.user.firstName} ${authStore.user.lastName}`.trim() || authStore.user.email
+  return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)
 })
 
 const loadCategories = async () => {

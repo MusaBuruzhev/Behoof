@@ -80,6 +80,9 @@ export const deleteProfile = () => api.delete('/auth/profile')
 /** Верификация токена */
 export const verifyToken = () => api.get('/auth/verify')
 
+/** Выход пользователя */
+export const logout = () => api.post('/auth/logout')
+
 // ==================== Избранное ====================
 
 /** Добавить в избранное */
