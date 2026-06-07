@@ -1,12 +1,11 @@
 <template>
-  <Teleport to="body">
-    <transition name="mega-menu">
-      <div
-        v-if="visible"
-        class="mega-menu-overlay"
-        @mouseenter="keepOpen"
-        @mouseleave="closeMenu"
-      >
+  <transition name="mega-menu">
+    <div
+      v-if="visible"
+      class="mega-menu-overlay"
+      @mouseenter="keepOpen"
+      @mouseleave="closeMenu"
+    >
         <div class="mega-menu">
           <div class="mega-menu-container">
             <!-- Левая колонка: Категории -->
@@ -79,8 +78,7 @@
         </div>
       </div>
     </transition>
-  </Teleport>
-</template>
+  </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
@@ -149,14 +147,14 @@ watch(
 
 <style scoped>
 .mega-menu-overlay {
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: var(--header-height, 72px);
   left: 0;
   right: 0;
   background: var(--color-surface);
   border-top: 1px solid var(--color-border-light);
   box-shadow: var(--shadow-dropdown);
-  z-index: var(--z-dropdown);
+  z-index: var(--z-dropdown, 100);
 }
 
 .mega-menu {

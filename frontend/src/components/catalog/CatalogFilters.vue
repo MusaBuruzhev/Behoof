@@ -71,7 +71,7 @@
               type="radio"
               :value="category.id"
               :checked="selectedCategory === category.id"
-              @change="$emit('update:selected-category', category.id)"
+              @change="toggleCategory(category.id)"
               class="filter-radio"
             />
             <span class="option-text">{{ category.name }}</span>
@@ -131,10 +131,15 @@
         </div>
       </div>
       
-      <!-- Кнопка применить -->
-      <button class="apply-btn" @click="$emit('apply-filters')">
-        Применить
-      </button>
+      <!-- Кнопки -->
+      <div class="filters-actions">
+        <button class="reset-btn-full" @click="$emit('reset-filters')">
+          Сбросить фильтры
+        </button>
+        <button class="apply-btn" @click="$emit('apply-filters')">
+          Применить
+        </button>
+      </div>
     </div>
   </aside>
 </template>
@@ -174,9 +179,20 @@ const toggleBrand = (brand: string) => {
   emit('update:selected-brands', newBrands)
 }
 
+const toggleCategory = (categoryId: string) => {
+  // Если нажали на ту же категорию — сбрасываем выбор
+  if (selectedCategory.value === categoryId) {
+    emit('update:selected-category', '')
+  } else {
+    emit('update:selected-category', categoryId)
+  }
+}
+
 const hasSubcategories = computed(() => {
   return currentSubcategories.value.length > 0
 })
+
+const selectedCategory = computed(() => props.selectedCategory)
 
 const currentSubcategories = computed<{ id: string; name: string }[]>(() => {
   if (!props.selectedCategory) return []
@@ -366,6 +382,31 @@ const currentSubcategories = computed<{ id: string; name: string }[]>(() => {
 
 .apply-btn:hover {
   background: var(--color-primary-hover);
+}
+
+.filters-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding-top: var(--spacing-4);
+}
+
+.reset-btn-full {
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.reset-btn-full:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
 }
 
 @media (max-width: 900px) {
