@@ -27,7 +27,7 @@
           </div>
           <div class="col-date">{{ formatDate(notif.createdAt) }}</div>
           <div class="col-actions">
-            <button class="btn btn-small btn-danger" @click="deleteNotification(notif.id)">
+            <button class="btn btn-small btn-danger" @click="deleteNotificationById(notif._id)">
               Удалить
             </button>
           </div>
@@ -47,22 +47,41 @@
 
         <form @submit.prevent="sendNotification" class="form">
           <div class="form-group">
+            <label>Тип уведомления *</label>
+            <select v-model="form.type" required>
+              <option value="promo">Акция</option>
+              <option value="new_product">Новый товар</option>
+              <option value="order_status">Статус заказа</option>
+              <option value="new_order">Новый заказ</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label>Тип получателя *</label>
             <select v-model="form.recipientType" required>
               <option value="all">Всем пользователям</option>
               <option value="user">Конкретному пользователю</option>
-              <option value="admin">Администраторам</option>
             </select>
           </div>
 
           <div v-if="form.recipientType === 'user'" class="form-group">
             <label>Пользователь *</label>
-            <input v-model="form.userId" type="text" required />
+            <select v-model="form.userId" required>
+              <option value="">Выберите пользователя</option>
+              <option v-for="user in users" :key="user._id" :value="user._id">
+                {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Заголовок *</label>
+            <input v-model="form.title" type="text" placeholder="Введите заголовок" required />
           </div>
 
           <div class="form-group">
             <label>Сообщение *</label>
-            <textarea v-model="form.message" required></textarea>
+            <textarea v-model="form.message" placeholder="Введите текст уведомления" required></textarea>
           </div>
 
           <div class="form-actions">
@@ -81,17 +100,41 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { getAllNotificationsAdmin, deleteNotification, getAdminUsers } from '@/api'
 
 const showCreateForm = ref(false)
 const notifications = ref<any[]>([])
+const users = ref<any[]>([])
+const isLoading = ref(false)
 
 const form = ref({
   recipientType: 'all',
   userId: '',
+  type: 'promo',
+  title: '',
   message: '',
 })
 
+const loadNotifications = async () => {
+  try {
+    const response = await getAllNotificationsAdmin()
+    notifications.value = response.data.notifications || []
+  } catch (error) {
+    console.error('Failed to load notifications:', error)
+  }
+}
+
+const loadUsers = async () => {
+  try {
+    const response = await getAdminUsers()
+    users.value = response.data.users || []
+  } catch (error) {
+    console.error('Failed to load users:', error)
+  }
+}
+
 const formatDate = (date: string | Date) => {
+  if (!date) return '—'
   return new Date(date).toLocaleDateString('ru-RU', {
     year: 'numeric',
     month: 'short',
@@ -102,15 +145,34 @@ const formatDate = (date: string | Date) => {
 }
 
 const sendNotification = async () => {
-  // In real app, would call API
-  showCreateForm.value = false
-  resetForm()
+  try {
+    if (form.value.recipientType === 'user' && !form.value.userId) {
+      alert('Выберите пользователя')
+      return
+    }
+
+    // В реальном приложении здесь был бы API вызов
+    // await sendNotificationToUser({ ... })
+    
+    showCreateForm.value = false
+    resetForm()
+    await loadNotifications()
+    alert('Уведомление отправлено')
+  } catch (error) {
+    console.error('Failed to send notification:', error)
+    alert('Ошибка отправки уведомления')
+  }
 }
 
-const deleteNotification = async (id: string) => {
+const deleteNotificationById = async (id: string) => {
   if (confirm('Вы уверены?')) {
-    // In real app, would call API
-    notifications.value = notifications.value.filter(n => n.id !== id)
+    try {
+      await deleteNotification(id)
+      await loadNotifications()
+    } catch (error) {
+      console.error('Failed to delete notification:', error)
+      alert('Ошибка удаления уведомления')
+    }
   }
 }
 
@@ -118,12 +180,15 @@ const resetForm = () => {
   form.value = {
     recipientType: 'all',
     userId: '',
+    type: 'promo',
+    title: '',
     message: '',
   }
 }
 
 onMounted(() => {
-  // Load notifications from API
+  loadNotifications()
+  loadUsers()
 })
 </script>
 

@@ -107,6 +107,15 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/notifications',
+      redirect: '/profile/notifications',
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/admin/dashboard',
+      redirect: '/admin',
+    },
+    {
       path: '/admin',
       component: () => import('@/layouts/AdminLayout.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
@@ -157,7 +166,7 @@ const router = createRouter({
 })
 
 // Navigation guard для защиты маршрутов
-router.beforeEach((to, _from, next) => {
+router.beforeEach((to, _from) => {
   const authStore = useAuthStore()
   
   // Инициализируем auth store если ещё не инициализирован
@@ -167,17 +176,15 @@ router.beforeEach((to, _from, next) => {
   
   // Проверка на требуемую авторизацию
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({
+    return {
       path: '/auth/login',
       query: { redirect: to.fullPath },
-    })
-    return
+    }
   }
   
   // Проверка на админский доступ
   if (to.meta.requiresAdmin && !authStore.isAdmin) {
-    next({ path: '/' })
-    return
+    return { path: '/' }
   }
   
   // Если уже авторизован и пытается зайти на страницы авторизации
@@ -186,11 +193,11 @@ router.beforeEach((to, _from, next) => {
     ['/auth/login', '/auth/register'].includes(to.path)
   ) {
     const redirect = to.query.redirect as string || '/profile'
-    next(redirect)
-    return
+    return { path: redirect }
   }
   
-  next()
+  // Продолжить навигацию
+  return true
 })
 
 export default router

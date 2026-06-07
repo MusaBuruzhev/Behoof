@@ -146,7 +146,7 @@ app.use('/api', authRoutes);
 app.use('/api', ordersRoutes);
 app.use('/api', notificationsRoutes);
 app.use('/api', cartRoutes);
-app.use('/api', adminRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ============ 404 ============
 

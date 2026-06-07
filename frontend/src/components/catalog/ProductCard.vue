@@ -90,7 +90,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useComparisonStore, useCartStore } from '@/stores'
+import { useComparisonStore, useCartStore, useFavoritesStore } from '@/stores'
+import { addToFavorites, removeFromFavorites } from '@/api'
 import type { Product } from '@/types'
 
 const props = defineProps<{
@@ -103,9 +104,10 @@ const emit = defineEmits<{
 
 const comparisonStore = useComparisonStore()
 const cartStore = useCartStore()
-const isFavorite = ref(false)
+const favoritesStore = useFavoritesStore()
 const isAddingToCart = ref(false)
 
+const isFavorite = computed(() => favoritesStore.isFavorite(props.product.id))
 const isInCompare = computed(() => comparisonStore.isInCompare(props.product.id))
 const isInCart = computed(() => cartStore.isInCart(props.product.id))
 
@@ -153,12 +155,19 @@ const averageRating = computed(() => {
   return sum / ratings.length
 })
 
-const toggleFavorite = () => {
-  if (isFavorite.value) {
-    emit('removeFromFavorites', props.product.id)
+const toggleFavorite = async () => {
+  try {
+    if (isFavorite.value) {
+      await removeFromFavorites(props.product.id)
+      favoritesStore.removeFavorite(props.product.id)
+      emit('removeFromFavorites', props.product.id)
+    } else {
+      await addToFavorites(props.product.id)
+      favoritesStore.addFavorite(props.product.id)
+    }
+  } catch (error) {
+    console.error('Failed to toggle favorite:', error)
   }
-  isFavorite.value = !isFavorite.value
-  // Здесь будет вызов API для добавления/удаления из избранного
 }
 
 const toggleCompare = () => {

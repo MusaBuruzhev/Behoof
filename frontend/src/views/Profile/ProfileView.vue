@@ -23,8 +23,20 @@
         </div>
         
         <div class="user-main-info">
-          <h2 class="user-display-name">{{ userName }}</h2>
-          <p class="user-email-display">{{ user.email }}</p>
+          <div class="user-header-actions">
+            <h2 class="user-display-name">{{ userName }}</h2>
+            <p class="user-email-display">{{ user.email }}</p>
+          </div>
+          
+          <!-- Кнопка админ-панели для админов -->
+          <router-link v-if="user.role === 'admin'" to="/admin/products" class="admin-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+            <span>Админ-панель</span>
+          </router-link>
+          
           <div class="account-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
@@ -283,17 +295,46 @@ const saveProfile = async () => {
   
   isSaving.value = true
   try {
-    await updateProfile({
+    const updateData: {
+      firstName?: string
+      lastName?: string
+      phoneNumber?: string
+      address?: {
+        street?: string
+        city?: string
+        postalCode?: string
+        country?: string
+      }
+    } = {
       firstName: formData.firstName || undefined,
       lastName: formData.lastName || undefined,
       phoneNumber: formData.phoneNumber || undefined,
-    })
-    
-    // Reload user data from localStorage
-    const updatedUser = JSON.parse(localStorage.getItem('user') || '{}')
-    if (updatedUser.id) {
-      authStore.$patch({ user: updatedUser })
     }
+    
+    // Добавляем адрес если он заполнен
+    if (formData.address.street || formData.address.city || formData.address.postalCode || formData.address.country) {
+      updateData.address = {
+        street: formData.address.street || undefined,
+        city: formData.address.city || undefined,
+        postalCode: formData.address.postalCode || undefined,
+        country: formData.address.country || undefined,
+      }
+    }
+    
+    await updateProfile(updateData)
+    
+    // Обновляем данные в localStorage и store
+    const updatedUser = {
+      ...user.value,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phoneNumber: formData.phoneNumber,
+      address: updateData.address,
+    }
+    
+    authStore.$patch({ user: updatedUser })
+    localStorage.setItem('user', JSON.stringify(updatedUser))
+    
     hasChanges.value = false
   } catch (error) {
     console.error('Failed to update profile:', error)
@@ -433,6 +474,38 @@ onMounted(() => {
   flex-direction: column;
   justify-content: center;
   gap: var(--spacing-3);
+}
+
+.user-header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: var(--radius-md);
+  width: fit-content;
+  margin-top: var(--spacing-2);
+  text-decoration: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-fast);
+}
+
+.admin-link:hover {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--color-primary-hover);
+}
+
+.admin-link svg {
+  width: 16px;
+  height: 16px;
 }
 
 .user-display-name {

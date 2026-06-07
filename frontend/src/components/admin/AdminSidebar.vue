@@ -6,9 +6,9 @@
 
     <nav class="sidebar-nav">
       <router-link
-        to="/admin/dashboard"
+        to="/admin"
         class="nav-link"
-        :class="{ active: isActive('/admin/dashboard') }"
+        :class="{ active: isDashboardActive }"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7"></rect>
@@ -111,15 +111,19 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const isActive = (path: string) => {
-  return router.currentRoute.value.path.startsWith(path)
+  return route.path.startsWith(path)
 }
+
+const isDashboardActive = computed(() => route.path === '/admin')
 
 const logout = () => {
   authStore.logout()

@@ -58,7 +58,10 @@ const columns = [
   { key: 'createdAt', label: 'Дата' },
 ]
 
-const formatPrice = (price: number) => price.toLocaleString('ru-RU')
+const formatPrice = (price: number | undefined | null) => {
+  if (price === undefined || price === null) return '0'
+  return price.toLocaleString('ru-RU')
+}
 
 const formatDate = (date: string | Date) => {
   return new Date(date).toLocaleDateString('ru-RU')
@@ -70,7 +73,7 @@ const handlePageChange = (page: number) => {
 
 const changeStatus = async (order: any, status: string) => {
   try {
-    await adminStore.updateOrderStatus(order._id, status)
+    await adminStore.updateOrderStatus(order.id, status)
   } catch (error) {
     console.error('Error changing status:', error)
   }
@@ -87,7 +90,7 @@ const deleteOrder = async (id: string) => {
 }
 
 const viewOrder = (order: any) => {
-  router.push(`/orders/${order._id}`)
+  router.push(`/admin/orders/${order._id}`)
 }
 
 onMounted(() => {

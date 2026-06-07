@@ -15,12 +15,12 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-if="items.length === 0">
+        <tr v-if="!items || items.length === 0">
           <td :colspan="columns.length + (hasActions ? 1 : 0)" class="empty-state">
             Нет данных
           </td>
         </tr>
-        <tr v-for="(item, index) in items" :key="getRowKey(item, index)">
+        <tr v-for="(item, index) in (items || [])" :key="getRowKey(item, index)">
           <td v-for="column in columns" :key="column.key" :style="{ width: column.width }">
             <slot :name="`cell-${column.key}`" :item="item" :value="getNestedValue(item, column.key)">
               {{ formatCell(getNestedValue(item, column.key), column) }}

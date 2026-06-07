@@ -137,7 +137,7 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
  try {
- const { firstName, lastName, phoneNumber } = req.body;
+ const { firstName, lastName, phoneNumber, address } = req.body;
 
  const user = await User.findByIdAndUpdate(
  req.user._id,
@@ -145,6 +145,7 @@ export const updateProfile = async (req, res) => {
  firstName: firstName || undefined,
  lastName: lastName || undefined,
  phoneNumber: phoneNumber || undefined,
+ address: address || undefined,
  updatedAt: new Date(),
  },
  { new: true, runValidators: true }

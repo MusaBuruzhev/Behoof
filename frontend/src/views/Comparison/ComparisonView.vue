@@ -115,7 +115,11 @@
                 
                 <div class="product-details">
                   <span class="product-brand">{{ product.brand }}</span>
-                  <h3 class="product-name" :title="product.name">{{ product.name }}</h3>
+                  <h3 class="product-name">
+                    <router-link :to="`/product/${product.id}`" :title="product.name">
+                      {{ product.name }}
+                    </router-link>
+                  </h3>
                 </div>
                 
                 <div class="product-price">{{ formatPrice(product.price) }} ₽</div>
@@ -748,6 +752,17 @@ onMounted(() => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin: 0;
+}
+
+.product-name a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.product-name a:hover {
+  color: var(--color-primary);
 }
 
 .product-price {

@@ -100,16 +100,29 @@
                   <div class="item-subtotal">{{ formatPrice(item.subtotal) }} ₽</div>
                 </div>
 
-                <button
-                  type="button"
-                  class="remove-btn"
-                  @click="removeItem(item.productId)"
-                  title="Удалить товар"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
-                </button>
+                <div class="item-buttons">
+                  <button
+                    type="button"
+                    class="compare-btn"
+                    :class="{ active: isInCompare(item.productId) }"
+                    @click="toggleCompare(item.productId)"
+                    title="Сравнить"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    class="remove-btn"
+                    @click="removeItem(item.productId)"
+                    title="Удалить товар"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -200,7 +213,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useCartStore, useAuthStore } from '@/stores'
+import { useCartStore, useAuthStore, useComparisonStore } from '@/stores'
 import { createOrder } from '@/api'
 import type { Product } from '@/types'
 import ProductCard from '@/components/catalog/ProductCard.vue'
@@ -208,6 +221,7 @@ import ProductCard from '@/components/catalog/ProductCard.vue'
 const router = useRouter()
 const cartStore = useCartStore()
 const authStore = useAuthStore()
+const comparisonStore = useComparisonStore()
 
 const relatedProducts = ref<Product[]>([])
 
@@ -248,6 +262,20 @@ const removeItem = async (productId: string) => {
 const confirmClearCart = () => {
   if (confirm('Вы уверены, что хотите очистить корзину?')) {
     cartStore.clearCart()
+  }
+}
+
+const isInCompare = (productId: string) => comparisonStore.isInCompare(productId)
+
+const toggleCompare = (productId: string) => {
+  if (isInCompare(productId)) {
+    comparisonStore.removeFromCompare(productId)
+  } else {
+    if (!comparisonStore.maxReached) {
+      comparisonStore.addToCompare(productId)
+    } else {
+      alert('Максимум 4 товара для сравнения')
+    }
   }
 }
 
@@ -572,6 +600,42 @@ onMounted(async () => {
   font-size: var(--font-size-h4);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+}
+
+.item-buttons {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.compare-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  color: var(--color-text-tertiary);
+  transition: all var(--transition-fast);
+}
+
+.compare-btn:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.compare-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.compare-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .remove-btn {

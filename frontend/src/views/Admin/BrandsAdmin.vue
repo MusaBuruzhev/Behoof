@@ -59,23 +59,26 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { useAdminStore } from '@/stores'
 
+const adminStore = useAdminStore()
 const showCreateForm = ref(false)
 const editingBrand = ref<any>(null)
-const brands = ref<any[]>([])
 
 const form = ref({
   name: '',
   description: '',
 })
 
+const brands = ref<any[]>([])
+
 const fetchBrands = async () => {
   try {
-    const response = await axios.get('/api/admin/brands')
-    brands.value = response.data.brands || []
+    await adminStore.fetchBrands()
+    brands.value = adminStore.brands.items
   } catch (error) {
     console.error('Failed to fetch brands:', error)
+    brands.value = []
   }
 }
 
@@ -88,9 +91,9 @@ const editBrand = (brand: any) => {
 const saveBrand = async () => {
   try {
     if (editingBrand.value) {
-      await axios.put(`/api/admin/brands/${editingBrand.value.id}`, form.value)
+      await adminStore.updateBrand(editingBrand.value.id, form.value)
     } else {
-      await axios.post('/api/admin/brands', form.value)
+      await adminStore.createBrand(form.value)
     }
     showCreateForm.value = false
     editingBrand.value = null
@@ -98,16 +101,18 @@ const saveBrand = async () => {
     fetchBrands()
   } catch (error) {
     console.error('Error saving brand:', error)
+    alert('Ошибка сохранения бренда: ' + (error as Error).message)
   }
 }
 
 const deleteBrand = async (id: string) => {
   if (confirm('Вы уверены?')) {
     try {
-      await axios.delete(`/api/admin/brands/${id}`)
+      await adminStore.deleteBrand(id)
       fetchBrands()
     } catch (error) {
       console.error('Error deleting brand:', error)
+      alert('Ошибка удаления бренда: ' + (error as Error).message)
     }
   }
 }

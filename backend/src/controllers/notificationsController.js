@@ -226,3 +226,68 @@ export const getAllNotificationsAdmin = async (req, res) => {
     res.status(500).json({ error: 'Ошибка получения уведомлений' });
   }
 };
+
+// Отправить уведомление пользователю (админ)
+export const sendNotificationToUser = async (req, res) => {
+  try {
+    const { userId, type, title, message, relatedId, relatedType } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({ error: 'userId обязателен' });
+    }
+
+    if (!title || !message) {
+      return res.status(400).json({ error: 'title и message обязательны' });
+    }
+
+    // Проверяем существование пользователя
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+
+    const notification = await createNotification(
+      userId,
+      type || 'promo',
+      title,
+      message,
+      relatedId || null,
+      relatedType || null
+    );
+
+    if (!notification) {
+      return res.status(500).json({ error: 'Ошибка создания уведомления' });
+    }
+
+    res.status(201).json({
+      message: 'Уведомление отправлено',
+      notification,
+    });
+  } catch (error) {
+    logger.error('Ошибка отправки уведомления пользователю:', error);
+    res.status(500).json({ error: 'Ошибка отправки уведомления' });
+  }
+};
+
+// Получить всех пользователей для выпадающего списка (админ)
+export const getUsersForNotifications = async (req, res) => {
+  try {
+    const users = await User.find({ role: 'user' })
+      .select('id _id email firstName lastName')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      users: users.map(user => ({
+        id: user._id,
+        userId: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        displayName: `${user.firstName} ${user.lastName}`.trim() || user.email,
+      })),
+    });
+  } catch (error) {
+    logger.error('Ошибка получения пользователей:', error);
+    res.status(500).json({ error: 'Ошибка получения пользователей' });
+  }
+};

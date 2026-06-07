@@ -21,13 +21,9 @@ onMounted(async () => {
   // Инициализация авторизации
   await authStore.initializeAuth()
   
-  // Загрузка корзины
+  // Загрузка корзины только если пользователь аутентифицирован
   if (authStore.isAuthenticated) {
-    try {
-      await cartStore.fetchCart()
-    } catch (error) {
-      console.error('Failed to load cart:', error)
-    }
+    await cartStore.fetchCart()
   }
   
   // Загрузка избранных товаров

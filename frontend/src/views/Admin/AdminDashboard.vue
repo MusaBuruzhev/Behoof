@@ -1,162 +1,109 @@
 <template>
   <div class="dashboard">
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-      <StatsCard label="Товары" :value="stats.totalProducts" color="primary">
-        <template #icon>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
-          </svg>
-        </template>
-      </StatsCard>
-
-      <StatsCard label="Пользователи" :value="stats.totalUsers" color="success">
-        <template #icon>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="9" cy="7" r="4"></circle>
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-          </svg>
-        </template>
-      </StatsCard>
-
-      <StatsCard label="Заказы" :value="stats.totalOrders" color="warning">
-        <template #icon>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-        </template>
-      </StatsCard>
-
-      <StatsCard label="Бренды" :value="stats.totalBrands" color="primary">
-        <template #icon>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </template>
-      </StatsCard>
-
-      <StatsCard label="Категории" :value="stats.totalCategories" color="error">
-        <template #icon>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2L2 7v10a8 8 0 0 0 8 8 8 8 0 0 0 8-8V7l-10-5z"></path>
-          </svg>
-        </template>
-      </StatsCard>
+    <!-- Loading State -->
+    <div v-if="isLoading" class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Загрузка статистики...</p>
     </div>
 
-    <!-- Recent Data Sections -->
-    <div class="recent-data">
-      <!-- Recent Orders -->
-      <section class="data-section">
-        <div class="section-header">
-          <h2 class="section-title">Последние заказы</h2>
-          <router-link to="/admin/orders" class="btn-link">Все заказы →</router-link>
-        </div>
+    <!-- Error State -->
+    <div v-else-if="error" class="error-state">
+      <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+      <h3 class="error-title">{{ error }}</h3>
+      <button class="btn btn-primary" @click="loadStats">Попробовать снова</button>
+    </div>
 
-        <div v-if="stats.recentOrders.length > 0" class="recent-list">
-          <div v-for="order in stats.recentOrders.slice(0, 5)" :key="order.id" class="recent-item">
-            <div class="item-info">
-              <p class="item-id">Заказ #{{ order.id }}</p>
-              <p class="item-detail">{{ formatDate(order.createdAt) }}</p>
-            </div>
-            <div class="item-status">
-              <span class="status-badge" :class="`status-${order.status}`">
-                {{ formatStatus(order.status) }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div v-else class="empty-state">Нет заказов</div>
-      </section>
+     <!-- Debug & Stats -->
+    <div v-else>
+      <!-- Debug -->
+      <div class="debug" v-if="false"> <!-- Убрать v-if="false" для отладки -->
+        <pre>{{ stats }}</pre>
+      </div>
 
-      <!-- Recent Products -->
-      <section class="data-section">
-        <div class="section-header">
-          <h2 class="section-title">Последние товары</h2>
-          <router-link to="/admin/products" class="btn-link">Все товары →</router-link>
-        </div>
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <StatsCard label="Товары" :value="stats.totalProducts" color="primary">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
+            </svg>
+          </template>
+        </StatsCard>
 
-        <div v-if="stats.recentProducts.length > 0" class="recent-list">
-          <div v-for="product in stats.recentProducts.slice(0, 5)" :key="product.id" class="recent-item">
-            <div class="item-info">
-              <p class="item-id">{{ product.name }}</p>
-              <p class="item-detail">{{ product.brand }} • {{ formatPrice(product.price) }} ₽</p>
-            </div>
-            <div class="item-action">
-              <router-link :to="`/admin/products/${product.id}`" class="btn-small">Редактировать</router-link>
-            </div>
-          </div>
-        </div>
-        <div v-else class="empty-state">Нет товаров</div>
-      </section>
+        <StatsCard label="Пользователи" :value="stats.totalUsers" color="success">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+            </svg>
+          </template>
+        </StatsCard>
 
-      <!-- Recent Users -->
-      <section class="data-section">
-        <div class="section-header">
-          <h2 class="section-title">Последние пользователи</h2>
-          <router-link to="/admin/users" class="btn-link">Все пользователи →</router-link>
-        </div>
+        <StatsCard label="Заказы" :value="stats.totalOrders" color="warning">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </template>
+        </StatsCard>
 
-        <div v-if="stats.recentUsers.length > 0" class="recent-list">
-          <div v-for="user in stats.recentUsers.slice(0, 5)" :key="user._id" class="recent-item">
-            <div class="item-info">
-              <p class="item-id">{{ user.firstName }} {{ user.lastName }}</p>
-              <p class="item-detail">{{ user.email }}</p>
-            </div>
-            <div class="item-status">
-              <span class="role-badge" :class="{ 'role-admin': user.role === 'admin' }">
-                {{ user.role === 'admin' ? 'Админ' : 'Пользователь' }}
-              </span>
-            </div>
-          </div>
-        </div>
-        <div v-else class="empty-state">Нет пользователей</div>
-      </section>
+        <StatsCard label="Бренды" :value="stats.totalBrands" color="primary">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </template>
+        </StatsCard>
+
+        <StatsCard label="Категории" :value="stats.totalCategories" color="error">
+          <template #icon>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7v10a8 8 0 0 0 8 8 8 8 0 0 0 8-8V7l-10-5z"></path>
+            </svg>
+          </template>
+        </StatsCard>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useAdminStore } from '@/stores'
 import StatsCard from '@/components/admin/StatsCard.vue'
 
 const adminStore = useAdminStore()
+const isLoading = ref(true)
+const error = ref<string | null>(null)
 
 const stats = computed(() => adminStore.stats)
 
-const formatDate = (date: string | Date) => {
-  return new Date(date).toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-const formatPrice = (price: number) => {
-  return price.toLocaleString('ru-RU')
-}
-
-const formatStatus = (status: string) => {
-  const statuses: Record<string, string> = {
-    pending: 'В ожидании',
-    confirmed: 'Подтвержден',
-    ready: 'Готов',
-    completed: 'Завершен',
-    cancelled: 'Отменен',
+const loadStats = async () => {
+  isLoading.value = true
+  error.value = null
+  console.log('Loading stats...')
+  try {
+    await adminStore.fetchStats()
+    console.log('Stats loaded:', stats.value)
+  } catch (err) {
+    error.value = 'Не удалось загрузить статистику'
+    console.error('Failed to fetch stats:', err)
+  } finally {
+    isLoading.value = false
+    console.log('Loading finished, isLoading:', isLoading.value)
   }
-  return statuses[status] || status
 }
 
-onMounted(async () => {
-  await adminStore.fetchStats()
+onMounted(() => {
+  console.log('AdminDashboard mounted')
+  loadStats()
 })
 </script>
 
@@ -167,192 +114,72 @@ onMounted(async () => {
   gap: var(--spacing-8);
 }
 
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-16);
+  text-align: center;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  min-height: 400px;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  margin-top: var(--spacing-4);
+  font-size: var(--font-size-body);
+  color: var(--color-text-secondary);
+}
+
+.error-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--color-error);
+  margin-bottom: var(--spacing-4);
+}
+
+.error-title {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-4) 0;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--spacing-6);
 }
 
-.recent-data {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: var(--spacing-6);
-}
-
-.data-section {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-6);
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--spacing-6);
-  gap: var(--spacing-4);
-}
-
-.section-title {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.btn-link {
-  font-size: 13px;
-  color: var(--color-primary);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: color var(--transition-normal);
-}
-
-.btn-link:hover {
-  color: var(--color-primary-dark);
-  text-decoration: underline;
-}
-
-.recent-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
-}
-
-.recent-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-3) var(--spacing-4);
-  background-color: var(--color-background);
+.debug {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
   border-radius: var(--radius-md);
-  transition: background-color var(--transition-normal);
+  padding: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+  font-size: 12px;
+  overflow: auto;
+  max-height: 200px;
 }
 
-.recent-item:hover {
-  background-color: var(--color-background);
-}
-
-.item-info {
-  flex: 1;
-}
-
-.item-id {
-  margin: 0 0 var(--spacing-1) 0;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-primary);
-}
-
-.item-detail {
+.debug pre {
   margin: 0;
-  font-size: 12px;
-  color: var(--color-text-secondary);
-}
-
-.item-status,
-.item-action {
-  flex-shrink: 0;
-  margin-left: var(--spacing-4);
-}
-
-.status-badge {
-  display: inline-flex;
-  padding: var(--spacing-1) var(--spacing-3);
-  background-color: var(--color-background);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-pending {
-  color: var(--color-warning);
-  background-color: rgba(245, 158, 11, 0.1);
-}
-
-.status-confirmed {
-  color: var(--color-info);
-  background-color: rgba(59, 130, 246, 0.1);
-}
-
-.status-ready {
-  color: #8B5CF6;
-  background-color: #F3E8FF;
-}
-
-.status-completed {
-  color: var(--color-success);
-  background-color: rgba(16, 185, 129, 0.1);
-}
-
-.status-cancelled {
-  color: var(--color-error);
-  background-color: rgba(239, 68, 68, 0.1);
-}
-
-.role-badge {
-  display: inline-flex;
-  padding: var(--spacing-1) var(--spacing-3);
-  background-color: var(--color-background);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-}
-
-.role-badge.role-admin {
-  color: var(--color-primary);
-  background-color: rgba(37, 99, 235, 0.1);
-}
-
-.btn-small {
-  padding: var(--spacing-2) var(--spacing-3);
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color var(--transition-normal);
-}
-
-.btn-small:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.empty-state {
-  padding: var(--spacing-6);
-  text-align: center;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-}
-
-@media (max-width: 768px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .recent-data {
-    grid-template-columns: 1fr;
-  }
-
-  .recent-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .item-status,
-  .item-action {
-    margin-left: 0;
-    margin-top: var(--spacing-2);
-    width: 100%;
-  }
-
-  .btn-small {
-    width: 100%;
-  }
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 </style>

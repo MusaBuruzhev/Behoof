@@ -194,7 +194,12 @@ export const useCartStore = defineStore('cart', {
       try {
         const response = await api.get('/cart')
         this.setCart(response.data)
-      } catch (error) {
+      } catch (error: any) {
+        // Если токен невалидный (401), очищаем корзину и не показываем ошибку
+        if (error?.response?.status === 401) {
+          this.clear()
+          return
+        }
         console.error('Failed to fetch cart:', error)
       } finally {
         this.isLoading = false
@@ -411,8 +416,11 @@ export const useAdminStore = defineStore('admin', {
 
     async fetchStats() {
       try {
+        console.log('Fetching admin stats...')
         const response = await api.get('/admin/stats')
+        console.log('Admin stats response:', response.data)
         this.setStats(response.data)
+        console.log('Admin stats after set:', this.stats)
       } catch (error) {
         console.error('Failed to fetch admin stats:', error)
       }
@@ -441,8 +449,16 @@ export const useAdminStore = defineStore('admin', {
 
     async addProduct(productData: any) {
       try {
-        await api.post('/products', productData)
+        let response
+        if (productData instanceof FormData) {
+          response = await api.post('/products', productData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          })
+        } else {
+          response = await api.post('/products', productData)
+        }
         await this.fetchProducts(1)
+        return response.data
       } catch (error) {
         console.error('Failed to add product:', error)
         throw error
@@ -559,8 +575,11 @@ export const useAdminStore = defineStore('admin', {
     async fetchCategories() {
       this.categories.isLoading = true
       try {
+        console.log('Fetching categories...')
         const response = await api.get('/admin/categories')
+        console.log('Categories response:', response.data)
         this.setCategories(response.data.categories || response.data || [])
+        console.log('Categories after set:', this.categories.items)
       } catch (error) {
         console.error('Failed to fetch categories:', error)
       } finally {
@@ -570,7 +589,9 @@ export const useAdminStore = defineStore('admin', {
 
     async createCategory(categoryData: any) {
       try {
-        await api.post('/admin/categories', categoryData)
+        console.log('Creating category:', categoryData)
+        const response = await api.post('/admin/categories', categoryData)
+        console.log('Category created:', response.data)
         await this.fetchCategories()
       } catch (error) {
         console.error('Failed to create category:', error)
@@ -594,6 +615,53 @@ export const useAdminStore = defineStore('admin', {
         await this.fetchCategories()
       } catch (error) {
         console.error('Failed to delete category:', error)
+        throw error
+      }
+    },
+
+    // Brands
+    setBrands(items: any[]) {
+      this.brands.items = items
+    },
+
+    async fetchBrands() {
+      this.brands.isLoading = true
+      try {
+        const response = await api.get('/admin/brands')
+        this.setBrands(response.data.brands || response.data || [])
+      } catch (error) {
+        console.error('Failed to fetch brands:', error)
+      } finally {
+        this.brands.isLoading = false
+      }
+    },
+
+    async createBrand(brandData: any) {
+      try {
+        await api.post('/admin/brands', brandData)
+        await this.fetchBrands()
+      } catch (error) {
+        console.error('Failed to create brand:', error)
+        throw error
+      }
+    },
+
+    async updateBrand(brandId: string, brandData: any) {
+      try {
+        await api.put(`/admin/brands/${brandId}`, brandData)
+        await this.fetchBrands()
+      } catch (error) {
+        console.error('Failed to update brand:', error)
+        throw error
+      }
+    },
+
+    async deleteBrand(brandId: string) {
+      try {
+        await api.delete(`/admin/brands/${brandId}`)
+        await this.fetchBrands()
+      } catch (error) {
+        console.error('Failed to delete brand:', error)
         throw error
       }
     },

@@ -7,10 +7,17 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 const getUserFromToken = async (token) => {
-  const decoded = jwt.verify(token, JWT_SECRET);
-  const User = (await import('../models/User.js')).default;
-  const user = await User.findById(decoded.userId);
-  return user;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const User = (await import('../models/User.js')).default;
+    const user = await User.findById(decoded.userId);
+    return user;
+  } catch (err) {
+    if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+      throw err;
+    }
+    throw err;
+  }
 };
 
 /**
@@ -23,15 +30,20 @@ export const getCart = async (req, res) => {
       return res.status(401).json({ error: 'Токен не найден' });
     }
 
+    console.log('Получен токен для корзины, длина:', token.length);
+    
     const user = await getUserFromToken(token);
     if (!user) {
+      console.log('Пользователь не найден по токену');
       return res.status(404).json({ error: 'Пользователь не найден' });
     }
 
-    let cart = await Cart.findOne({ userId: user._id });
+    console.log('Пользователь найден:', user._id);
     
+    let cart = await Cart.findOne({ userId: user._id });
+
     if (!cart) {
-      // Создаём пустую корзину если её нет
+      console.log('Корзина не найдена, создаём новую');
       cart = await Cart.create({
         userId: user._id,
         items: [],
@@ -40,14 +52,17 @@ export const getCart = async (req, res) => {
       });
     }
 
+    console.log('Получаем полную корзину...');
     const fullCart = await cart.getFullCart();
+    console.log('Корзина успешно получена');
     res.json(fullCart);
   } catch (err) {
-    if (err.name === 'JsonWebTokenError') {
+    console.error('Ошибка получения корзины:', err.name, err.message);
+    if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Неверный или истекший токен' });
     }
-    console.error('Ошибка получения корзины:', err.message);
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    console.error('Stack:', err.stack);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера', details: err.message });
   }
 };
 

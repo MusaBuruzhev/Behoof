@@ -175,6 +175,10 @@ export const deleteOrderAdmin = (orderId: string) =>
 export const getAllNotificationsAdmin = () =>
   api.get('/admin/notifications')
 
+/** Получить пользователей для уведомлений (только админ) */
+export const getUsersForNotifications = () =>
+  api.get('/admin/users-list')
+
 /** Получить все бренды (только админ) */
 export const getBrands = () => api.get('/admin/brands')
 
