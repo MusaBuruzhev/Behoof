@@ -73,12 +73,12 @@ const productSchema = new mongoose.Schema(
       default: [],
       validate: {
         validator: function(arr) {
-          return arr.length >= 3 && arr.length <= 10;
+          return arr.length >= 1 && arr.length <= 10;
         },
-        message: 'Количество изображений должно быть от 3 до 10'
+        message: 'Количество изображений должно быть от 1 до 10'
       }
     },
-    reviews: {
+reviews: {
       type: [{
         userId: {
           type: String,
@@ -108,6 +108,28 @@ const productSchema = new mongoose.Schema(
         },
       }],
       default: [],
+    },
+    status: {
+      type: String,
+      enum: ['draft', 'published'],
+      default: 'published',
+    },
+    publishedAt: {
+      type: Date,
+      default: null,
+    },
+    sku: {
+      type: String,
+      default: '',
+    },
+    stock: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false,
     },
   },
   {

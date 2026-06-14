@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores'
 import AdminSidebar from '@/components/admin/AdminSidebar.vue'
@@ -20,7 +20,7 @@ import AdminHeader from '@/components/admin/AdminHeader.vue'
 const authStore = useAuthStore()
 const router = useRouter()
 
-const isAdmin = computed(() => authStore.isAuthenticated && authStore.user?.role === 'admin')
+// const isAdmin = computed(() => authStore.isAuthenticated && authStore.user?.role === 'admin')
 
 onMounted(() => {
   // Проверяем что пользователь админ

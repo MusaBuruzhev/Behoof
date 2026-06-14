@@ -116,7 +116,7 @@ export const getBrands = async (req, res) => {
 
 export const createBrand = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, categoryId, logo, website } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Название бренда обязательно' });
@@ -132,6 +132,9 @@ export const createBrand = async (req, res) => {
       id: brandId,
       name: name.trim(),
       description: description || '',
+      categoryId: categoryId || null,
+      logo: logo || '',
+      website: website || '',
     });
 
     await brand.save();
@@ -148,7 +151,7 @@ export const createBrand = async (req, res) => {
 export const updateBrand = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, categoryId, logo, website } = req.body;
 
     const brand = await Brand.findOne({ id });
     if (!brand) {
@@ -166,9 +169,10 @@ export const updateBrand = async (req, res) => {
       brand.name = name.trim();
     }
 
-    if (description !== undefined) {
-      brand.description = description;
-    }
+    if (description !== undefined) brand.description = description;
+    if (categoryId !== undefined) brand.categoryId = categoryId;
+    if (logo !== undefined) brand.logo = logo;
+    if (website !== undefined) brand.website = website;
 
     await brand.save();
 

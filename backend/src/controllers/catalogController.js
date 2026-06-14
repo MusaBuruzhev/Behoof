@@ -13,8 +13,10 @@ const __dirname = path.dirname(__filename)
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '..', '..', '..', 'public', 'uploads');
+    const uploadPath = path.join(__dirname, '..', '..', 'public', 'uploads');
+    console.log('Multer destination path:', uploadPath)
     if (!fs.existsSync(uploadPath)) {
+      console.log('Creating uploads directory...')
       fs.mkdirSync(uploadPath, { recursive: true });
     }
     cb(null, uploadPath);
@@ -22,6 +24,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const filename = uniqueSuffix + path.extname(file.originalname);
+    console.log('Multer filename:', filename)
     cb(null, filename);
   }
 });
@@ -315,7 +318,9 @@ export const getProducts = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    let { name, price, brand, model, categoryId, description, characteristics } = req.body
+    console.log('addProduct - req.body:', req.body)
+    console.log('addProduct - req.files:', req.files)
+    let { name, price, brand, model, modelId, categoryId, description, characteristics } = req.body
 
     // Преобразуем price в число если это строка
     if (typeof price === 'string') {
@@ -324,20 +329,29 @@ export const addProduct = async (req, res) => {
 
     let parsedCharacteristics;
     try {
+      console.log('Raw characteristics:', characteristics)
       parsedCharacteristics = characteristics ? JSON.parse(characteristics) : [];
-    } catch {
+      console.log('Parsed characteristics:', parsedCharacteristics)
+    } catch (err) {
+      console.error('Failed to parse characteristics:', err)
       return res.status(400).json({ error: 'Неверный формат характеристик' });
     }
 
-    if (!name || !price || !brand || !model || !categoryId) {
+    if (!name || !price || !brand || !categoryId) {
       return res.status(400).json({
-        error: 'Все поля обязательны: name, price, brand, model, categoryId',
+        error: 'Все поля обязательны: name, price, brand, categoryId',
       })
     }
 
-    if (!req.files || req.files.length < 3 || req.files.length > 10) {
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({
-        error: 'Необходимо загрузить от 3 до 10 изображений',
+        error: 'Необходимо загрузить хотя бы одно изображение',
+      })
+    }
+
+    if (req.files.length > 10) {
+      return res.status(400).json({
+        error: 'Максимум 10 изображений',
       })
     }
 
@@ -357,6 +371,7 @@ export const addProduct = async (req, res) => {
     // Сохраняем пути к загруженным файлам
     const imagePaths = req.files.map(file => `/uploads/${file.filename}`)
 
+    // Находим или создаём бренд как подкатегорию (для обратной совместимости)
     let subcategory = await Subcategory.findOne({
       name: brand,
       categoryId: categoryId,
@@ -378,22 +393,35 @@ export const addProduct = async (req, res) => {
       await category.save()
     }
 
-    let modelDoc = await Model.findOne({
-      name: model,
-      subcategoryId: subcategory.id,
-    })
+    // Если modelId передан - используем его, иначе ищем/создаём по названию модели
+    let finalModelId = modelId
+    let modelDoc
 
-    if (!modelDoc) {
-      const modelId = await getNextId('mod')
+    if (modelId) {
+      modelDoc = await Model.findOne({ id: modelId })
+    }
 
-      modelDoc = new Model({
-        id: modelId,
+    if (!modelDoc && model) {
+      modelDoc = await Model.findOne({
         name: model,
-        subcategoryId: subcategory.id,
+        brandId: subcategory.id,
+      })
+    }
+
+    if (!modelDoc && model) {
+      const newModelId = await getNextId('mod')
+      modelDoc = new Model({
+        id: newModelId,
+        name: model,
+        brandId: subcategory.id,
+        categoryId: categoryId,
         productIds: [],
       })
-
       await modelDoc.save()
+    }
+
+    if (modelDoc) {
+      finalModelId = modelDoc.id
     }
 
     const product = new Product({
@@ -405,7 +433,7 @@ export const addProduct = async (req, res) => {
       brand,
       categoryId,
       subcategoryId: subcategory.id,
-      modelId: modelDoc.id,
+      modelId: finalModelId || subcategory.id,
       traitRatings,
       images: imagePaths,
       reviews: [],
@@ -413,8 +441,10 @@ export const addProduct = async (req, res) => {
 
     await product.save()
 
-    modelDoc.productIds.push(productId)
-    await modelDoc.save()
+    if (modelDoc) {
+      modelDoc.productIds.push(productId)
+      await modelDoc.save()
+    }
 
     subcategory.productIds.push(productId)
     await subcategory.save()
@@ -486,13 +516,22 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ error: 'Товар не найден' })
     }
 
+    // Парсим characteristics если пришли как JSON строка (FormData)
+    if (updates.characteristics && typeof updates.characteristics === 'string') {
+      try {
+        updates.characteristics = JSON.parse(updates.characteristics)
+      } catch {
+        // Оставляем как есть
+      }
+    }
+
     // Специальная обработка для цены - добавляем в историю если цена изменилась
     if (updates.price !== undefined && Number(updates.price) !== product.price) {
       product.priceHistory.push({ date: new Date(), price: Number(updates.price) })
     }
 
     // Обновляем разрешенные поля
-    const allowedFields = ['name', 'description', 'characteristics', 'brand', 'traitRatings', 'images']
+    const allowedFields = ['name', 'description', 'characteristics', 'brand', 'traitRatings']
     allowedFields.forEach(field => {
       if (updates[field] !== undefined) {
         if (field === 'characteristics') {
@@ -502,6 +541,18 @@ export const updateProduct = async (req, res) => {
         }
       }
     })
+
+    // Обработка новых изображений
+    if (req.files && req.files.length > 0) {
+      const newImagePaths = req.files.map(file => `/uploads/${file.filename}`)
+      // Заменяем изображения полностью или добавляем
+      const existingImages = product.images || []
+      const totalImages = existingImages.length + newImagePaths.length
+      if (totalImages > 10) {
+        return res.status(400).json({ error: 'Максимум 10 изображений' })
+      }
+      product.images = [...existingImages, ...newImagePaths]
+    }
 
     await product.save()
 

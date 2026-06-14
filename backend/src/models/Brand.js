@@ -17,6 +17,18 @@ const brandSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    categoryId: {
+      type: String,
+      default: null,
+    },
+    logo: {
+      type: String,
+      default: '',
+    },
+    website: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

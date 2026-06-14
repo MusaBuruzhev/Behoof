@@ -131,6 +131,11 @@ const router = createRouter({
           component: () => import('@/views/Admin/ProductsAdmin.vue'),
         },
         {
+          path: 'products/new',
+          name: 'admin-product-create',
+          component: () => import('@/views/Admin/ProductEditAdmin.vue'),
+        },
+        {
           path: 'products/:id',
           name: 'admin-product-edit',
           component: () => import('@/views/Admin/ProductEditAdmin.vue'),
@@ -146,6 +151,11 @@ const router = createRouter({
           component: () => import('@/views/Admin/OrdersAdmin.vue'),
         },
         {
+          path: 'catalog',
+          name: 'admin-catalog',
+          component: () => import('@/views/Admin/CatalogAdmin.vue'),
+        },
+        {
           path: 'categories',
           name: 'admin-categories',
           component: () => import('@/views/Admin/CategoriesAdmin.vue'),
@@ -159,6 +169,11 @@ const router = createRouter({
           path: 'notifications',
           name: 'admin-notifications',
           component: () => import('@/views/Admin/NotificationsAdmin.vue'),
+        },
+        {
+          path: 'characteristics',
+          name: 'admin-characteristics',
+          component: () => import('@/views/Admin/CharacteristicsView.vue'),
         },
       ],
     },

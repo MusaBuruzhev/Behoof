@@ -17,6 +17,7 @@ import ordersRoutes from './src/routes/ordersRoutes.js';
 import notificationsRoutes from './src/routes/notificationsRoutes.js';
 import cartRoutes from './src/routes/cartRoutes.js';
 import adminRoutes from './src/routes/adminRoutes.js';
+import characteristicRoutes from './src/routes/characteristicRoutes.js';
 import swaggerSpec from './src/config/swagger.js';
 import logger from './src/utils/logger.js';
 
@@ -55,6 +56,7 @@ app.use((req, res, next) => {
 // Helmet - защитные заголовки (отключаем для разработки)
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
   contentSecurityPolicy: false,
 }));
 
@@ -139,6 +141,19 @@ app.get('/', (req, res) => {
   });
 });
 
+// ============ СТАТИКА (uploads) ============
+const uploadsPath = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+
+// Добавляем CORS заголовки для статики
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', FRONTEND_URL);
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  next();
+}, express.static(uploadsPath));
+
 // ============ ПОДКЛЮЧЕНИЕ МАРШРУТОВ ============
 
 app.use('/api', catalogRoutes);
@@ -147,6 +162,7 @@ app.use('/api', ordersRoutes);
 app.use('/api', notificationsRoutes);
 app.use('/api', cartRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin', characteristicRoutes);
 
 // ============ 404 ============
 

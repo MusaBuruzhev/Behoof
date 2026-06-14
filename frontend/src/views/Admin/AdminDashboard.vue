@@ -1,74 +1,98 @@
 <template>
   <div class="dashboard">
-    <!-- Loading State -->
-    <div v-if="isLoading" class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Загрузка статистики...</p>
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Сводка</h1>
+        <p class="page-subtitle">{{ today }}</p>
+      </div>
     </div>
 
-    <!-- Error State -->
-    <div v-else-if="error" class="error-state">
-      <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="16" x2="12.01" y2="16" />
-      </svg>
-      <h3 class="error-title">{{ error }}</h3>
-      <button class="btn btn-primary" @click="loadStats">Попробовать снова</button>
-    </div>
-
-     <!-- Debug & Stats -->
-    <div v-else>
-      <!-- Debug -->
-      <div class="debug" v-if="false"> <!-- Убрать v-if="false" для отладки -->
-        <pre>{{ stats }}</pre>
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #DBEAFE; color: #2563EB;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalProducts }}</span>
+          <span class="stat-label">Товаров</span>
+        </div>
       </div>
 
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <StatsCard label="Товары" :value="stats.totalProducts" color="primary">
-          <template #icon>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
-            </svg>
-          </template>
-        </StatsCard>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #D1FAE5; color: #059669;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalUsers }}</span>
+          <span class="stat-label">Пользователей</span>
+        </div>
+      </div>
 
-        <StatsCard label="Пользователи" :value="stats.totalUsers" color="success">
-          <template #icon>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-              <circle cx="9" cy="7" r="4"></circle>
-            </svg>
-          </template>
-        </StatsCard>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #FEF3C7; color: #D97706;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalOrders }}</span>
+          <span class="stat-label">Заказов</span>
+        </div>
+      </div>
 
-        <StatsCard label="Заказы" :value="stats.totalOrders" color="warning">
-          <template #icon>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-          </template>
-        </StatsCard>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #F3E8FF; color: #7C3AED;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalCategories }}</span>
+          <span class="stat-label">Категорий</span>
+        </div>
+      </div>
 
-        <StatsCard label="Бренды" :value="stats.totalBrands" color="primary">
-          <template #icon>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </template>
-        </StatsCard>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: #FEE2E2; color: #DC2626;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+        <div class="stat-info">
+          <span class="stat-value">{{ stats.totalBrands }}</span>
+          <span class="stat-label">Брендов</span>
+        </div>
+      </div>
+    </div>
 
-        <StatsCard label="Категории" :value="stats.totalCategories" color="error">
-          <template #icon>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7v10a8 8 0 0 0 8 8 8 8 0 0 0 8-8V7l-10-5z"></path>
-            </svg>
-          </template>
-        </StatsCard>
+    <!-- Recent Sections -->
+    <div class="recent-grid">
+      <div class="recent-section">
+        <div class="section-header">
+          <h3>Последние заказы</h3>
+          <router-link to="/admin/orders" class="link">Все заказы →</router-link>
+        </div>
+        <div v-if="stats.recentOrders?.length" class="recent-list">
+          <div v-for="order in stats.recentOrders.slice(0, 5)" :key="order.id" class="recent-item">
+            <div class="recent-item-main">
+              <span class="order-id">#{{ order.id?.slice(-6) }}</span>
+              <span :class="['status', order.status]">{{ orderStatusLabel(order.status) }}</span>
+            </div>
+            <span class="recent-meta">{{ formatDate(order.createdAt) }}</span>
+          </div>
+        </div>
+        <div v-else class="empty-recent">Нет заказов</div>
+      </div>
+
+      <div class="recent-section">
+        <div class="section-header">
+          <h3>Последние товары</h3>
+          <router-link to="/admin/products" class="link">Все товары →</router-link>
+        </div>
+        <div v-if="stats.recentProducts?.length" class="recent-list">
+          <div v-for="product in stats.recentProducts.slice(0, 5)" :key="product.id" class="recent-item">
+            <div class="recent-item-main">
+              <span class="product-name">{{ product.name }}</span>
+            </div>
+            <span class="recent-meta">{{ formatPrice(product.priceHistory?.[0]?.price) }} ₽</span>
+          </div>
+        </div>
+        <div v-else class="empty-recent">Нет товаров</div>
       </div>
     </div>
   </div>
@@ -77,109 +101,102 @@
 <script setup lang="ts">
 import { onMounted, computed, ref } from 'vue'
 import { useAdminStore } from '@/stores'
-import StatsCard from '@/components/admin/StatsCard.vue'
 
 const adminStore = useAdminStore()
 const isLoading = ref(true)
-const error = ref<string | null>(null)
 
 const stats = computed(() => adminStore.stats)
 
-const loadStats = async () => {
-  isLoading.value = true
-  error.value = null
-  console.log('Loading stats...')
-  try {
-    await adminStore.fetchStats()
-    console.log('Stats loaded:', stats.value)
-  } catch (err) {
-    error.value = 'Не удалось загрузить статистику'
-    console.error('Failed to fetch stats:', err)
-  } finally {
-    isLoading.value = false
-    console.log('Loading finished, isLoading:', isLoading.value)
-  }
+const today = computed(() => {
+  return new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+})
+
+const orderStatusLabel = (status: string) => {
+  const map: Record<string, string> = { pending: 'Ожидает', confirmed: 'Подтверждён', ready: 'Готов', completed: 'Выполнен', cancelled: 'Отменён' }
+  return map[status] || status
 }
 
-onMounted(() => {
-  console.log('AdminDashboard mounted')
-  loadStats()
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return ''
+  return new Date(dateStr).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+}
+
+const formatPrice = (price: number) => {
+  if (!price && price !== 0) return '0'
+  return price.toLocaleString('ru-RU')
+}
+
+onMounted(async () => {
+  try {
+    await adminStore.fetchStats()
+  } finally {
+    isLoading.value = false
+  }
 })
 </script>
 
 <style scoped>
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-8);
-}
+.dashboard { display: flex; flex-direction: column; gap: 28px; }
 
-.loading-state,
-.error-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-16);
-  text-align: center;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  min-height: 400px;
-}
+.page-header { display: flex; justify-content: space-between; align-items: center; }
+.page-title { font-size: 22px; font-weight: 600; color: var(--color-text-primary); margin: 0; letter-spacing: -0.01em; }
+.page-subtitle { margin: 4px 0 0; font-size: 13px; color: var(--color-text-tertiary); }
 
-.loading-spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-primary);
-  border-radius: var(--radius-full);
-  animation: spin 1s linear infinite;
-}
+/* Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.stat-card {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 14px; padding: 20px;
+  transition: box-shadow 0.15s ease;
 }
+.stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
 
-.loading-state p {
-  margin-top: var(--spacing-4);
-  font-size: var(--font-size-body);
-  color: var(--color-text-secondary);
+.stat-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0;
 }
+.stat-icon svg { width: 22px; height: 22px; }
 
-.error-icon {
-  width: 64px;
-  height: 64px;
-  color: var(--color-error);
-  margin-bottom: var(--spacing-4);
+.stat-info { display: flex; flex-direction: column; }
+.stat-value { font-size: 24px; font-weight: 700; color: var(--color-text-primary); letter-spacing: -0.02em; line-height: 1; }
+.stat-label { font-size: 13px; color: var(--color-text-tertiary); margin-top: 4px; }
+
+/* Recent */
+.recent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+
+.recent-section {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 14px; padding: 20px;
 }
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.section-header h3 { margin: 0; font-size: 14px; font-weight: 600; color: var(--color-text-primary); }
+.link { font-size: 12px; color: var(--color-primary); text-decoration: none; font-weight: 500; }
+.link:hover { text-decoration: underline; }
 
-.error-title {
-  font-size: var(--font-size-h4);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-4) 0;
-}
+.recent-list { display: flex; flex-direction: column; gap: 2px; }
+.recent-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-radius: 8px; transition: background 0.1s; }
+.recent-item:hover { background: var(--color-surface-secondary, #F9FAFB); }
+.recent-item-main { display: flex; align-items: center; gap: 10px; }
+.order-id { font-size: 13px; font-weight: 500; color: var(--color-text-primary); font-family: 'JetBrains Mono', monospace; }
+.product-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+.recent-meta { font-size: 12px; color: var(--color-text-tertiary); }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: var(--spacing-6);
-}
+.status { font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: 500; }
+.status.pending { background: #FEF3C7; color: #92400E; }
+.status.confirmed { background: #DBEAFE; color: #1E40AF; }
+.status.ready { background: #D1FAE5; color: #065F46; }
+.status.completed { background: #E0E7FF; color: #3730A3; }
+.status.cancelled { background: #FEE2E2; color: #991B1B; }
 
-.debug {
-  background: #f3f4f6;
-  border: 1px solid #d1d5db;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-4);
-  margin-bottom: var(--spacing-4);
-  font-size: 12px;
-  overflow: auto;
-  max-height: 200px;
-}
+.empty-recent { padding: 20px; text-align: center; color: var(--color-text-tertiary); font-size: 13px; }
 
-.debug pre {
-  margin: 0;
-  white-space: pre-wrap;
-  word-break: break-all;
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-card { padding: 14px; gap: 10px; }
+  .stat-icon { width: 36px; height: 36px; }
+  .stat-value { font-size: 20px; }
+  .recent-grid { grid-template-columns: 1fr; }
 }
 </style>

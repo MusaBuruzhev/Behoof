@@ -11,7 +11,11 @@ const modelSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    subcategoryId: {
+    brandId: {
+      type: String,
+      required: true,
+    },
+    categoryId: {
       type: String,
       required: true,
     },

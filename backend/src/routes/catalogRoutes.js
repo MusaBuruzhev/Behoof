@@ -137,11 +137,15 @@ router.get('/products', validateQuery(paginationSchema), getProducts)
  *         description: Нет прав администратора
  */
 router.post('/products', authenticate, requireAdmin, (req, res, next) => {
+  console.log('POST /products - files:', req.files ? req.files.length : 'none')
+  console.log('POST /products - content-type:', req.headers['content-type'])
   uploadImages(req, res, (err) => {
     if (err) {
+      console.error('Multer error:', err)
       logger.warn(`Multer error: ${err.message}`);
       return res.status(400).json({ error: err.message });
     }
+    console.log('Multer completed successfully, files:', req.files ? req.files.length : 0)
     next();
   });
 }, validate(productSchema), addProduct)
@@ -237,7 +241,17 @@ router.post('/products/:id/reviews', authenticate, validate(reviewSchema), addRe
  *       200:
  *         description: Товар удален
  */
-router.put('/products/:id', authenticate, requireAdmin, validate(updateProductSchema), updateProduct)
+router.put('/products/:id', authenticate, requireAdmin, (req, res, next) => {
+    console.log('PUT /products/:id - content-type:', req.headers['content-type'])
+    uploadImages(req, res, (err) => {
+      if (err) {
+        console.error('Multer error:', err)
+        return res.status(400).json({ error: err.message })
+      }
+      console.log('PUT Multer completed, files:', req.files ? req.files.length : 0)
+      next()
+    })
+  }, validate(updateProductSchema), updateProduct)
 router.delete('/products/:id', authenticate, requireAdmin, deleteProduct)
 
 /**

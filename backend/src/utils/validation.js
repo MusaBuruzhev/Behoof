@@ -87,11 +87,14 @@ export const productSchema = Joi.object({
   model: Joi.string()
     .min(1)
     .max(50)
-    .required()
+    .optional()
+    .allow('', null)
     .messages({
       'string.max': 'Модель не должна превышать 50 символов',
-      'any.required': 'Модель обязательна',
     }),
+  modelId: Joi.string()
+    .optional()
+    .allow('', null),
   categoryId: Joi.string()
     .required()
     .messages({
@@ -100,7 +103,10 @@ export const productSchema = Joi.object({
   description: Joi.string()
     .max(5000)
     .allow('', null),
-  // characteristics убираем из валидации - они приходят как JSON строка из FormData
+  characteristics: Joi.string()
+    .max(50000)
+    .allow('', null)
+    .optional(),
 });
 
 // Обновление товара
@@ -113,19 +119,21 @@ export const updateProductSchema = Joi.object({
   description: Joi.string()
     .max(5000)
     .allow('', null),
-  characteristics: Joi.array().items(
-    Joi.object({
-      trait: Joi.string().required(),
-      value: Joi.string().allow(''),
-    })
+  characteristics: Joi.alternatives().try(
+    Joi.array().items(
+      Joi.object({
+        trait: Joi.string().required(),
+        value: Joi.string().allow(''),
+      })
+    ),
+    Joi.string().max(50000).allow('', null)
   ),
   brand: Joi.string()
     .min(2)
     .max(50),
-  images: Joi.array()
-    .items(Joi.string())
-    .min(3)
-    .max(10),
+  modelId: Joi.string()
+    .allow('', null)
+    .optional(),
 });
 
 // Отзыв
