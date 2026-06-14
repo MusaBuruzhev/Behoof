@@ -60,6 +60,7 @@ export interface ProductsResponse {
 export interface CatalogResponse {
   categories: Category[]
   subcategories: Record<string, Subcategory>
+  models: Record<string, any>
   products: Record<string, Product>
 }
 

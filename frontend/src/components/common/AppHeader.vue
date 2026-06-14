@@ -143,6 +143,8 @@
     <MegaMenu
       :visible="showMegaMenu"
       :categories="categories"
+      :brandsByCategory="brandsByCategory"
+      :productsById="productsById"
       @close="showMegaMenu = false"
     />
     
@@ -160,10 +162,17 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getCatalog } from '@/api'
 import { useAuthStore, useFavoritesStore, useNotificationsStore, useComparisonStore, useCartStore } from '@/stores'
-import type { Category } from '@/types'
+import type { Category, Product } from '@/types'
 
 import MegaMenu from './MegaMenu.vue'
 import MobileMenu from './MobileMenu.vue'
+
+interface BrandInfo {
+  id: string
+  name: string
+  productCount: number
+  productIds: string[]
+}
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -178,6 +187,8 @@ const showMegaMenu = ref(false)
 const showMobileMenu = ref(false)
 const showProfileMenu = ref(false)
 const categories = ref<Category[]>([])
+const brandsByCategory = ref<Record<string, BrandInfo[]>>({})
+const productsById = ref<Record<string, Product>>({})
 
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const favoritesCount = computed(() => favoritesStore.favoritesCount)
@@ -190,12 +201,51 @@ const userInitials = computed(() => {
   return name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0, 2)
 })
 
-const loadCategories = async () => {
+const loadCatalogData = async () => {
   try {
     const response = await getCatalog()
-    categories.value = response.data.categories || []
+    const data = response.data
+
+    categories.value = data.categories || []
+
+    // Строим brandsByCategory: categoryId → список брендов (уникальные по имени)
+    const brandsMap: Record<string, BrandInfo[]> = {}
+    const products = data.products || {}
+
+    productsById.value = products
+
+    // Собираем товары по категориям и брендам
+    for (const product of Object.values(products) as Product[]) {
+      const catId = product.categoryId
+      if (!catId) continue
+
+      if (!brandsMap[catId]) brandsMap[catId] = []
+
+      const brandName = product.brand || 'Другие'
+      let brand = brandsMap[catId].find(b => b.name === brandName)
+
+      if (!brand) {
+        brand = {
+          id: `${catId}_${brandName}`,
+          name: brandName,
+          productCount: 0,
+          productIds: [],
+        }
+        brandsMap[catId].push(brand)
+      }
+
+      brand.productCount++
+      brand.productIds.push(product.id)
+    }
+
+    // Сортируем бренды по количеству товаров
+    for (const catId of Object.keys(brandsMap)) {
+      brandsMap[catId].sort((a, b) => b.productCount - a.productCount)
+    }
+
+    brandsByCategory.value = brandsMap
   } catch (error) {
-    console.error('Failed to load categories:', error)
+    console.error('Failed to load catalog:', error)
   }
 }
 
@@ -247,7 +297,7 @@ const handleClickOutside = (event: MouseEvent) => {
 }
 
 onMounted(() => {
-  loadCategories()
+  loadCatalogData()
   window.addEventListener('scroll', handleScroll)
   document.addEventListener('click', handleClickOutside)
 })
@@ -274,11 +324,12 @@ onUnmounted(() => {
 }
 
 .header-container {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-6);
-  height: 80px;
-  max-width: var(--container-max);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+    height: 80px;
+    max-width: var(--container-max);
+    justify-content: space-between;
 }
 
 /* Левая часть */
