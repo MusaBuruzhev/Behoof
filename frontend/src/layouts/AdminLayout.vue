@@ -23,22 +23,15 @@ const router = useRouter()
 // const isAdmin = computed(() => authStore.isAuthenticated && authStore.user?.role === 'admin')
 
 onMounted(() => {
-  // Проверяем что пользователь админ
-  console.log('AdminLayout mounted. Auth:', authStore.isAuthenticated, 'Role:', authStore.user?.role)
-  
   if (!authStore.isAuthenticated) {
-    console.log('Not authenticated, redirecting to login')
     router.push('/auth/login')
     return
   }
   
   if (authStore.user?.role !== 'admin') {
-    console.log('Not admin, redirecting to home')
     router.push('/')
     return
   }
-  
-  console.log('Admin access granted')
 })
 </script>
 

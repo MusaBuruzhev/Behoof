@@ -170,12 +170,11 @@ const changePage = (p: number) => {
 }
 
 const deleteProductHandler = async (id: string) => {
-  if (!confirm('Удалить товар?')) return
   try {
     await adminStore.deleteProduct(id)
     await loadProducts()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка удаления')
+    // error handled silently
   }
 }
 

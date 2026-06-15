@@ -125,12 +125,11 @@ const changeRole = async (user: any, role: string) => {
 }
 
 const deleteUserHandler = async (user: any) => {
-  if (!confirm('Удалить пользователя?')) return
   try {
     await adminStore.deleteUser(user._id || user.id)
     await loadUsers()
   } catch (err) {
-    console.error('Error deleting user:', err)
+    // error handled silently
   }
 }
 

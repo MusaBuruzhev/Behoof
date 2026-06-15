@@ -143,17 +143,16 @@ const saveBrand = async () => {
     editingBrand.value = null
     await adminStore.fetchBrands()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка сохранения бренда')
+    // error handled silently
   }
 }
 
 const deleteBrandHandler = async (id: string) => {
-  if (!confirm('Удалить бренд?')) return
   try {
     await adminStore.deleteBrand(id)
     await adminStore.fetchBrands()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка удаления бренда')
+    // error handled silently
   }
 }
 

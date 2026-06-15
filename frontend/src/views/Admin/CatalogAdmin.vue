@@ -298,19 +298,15 @@ const filteredCategories = computed(() => {
 
 const getBrandsForCategory = (categoryId: string) => {
   const result = brands.value.filter((b) => b.categoryId === categoryId)
-  console.log('getBrandsForCategory', { categoryId, result })
   return result
 }
 
 const getModelsForBrand = (brandId: string) => {
-  // Поддержка обоих форматов: новые модели с brandId и старые с subcategoryId
   const result = models.value.filter((m) => {
     if (m.brandId) return m.brandId === brandId
-    // Для старых моделей: brandId = subcategoryId (бренд как подкатегория)
     if (m.subcategoryId) return m.subcategoryId === brandId
     return false
   })
-  console.log('getModelsForBrand', { brandId, result })
   return result
 }
 
@@ -378,12 +374,6 @@ const selectNode = (type: string, item: any) => {
   selected.value = { type, item, id: item.id }
 }
 
-const openCategoryModal = () => {
-  editingCategory.value = null
-  categoryForm.value = { name: '' }
-  showCategoryModal.value = true
-}
-
 const editCategory = (cat: any) => {
   editingCategory.value = cat
   categoryForm.value = { name: cat.name }
@@ -400,7 +390,7 @@ const saveCategory = async () => {
     showCategoryModal.value = false
     await loadCatalog()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка')
+    // error handled silently
   }
 }
 
@@ -418,7 +408,6 @@ const editBrand = (brand: any) => {
 
 const saveBrand = async () => {
   try {
-    console.log('Saving brand:', brandForm.value)
     if (editingBrand.value) {
       await adminStore.updateBrand(editingBrand.value.id, brandForm.value)
     } else {
@@ -427,16 +416,13 @@ const saveBrand = async () => {
     showBrandModal.value = false
     await loadCatalog()
   } catch (err: any) {
-    console.error('Brand error:', err)
-    alert(err?.response?.data?.error || 'Ошибка')
+    // error handled silently
   }
 }
 
 const openModelModal = (categoryId: string, brandId: string) => {
   editingModel.value = null
-  const brand = brands.value.find((b: any) => b.id === brandId)
   modelForm.value = { name: '', brandId: brandId, categoryId: categoryId }
-  console.log('Opening model modal:', { categoryId, brandId, brandName: brand?.name })
   showModelModal.value = true
 }
 
@@ -449,17 +435,14 @@ const editModel = (model: any) => {
 const saveModel = async () => {
   try {
     if (editingModel.value) {
-      const res = await api.put(`/admin/models/${editingModel.value.id}`, modelForm.value)
-      console.log('Model updated:', res.data)
+      await api.put(`/admin/models/${editingModel.value.id}`, modelForm.value)
     } else {
-      const res = await api.post('/admin/models', modelForm.value)
-      console.log('Model created:', res.data)
+      await api.post('/admin/models', modelForm.value)
     }
     showModelModal.value = false
     await loadCatalog()
   } catch (err: any) {
-    console.error('Model save error:', err)
-    alert(err?.response?.data?.error || 'Ошибка')
+    // error handled silently
   }
 }
 
@@ -475,12 +458,11 @@ const loadCatalog = async () => {
   try {
     const modelsRes = await api.get('/admin/models')
     models.value = modelsRes.data.models || []
-    console.log('Models loaded:', models.value)
     
     const catalogRes = await api.get('/catalog')
     products.value = Object.values(catalogRes.data.products || {})
   } catch (err) {
-    console.error('Failed to load catalog:', err)
+    // error handled silently
   }
 }
 

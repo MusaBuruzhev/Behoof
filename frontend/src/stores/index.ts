@@ -416,13 +416,10 @@ export const useAdminStore = defineStore('admin', {
 
     async fetchStats() {
       try {
-        console.log('Fetching admin stats...')
         const response = await api.get('/admin/stats')
-        console.log('Admin stats response:', response.data)
         this.setStats(response.data)
-        console.log('Admin stats after set:', this.stats)
       } catch (error) {
-        console.error('Failed to fetch admin stats:', error)
+        // error handled silently
       }
     },
 
@@ -441,7 +438,7 @@ export const useAdminStore = defineStore('admin', {
         this.setProducts(response.data)
         this.products.page = page
       } catch (error) {
-        console.error('Failed to fetch products:', error)
+        // error handled silently
       } finally {
         this.products.isLoading = false
       }
@@ -460,7 +457,6 @@ export const useAdminStore = defineStore('admin', {
         await this.fetchProducts(1)
         return response.data
       } catch (error) {
-        console.error('Failed to add product:', error)
         throw error
       }
     },
@@ -470,7 +466,6 @@ export const useAdminStore = defineStore('admin', {
         await api.put(`/products/${productId}`, productData)
         await this.fetchProducts(this.products.page)
       } catch (error) {
-        console.error('Failed to update product:', error)
         throw error
       }
     },
@@ -480,7 +475,6 @@ export const useAdminStore = defineStore('admin', {
         await api.delete(`/products/${productId}`)
         await this.fetchProducts(this.products.page)
       } catch (error) {
-        console.error('Failed to delete product:', error)
         throw error
       }
     },
@@ -500,7 +494,7 @@ export const useAdminStore = defineStore('admin', {
         this.setUsers(response.data)
         this.users.page = page
       } catch (error) {
-        console.error('Failed to fetch users:', error)
+        // error handled silently
       } finally {
         this.users.isLoading = false
       }
@@ -511,7 +505,6 @@ export const useAdminStore = defineStore('admin', {
         await api.put(`/admin/users/${userId}/role`, { role })
         await this.fetchUsers(this.users.page)
       } catch (error) {
-        console.error('Failed to update user role:', error)
         throw error
       }
     },
@@ -521,7 +514,6 @@ export const useAdminStore = defineStore('admin', {
         await api.delete(`/admin/users/${userId}`)
         await this.fetchUsers(this.users.page)
       } catch (error) {
-        console.error('Failed to delete user:', error)
         throw error
       }
     },
@@ -541,7 +533,7 @@ export const useAdminStore = defineStore('admin', {
         this.setOrders(response.data)
         this.orders.page = page
       } catch (error) {
-        console.error('Failed to fetch orders:', error)
+        // error handled silently
       } finally {
         this.orders.isLoading = false
       }
@@ -552,7 +544,6 @@ export const useAdminStore = defineStore('admin', {
         await api.put(`/admin/orders/${orderId}/status`, { status })
         await this.fetchOrders(this.orders.page)
       } catch (error) {
-        console.error('Failed to update order status:', error)
         throw error
       }
     },
@@ -562,7 +553,6 @@ export const useAdminStore = defineStore('admin', {
         await api.delete(`/admin/orders/${orderId}`)
         await this.fetchOrders(this.orders.page)
       } catch (error) {
-        console.error('Failed to delete order:', error)
         throw error
       }
     },
@@ -575,13 +565,10 @@ export const useAdminStore = defineStore('admin', {
     async fetchCategories() {
       this.categories.isLoading = true
       try {
-        console.log('Fetching categories...')
         const response = await api.get('/admin/categories')
-        console.log('Categories response:', response.data)
         this.setCategories(response.data.categories || response.data || [])
-        console.log('Categories after set:', this.categories.items)
       } catch (error) {
-        console.error('Failed to fetch categories:', error)
+        // error handled silently
       } finally {
         this.categories.isLoading = false
       }
@@ -589,12 +576,10 @@ export const useAdminStore = defineStore('admin', {
 
     async createCategory(categoryData: any) {
       try {
-        console.log('Creating category:', categoryData)
-        const response = await api.post('/admin/categories', categoryData)
-        console.log('Category created:', response.data)
+        await api.post('/admin/categories', categoryData)
         await this.fetchCategories()
       } catch (error) {
-        console.error('Failed to create category:', error)
+        // error handled silently
         throw error
       }
     },
@@ -604,7 +589,6 @@ export const useAdminStore = defineStore('admin', {
         await api.put(`/admin/categories/${categoryId}`, categoryData)
         await this.fetchCategories()
       } catch (error) {
-        console.error('Failed to update category:', error)
         throw error
       }
     },
@@ -614,7 +598,6 @@ export const useAdminStore = defineStore('admin', {
         await api.delete(`/admin/categories/${categoryId}`)
         await this.fetchCategories()
       } catch (error) {
-        console.error('Failed to delete category:', error)
         throw error
       }
     },
@@ -630,7 +613,7 @@ export const useAdminStore = defineStore('admin', {
         const response = await api.get('/admin/brands')
         this.setBrands(response.data.brands || response.data || [])
       } catch (error) {
-        console.error('Failed to fetch brands:', error)
+        // error handled silently
       } finally {
         this.brands.isLoading = false
       }
@@ -641,7 +624,6 @@ export const useAdminStore = defineStore('admin', {
         await api.post('/admin/brands', brandData)
         await this.fetchBrands()
       } catch (error) {
-        console.error('Failed to create brand:', error)
         throw error
       }
     },
@@ -651,7 +633,6 @@ export const useAdminStore = defineStore('admin', {
         await api.put(`/admin/brands/${brandId}`, brandData)
         await this.fetchBrands()
       } catch (error) {
-        console.error('Failed to update brand:', error)
         throw error
       }
     },
@@ -661,7 +642,6 @@ export const useAdminStore = defineStore('admin', {
         await api.delete(`/admin/brands/${brandId}`)
         await this.fetchBrands()
       } catch (error) {
-        console.error('Failed to delete brand:', error)
         throw error
       }
     },

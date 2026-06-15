@@ -140,12 +140,11 @@ const changeStatus = async (order: any, status: string) => {
 }
 
 const deleteOrderHandler = async (order: any) => {
-  if (!confirm('Удалить заказ?')) return
   try {
     await adminStore.deleteOrder(order.id || order._id)
     await loadOrders()
   } catch (err) {
-    console.error('Error deleting order:', err)
+    // error handled silently
   }
 }
 

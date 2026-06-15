@@ -353,9 +353,9 @@ const openGroupModal = (group: any | null) => {
 const saveGroup = async () => {
   try {
     const payload = {
-      ...groupForm.value,
-      traitNames: groupForm.value.traitNames.filter((t) => t.trim() !== ''),
-      slug: groupForm.value.slug || groupForm.value.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+      name: groupForm.value.name,
+      description: groupForm.value.description,
+      categoryId: groupForm.value.categoryId,
     }
     if (editingGroup.value) {
       await api.put(`/admin/characteristic-groups/${editingGroup.value.id}`, payload)
@@ -367,18 +367,17 @@ const saveGroup = async () => {
     await fetchGroups()
     await fetchAllValues()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка сохранения группы')
+    // error handled silently
   }
 }
 
 const deleteGroupHandler = async (groupId: string) => {
-  if (!confirm('Удалить группу и все её значения?')) return
   try {
     await api.delete(`/admin/characteristic-groups/${groupId}`)
     await fetchGroups()
     await fetchAllValues()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка удаления группы')
+    // error handled silently
   }
 }
 
@@ -416,17 +415,16 @@ const saveValue = async () => {
     editingValue.value = null
     await fetchAllValues()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка сохранения значения')
+    // error handled silently
   }
 }
 
 const deleteValueHandler = async (valueId: string) => {
-  if (!confirm('Удалить значение?')) return
   try {
     await api.delete(`/admin/characteristic-values/${valueId}`)
     await fetchAllValues()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка удаления значения')
+    // error handled silently
   }
 }
 

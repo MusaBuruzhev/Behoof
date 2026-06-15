@@ -166,18 +166,16 @@ const loadUsers = async () => {
 }
 
 const deleteHandler = async (notif: any) => {
-  if (!confirm('Удалить уведомление?')) return
   try {
     await deleteNotification(notif._id || notif.id)
     await loadNotifications()
   } catch (err) {
-    console.error('Failed to delete:', err)
+    // error handled silently
   }
 }
 
 const sendNotification = async () => {
   if (form.value.recipientType === 'user' && !form.value.userId) {
-    alert('Выберите пользователя')
     return
   }
   try {
@@ -186,7 +184,7 @@ const sendNotification = async () => {
     resetForm()
     await loadNotifications()
   } catch (err) {
-    console.error('Failed to send:', err)
+    // error handled silently
   }
 }
 

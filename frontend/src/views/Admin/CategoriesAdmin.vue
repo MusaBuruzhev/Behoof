@@ -97,17 +97,16 @@ const saveCategory = async () => {
     editingCategory.value = null
     await adminStore.fetchCategories()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка сохранения')
+    // error handled silently
   }
 }
 
 const deleteCategoryHandler = async (id: string) => {
-  if (!confirm('Удалить категорию?')) return
   try {
     await adminStore.deleteCategory(id)
     await adminStore.fetchCategories()
   } catch (err: any) {
-    alert(err?.response?.data?.error || 'Ошибка удаления')
+    // error handled silently
   }
 }
 

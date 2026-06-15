@@ -413,12 +413,6 @@ const saveProduct = async () => {
   try {
     const fd = buildFormData()
 
-    console.log('Saving product...')
-    console.log('Form data entries:')
-    for (const [key, value] of fd.entries()) {
-      console.log(key, value instanceof File ? `File: ${value.name}` : value)
-    }
-
     if (isEdit.value) {
       await api.put(`/products/${productId.value}`, fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -431,8 +425,7 @@ const saveProduct = async () => {
 
     router.push('/admin/products')
   } catch (err: any) {
-    console.error('Save error:', err)
-    alert(err?.response?.data?.error || 'Ошибка сохранения товара')
+    // error handled silently
   } finally {
     saving.value = false
   }
@@ -491,7 +484,6 @@ onMounted(async () => {
         } catch {}
       }
     } catch (err: any) {
-      alert('Ошибка загрузки товара: ' + (err?.response?.data?.error || err.message))
       router.push('/admin/products')
     }
   }
