@@ -12,7 +12,7 @@
         <router-link
           v-for="category in categories"
           :key="category.id"
-          :to="`/catalog/${category.id}`"
+          :to="{ path: '/catalog', query: { category: category.id } }"
           class="category-card"
         >
           <div class="category-image-wrapper">

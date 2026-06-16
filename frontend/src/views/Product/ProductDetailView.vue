@@ -3,9 +3,15 @@
     <div class="loading-spinner"></div>
     <p class="loading-text">Загрузка товара...</p>
   </div>
-  
+
   <div v-else-if="!product" class="not-found">
-    <svg class="not-found-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <svg
+      class="not-found-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+    >
       <circle cx="12" cy="12" r="10" />
       <path d="M12 8v4M12 16h.01" />
     </svg>
@@ -15,24 +21,34 @@
       Вернуться в каталог
     </router-link>
   </div>
-  
+
   <div v-else class="product-detail">
-    <!-- Sticky Buy Bar -->
     <transition name="sticky-bar">
       <div v-if="showStickyBar" class="sticky-buy-bar">
         <div class="container sticky-bar-container">
           <div class="sticky-bar-content">
-            <img :src="allImages[0]" :alt="product.name" class="sticky-bar-image" />
+            <img
+              :src="allImages[0]"
+              :alt="product.name"
+              class="sticky-bar-image"
+            />
             <div class="sticky-bar-info">
               <span class="sticky-bar-brand">{{ product.brand }}</span>
               <h3 class="sticky-bar-name">{{ product.name }}</h3>
             </div>
-            <div class="sticky-bar-price">{{ formatPrice(product.price) }} ₽</div>
+            <div class="sticky-bar-price">
+              {{ formatPrice(product.price) }} ₽
+            </div>
             <button class="btn btn-primary btn-buy" @click="openOrderModal">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
               Купить
             </button>
@@ -40,9 +56,8 @@
         </div>
       </div>
     </transition>
-      
+
     <div class="container">
-      <!-- HERO PRODUCT -->
       <section class="hero-product">
         <div class="hero-gallery">
           <div class="gallery-main-wrapper">
@@ -56,14 +71,10 @@
                 @mouseleave="disableZoom"
                 ref="mainImageRef"
               />
-              <div
-                v-if="isZoomed"
-                class="zoom-lens"
-                :style="lensStyle"
-              ></div>
+              <div v-if="isZoomed" class="zoom-lens" :style="lensStyle"></div>
             </div>
           </div>
-          
+
           <div v-if="allImages.length > 1" class="gallery-thumbnails">
             <button
               v-for="(image, index) in allImages"
@@ -71,15 +82,19 @@
               :class="['thumbnail', { active: currentImageIndex === index }]"
               @click="currentImageIndex = index"
             >
-              <img :src="image" :alt="`${product.name} ${index + 1}`" loading="lazy" />
+              <img
+                :src="image"
+                :alt="`${product.name} ${index + 1}`"
+                loading="lazy"
+              />
             </button>
           </div>
         </div>
-        
+
         <div class="hero-info">
           <div class="hero-brand">{{ product.brand }}</div>
           <h1 class="hero-title">{{ product.name }}</h1>
-          
+
           <div v-if="hasRatings" class="hero-rating">
             <div class="rating-stars">
               <svg
@@ -91,14 +106,18 @@
                 :stroke="star <= averageRating ? 'currentColor' : '#D1D5DB'"
                 stroke-width="2"
               >
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                />
               </svg>
             </div>
             <span class="rating-value">{{ averageRating.toFixed(1) }}</span>
             <span class="rating-separator">•</span>
-            <router-link to="#reviews" class="rating-link">{{ product.reviews.length }} отзывов</router-link>
+            <router-link to="#reviews" class="rating-link"
+              >{{ product.reviews.length }} отзывов</router-link
+            >
           </div>
-          
+
           <div class="hero-price-block">
             <div class="price-current">{{ formatPrice(product.price) }} ₽</div>
             <div v-if="hasPriceHistory" class="price-analytics">
@@ -108,9 +127,9 @@
               <span class="price-period">за последний месяц</span>
             </div>
           </div>
-          
+
           <p class="hero-description">{{ product.description }}</p>
-          
+
           <!-- Quick Specs -->
           <div v-if="shortCharacteristics.length > 0" class="hero-quick-specs">
             <div
@@ -122,21 +141,25 @@
               <span class="quick-spec-value">{{ spec.value }}</span>
             </div>
           </div>
-          
-          <!-- Actions -->
+
           <div class="hero-actions">
             <button
               class="btn btn-primary btn-buy-large"
               @click="openOrderModal"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
               Оформить заказ
             </button>
-            
+
             <div class="action-buttons">
               <button
                 class="btn btn-outline btn-icon"
@@ -145,76 +168,105 @@
                 :disabled="isAddingToCart"
                 title="Добавить в корзину"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                  <line x1="3" y1="6" x2="21" y2="6"/>
-                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"
+                  />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
                 </svg>
-                <span>{{ isInCart ? 'В корзине' : 'В корзину' }}</span>
+                <span>{{ isInCart ? "В корзине" : "В корзину" }}</span>
               </button>
-              
+
               <button
                 class="btn btn-outline btn-icon"
                 :class="{ active: isFavorite }"
                 @click="toggleFavorite"
                 title="В избранное"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                  />
                 </svg>
-                <span>{{ isFavorite ? 'В избранном' : 'Избранное' }}</span>
+                <span>{{ isFavorite ? "В избранном" : "Избранное" }}</span>
               </button>
-              
+
               <button
                 class="btn btn-outline btn-icon"
                 :class="{ active: isInCompare }"
                 @click="toggleCompare"
                 title="Сравнить"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
                 </svg>
-                <span>{{ isInCompare ? 'В сравнении' : 'Сравнить' }}</span>
+                <span>{{ isInCompare ? "В сравнении" : "Сравнить" }}</span>
               </button>
             </div>
           </div>
         </div>
       </section>
-      
-      <!-- PRICE HISTORY -->
+
       <section v-if="hasPriceHistory" class="price-history-section">
         <div class="section-header">
           <div class="section-title-block">
-            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
             <h2>Аналитика цены</h2>
           </div>
         </div>
-        
+
         <div class="price-analytics-grid">
           <div class="analytics-card analytics-current">
             <span class="analytics-label">Текущая цена</span>
-            <span class="analytics-value">{{ formatPrice(product.price) }} ₽</span>
+            <span class="analytics-value"
+              >{{ formatPrice(product.price) }} ₽</span
+            >
           </div>
-          
+
           <div class="analytics-card analytics-min">
             <span class="analytics-label">Минимальная</span>
             <span class="analytics-value">{{ formatPrice(minPrice) }} ₽</span>
           </div>
-          
+
           <div class="analytics-card analytics-max">
             <span class="analytics-label">Максимальная</span>
             <span class="analytics-value">{{ formatPrice(maxPrice) }} ₽</span>
           </div>
-          
-          <div class="analytics-card analytics-change" :class="priceChangeClass">
+
+          <div
+            class="analytics-card analytics-change"
+            :class="priceChangeClass"
+          >
             <span class="analytics-label">Изменение</span>
             <span class="analytics-value">{{ priceChangeLabel }}</span>
           </div>
         </div>
-          
+
         <div class="price-chart-wrapper">
           <svg
             :viewBox="`0 0 ${chartWidth} ${chartHeight}`"
@@ -222,13 +274,26 @@
             preserveAspectRatio="none"
           >
             <defs>
-              <linearGradient id="priceGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" :stop-color="priceChange >= 0 ? '#EF4444' : '#059669'" stop-opacity="0.3"/>
-                <stop offset="100%" :stop-color="priceChange >= 0 ? '#EF4444' : '#059669'" stop-opacity="0"/>
+              <linearGradient
+                id="priceGradient"
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
+                <stop
+                  offset="0%"
+                  :stop-color="priceChange >= 0 ? '#EF4444' : '#059669'"
+                  stop-opacity="0.3"
+                />
+                <stop
+                  offset="100%"
+                  :stop-color="priceChange >= 0 ? '#EF4444' : '#059669'"
+                  stop-opacity="0"
+                />
               </linearGradient>
             </defs>
-            
-            <!-- Grid lines -->
+
             <line
               v-for="line in gridLines"
               :key="line.y"
@@ -238,23 +303,20 @@
               :y2="line.y"
               class="chart-grid"
             />
-            
-            <!-- Area fill -->
+
             <polyline
               :points="chartAreaPoints"
               class="chart-area"
               fill="url(#priceGradient)"
             />
-            
-            <!-- Line -->
+
             <polyline
               :points="chartPoints"
               class="chart-line"
               fill="none"
               :stroke="priceChange >= 0 ? '#EF4444' : '#059669'"
             />
-            
-            <!-- Points -->
+
             <circle
               v-for="(point, index) in chartDataPoints"
               :key="index"
@@ -264,10 +326,13 @@
               class="chart-point"
               :fill="priceChange >= 0 ? '#EF4444' : '#059669'"
             >
-              <title>{{ formatDate(point.date.toISOString()) }}: {{ formatPrice(point.price) }} ₽</title>
+              <title>
+                {{ formatDate(point.date.toISOString()) }}:
+                {{ formatPrice(point.price) }} ₽
+              </title>
             </circle>
           </svg>
-          
+
           <div class="chart-dates">
             <span
               v-for="(date, index) in chartDates"
@@ -279,20 +344,28 @@
           </div>
         </div>
       </section>
-      
-      <!-- CHARACTERISTICS -->
-      <section v-if="product.characteristics.length > 0" class="characteristics-section">
+
+      <section
+        v-if="product.characteristics.length > 0"
+        class="characteristics-section"
+      >
         <div class="section-header">
           <div class="section-title-block">
-            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
             </svg>
             <h2>Характеристики</h2>
           </div>
         </div>
-        
+
         <div class="characteristics-grid">
           <div
             v-for="(spec, index) in product.characteristics"
@@ -304,18 +377,26 @@
           </div>
         </div>
       </section>
-      
+
       <!-- RATINGS -->
       <section v-if="hasTraitRatings" class="ratings-section">
         <div class="section-header">
           <div class="section-title-block">
-            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
             </svg>
             <h2>Оценки характеристик</h2>
           </div>
         </div>
-        
+
         <div class="trait-ratings-grid">
           <div
             v-for="(rating, trait) in product.traitRatings"
@@ -336,39 +417,55 @@
           </div>
         </div>
       </section>
-      
+
       <!-- PRODUCT DESCRIPTION -->
       <section v-if="product.description" class="description-section">
         <div class="section-header">
           <div class="section-title-block">
-            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-              <polyline points="10 9 9 9 8 9"/>
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+              <polyline points="10 9 9 9 8 9" />
             </svg>
             <h2>Описание</h2>
           </div>
         </div>
-        
+
         <div class="description-content">
           <p>{{ product.description }}</p>
         </div>
       </section>
-      
+
       <!-- REVIEWS -->
       <section id="reviews" class="reviews-section">
         <div class="reviews-header-block">
           <div class="section-title-block">
-            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              />
             </svg>
             <h2>Отзывы</h2>
           </div>
           <span class="reviews-badge">{{ product.reviews.length }}</span>
         </div>
-        
+
         <!-- Review Form -->
         <div v-if="isAuthenticated" class="review-form-section">
           <form @submit.prevent="submitReview" class="review-form">
@@ -383,7 +480,7 @@
                 required
               ></textarea>
             </div>
-            
+
             <div v-if="hasTraitRatings" class="trait-ratings-input">
               <div
                 v-for="(_rating, trait) in product.traitRatings"
@@ -401,24 +498,30 @@
                     @click="setRating(trait, star)"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                      />
                     </svg>
                   </button>
                 </div>
               </div>
             </div>
-            
-            <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-              {{ isSubmitting ? 'Отправка...' : 'Опубликовать отзыв' }}
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="isSubmitting"
+            >
+              {{ isSubmitting ? "Отправка..." : "Опубликовать отзыв" }}
             </button>
           </form>
         </div>
-        
+
         <div v-else class="login-prompt">
           <p>Чтобы оставить отзыв, необходимо</p>
           <router-link to="/auth/login" class="link-primary">войти</router-link>
         </div>
-        
+
         <!-- Reviews List -->
         <div class="reviews-list">
           <div
@@ -436,22 +539,34 @@
                 </div>
                 <div class="reviewer-details">
                   <span class="reviewer-name">{{ review.userName }}</span>
-                  <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+                  <span class="review-date">{{
+                    formatDate(review.createdAt)
+                  }}</span>
                 </div>
               </div>
-              
+
               <button
                 v-if="canDeleteReview(review)"
                 class="delete-review-btn"
                 @click="deleteReviewById(review.id!)"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
                 </svg>
               </button>
             </div>
-            
-            <div v-if="hasTraitRatingsInReview(review)" class="review-trait-ratings">
+
+            <div
+              v-if="hasTraitRatingsInReview(review)"
+              class="review-trait-ratings"
+            >
               <div
                 v-for="(rating, trait) in review.traitRatings"
                 :key="trait"
@@ -468,37 +583,53 @@
                     :stroke="star <= rating ? 'currentColor' : '#D1D5DB'"
                     stroke-width="2"
                   >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path
+                      d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                    />
                   </svg>
                 </div>
               </div>
             </div>
-            
+
             <p class="review-text">{{ review.text }}</p>
           </div>
-          
+
           <div v-if="product.reviews.length === 0" class="reviews-empty">
-            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <svg
+              class="empty-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              />
             </svg>
             <p>Пока нет отзывов</p>
             <p class="empty-subtitle">Будьте первым, кто оставит отзыв</p>
           </div>
         </div>
       </section>
-      
+
       <!-- RELATED PRODUCTS -->
       <section v-if="relatedProducts.length > 0" class="related-section">
         <div class="section-header">
           <div class="section-title-block">
-            <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 8v4M12 16h.01"/>
+            <svg
+              class="section-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 8v4M12 16h.01" />
             </svg>
             <h2>Похожие товары</h2>
           </div>
         </div>
-        
+
         <div class="related-grid">
           <ProductCard
             v-for="relatedProduct in relatedProducts"
@@ -508,28 +639,39 @@
         </div>
       </section>
     </div>
-    
+
     <!-- Order Modal -->
     <div v-if="showOrderModal" class="modal-overlay" @click="closeOrderModal">
       <div class="modal" @click.stop>
         <div class="modal-header">
           <h3>Оформление заказа</h3>
           <button class="modal-close" @click="closeOrderModal">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 6L6 18M6 6l12 12"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
-        
+
         <form @submit.prevent="submitOrder" class="order-form">
           <div class="order-product-info">
-            <img :src="allImages[0]" :alt="product?.name" class="order-product-image" />
+            <img
+              :src="allImages[0]"
+              :alt="product?.name"
+              class="order-product-image"
+            />
             <div class="order-product-details">
               <h4>{{ product?.name }}</h4>
-              <span class="order-product-price">{{ formatPrice(product?.price) }} ₽</span>
+              <span class="order-product-price"
+                >{{ formatPrice(product?.price) }} ₽</span
+              >
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="pickup-date" class="form-label">Дата получения *</label>
             <input
@@ -541,7 +683,7 @@
               :min="minPickupDate"
             />
           </div>
-          
+
           <div class="form-group">
             <label for="contact-phone" class="form-label">Телефон</label>
             <input
@@ -552,7 +694,7 @@
               placeholder="+7 (___) ___-__-__"
             />
           </div>
-          
+
           <div class="form-group">
             <label for="order-comment" class="form-label">Комментарий</label>
             <textarea
@@ -563,13 +705,21 @@
               rows="3"
             ></textarea>
           </div>
-          
+
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="closeOrderModal">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              @click="closeOrderModal"
+            >
               Отмена
             </button>
-            <button type="submit" class="btn btn-primary" :disabled="isOrderSubmitting">
-              {{ isOrderSubmitting ? 'Оформление...' : 'Заказать' }}
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :disabled="isOrderSubmitting"
+            >
+              {{ isOrderSubmitting ? "Оформление..." : "Заказать" }}
             </button>
           </div>
         </form>
@@ -579,400 +729,447 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, reactive } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getProduct, addReview, deleteReview, createOrder, addToFavorites, removeFromFavorites } from '@/api'
-import { useAuthStore, useFavoritesStore, useComparisonStore, useCartStore } from '@/stores'
-import type { Product, Review } from '@/types'
+import { ref, computed, onMounted, onUnmounted, reactive } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  getProduct,
+  addReview,
+  deleteReview,
+  createOrder,
+  addToFavorites,
+  removeFromFavorites,
+} from "@/api";
+import {
+  useAuthStore,
+  useFavoritesStore,
+  useComparisonStore,
+  useCartStore,
+} from "@/stores";
+import type { Product, Review } from "@/types";
 
-import ProductCard from '@/components/catalog/ProductCard.vue'
+import ProductCard from "@/components/catalog/ProductCard.vue";
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
-const favoritesStore = useFavoritesStore()
-const comparisonStore = useComparisonStore()
-const cartStore = useCartStore()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+const favoritesStore = useFavoritesStore();
+const comparisonStore = useComparisonStore();
+const cartStore = useCartStore();
 
-const product = ref<Product | null>(null)
-const relatedProducts = ref<Product[]>([])
-const isLoading = ref(true)
-const currentImageIndex = ref(0)
-const isFavorite = ref(false)
-const showOrderModal = ref(false)
-const isSubmitting = ref(false)
-const isOrderSubmitting = ref(false)
-const showStickyBar = ref(false)
-const isAddingToCart = ref(false)
+const product = ref<Product | null>(null);
+const relatedProducts = ref<Product[]>([]);
+const isLoading = ref(true);
+const currentImageIndex = ref(0);
+const isFavorite = ref(false);
+const showOrderModal = ref(false);
+const isSubmitting = ref(false);
+const isOrderSubmitting = ref(false);
+const showStickyBar = ref(false);
+const isAddingToCart = ref(false);
 
 // Zoom
-const mainImageRef = ref<HTMLImageElement | null>(null)
-const isZoomed = ref(false)
-const lensStyle = ref({ left: '0px', top: '0px' })
+const mainImageRef = ref<HTMLImageElement | null>(null);
+const isZoomed = ref(false);
+const lensStyle = ref({ left: "0px", top: "0px" });
 
 // Форма отзыва
-const reviewText = ref('')
-const reviewRatings = ref<Record<string, number>>({})
+const reviewText = ref("");
+const reviewRatings = ref<Record<string, number>>({});
 
 // Форма заказа
 const orderForm = reactive({
-  pickupAt: '',
-  contactPhone: '',
-  comment: '',
-})
+  pickupAt: "",
+  contactPhone: "",
+  comment: "",
+});
 
-const isAuthenticated = computed(() => authStore.isAuthenticated)
-const isInCompare = computed(() => comparisonStore.isInCompare(product.value?.id || ''))
-const isInCart = computed(() => cartStore.isInCart(product.value?.id || ''))
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const isInCompare = computed(() =>
+  comparisonStore.isInCompare(product.value?.id || "")
+);
+const isInCart = computed(() => cartStore.isInCart(product.value?.id || ""));
 
 const allImages = computed(() => {
-  if (!product.value) return []
-  return product.value.images.map(img => `http://localhost:5000${img}`)
-})
+  if (!product.value) return [];
+  return product.value.images.map((img) => `http://localhost:5000${img}`);
+});
 
 const hasRatings = computed(() => {
-  return product.value?.traitRatings && Object.keys(product.value.traitRatings).length > 0
-})
+  return (
+    product.value?.traitRatings &&
+    Object.keys(product.value.traitRatings).length > 0
+  );
+});
 
 const averageRating = computed(() => {
-  if (!hasRatings.value || !product.value) return 0
-  const ratings = Object.values(product.value.traitRatings)
-  const sum = ratings.reduce((acc, val) => acc + val, 0)
-  return sum / ratings.length
-})
+  if (!hasRatings.value || !product.value) return 0;
+  const ratings = Object.values(product.value.traitRatings);
+  const sum = ratings.reduce((acc, val) => acc + val, 0);
+  return sum / ratings.length;
+});
 
 const hasPriceHistory = computed(() => {
-  return product.value?.priceHistory && product.value.priceHistory.length > 1
-})
+  return product.value?.priceHistory && product.value.priceHistory.length > 1;
+});
 
 const priceChange = computed(() => {
-  if (!hasPriceHistory.value || !product.value) return 0
-  const history = product.value.priceHistory
-  const current = history[history.length - 1].price
-  const previous = history[history.length - 2].price
-  return ((current - previous) / previous) * 100
-})
+  if (!hasPriceHistory.value || !product.value) return 0;
+  const history = product.value.priceHistory;
+  const current = history[history.length - 1].price;
+  const previous = history[history.length - 2].price;
+  return ((current - previous) / previous) * 100;
+});
 
 const priceChangeLabel = computed(() => {
-  const change = priceChange.value
-  if (change > 0) return `+${Math.round(change)}%`
-  if (change < 0) return `${Math.round(change)}%`
-  return '0%'
-})
+  const change = priceChange.value;
+  if (change > 0) return `+${Math.round(change)}%`;
+  if (change < 0) return `${Math.round(change)}%`;
+  return "0%";
+});
 
 const priceChangeClass = computed(() => {
-  if (priceChange.value > 0) return 'price-increase'
-  if (priceChange.value < 0) return 'price-decrease'
-  return ''
-})
+  if (priceChange.value > 0) return "price-increase";
+  if (priceChange.value < 0) return "price-decrease";
+  return "";
+});
 
 const shortCharacteristics = computed(() => {
-  if (!product.value) return []
-  return product.value.characteristics.slice(0, 4)
-})
+  if (!product.value) return [];
+  return product.value.characteristics.slice(0, 4);
+});
 
 const hasTraitRatings = computed(() => {
-  return product.value?.traitRatings && Object.keys(product.value.traitRatings).length > 0
-})
+  return (
+    product.value?.traitRatings &&
+    Object.keys(product.value.traitRatings).length > 0
+  );
+});
 
 const minPickupDate = computed(() => {
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-  return now.toISOString().slice(0, 16)
-})
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 16);
+});
 
 // Chart
-const chartWidth = 800
-const chartHeight = 200
-const chartPadding = 40
+const chartWidth = 800;
+const chartHeight = 200;
+const chartPadding = 40;
 
 const chartData = computed(() => {
-  if (!hasPriceHistory.value || !product.value) return []
-  return product.value.priceHistory.map(entry => ({
+  if (!hasPriceHistory.value || !product.value) return [];
+  return product.value.priceHistory.map((entry) => ({
     date: new Date(entry.date),
     price: entry.price,
-  }))
-})
+  }));
+});
 
 const minPrice = computed(() => {
-  if (!chartData.value.length) return 0
-  return Math.min(...chartData.value.map(d => d.price))
-})
+  if (!chartData.value.length) return 0;
+  return Math.min(...chartData.value.map((d) => d.price));
+});
 
 const maxPrice = computed(() => {
-  if (!chartData.value.length) return 0
-  return Math.max(...chartData.value.map(d => d.price))
-})
+  if (!chartData.value.length) return 0;
+  return Math.max(...chartData.value.map((d) => d.price));
+});
 
 const chartPoints = computed(() => {
-  if (!chartData.value.length) return ''
-  
+  if (!chartData.value.length) return "";
+
   const dataPoints = chartData.value.map((entry, index) => {
-    const x = chartPadding + (index / (chartData.value.length - 1)) * (chartWidth - 2 * chartPadding)
-    const y = chartHeight - chartPadding - ((entry.price - minPrice.value) / (maxPrice.value - minPrice.value || 1)) * (chartHeight - 2 * chartPadding)
-    return { x, y }
-  })
-  
-  return dataPoints.map(p => `${p.x},${p.y}`).join(' ')
-})
+    const x =
+      chartPadding +
+      (index / (chartData.value.length - 1)) * (chartWidth - 2 * chartPadding);
+    const y =
+      chartHeight -
+      chartPadding -
+      ((entry.price - minPrice.value) /
+        (maxPrice.value - minPrice.value || 1)) *
+        (chartHeight - 2 * chartPadding);
+    return { x, y };
+  });
+
+  return dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
+});
 
 const chartAreaPoints = computed(() => {
-  if (!chartData.value.length) return ''
-  
+  if (!chartData.value.length) return "";
+
   const dataPoints = chartData.value.map((entry, index) => {
-    const x = chartPadding + (index / (chartData.value.length - 1)) * (chartWidth - 2 * chartPadding)
-    const y = chartHeight - chartPadding - ((entry.price - minPrice.value) / (maxPrice.value - minPrice.value || 1)) * (chartHeight - 2 * chartPadding)
-    return { x, y }
-  })
-  
-  const linePoints = dataPoints.map(p => `${p.x},${p.y}`).join(' ')
-  return `${chartPadding},${chartHeight - chartPadding} ${linePoints} ${chartWidth - chartPadding},${chartHeight - chartPadding}`
-})
+    const x =
+      chartPadding +
+      (index / (chartData.value.length - 1)) * (chartWidth - 2 * chartPadding);
+    const y =
+      chartHeight -
+      chartPadding -
+      ((entry.price - minPrice.value) /
+        (maxPrice.value - minPrice.value || 1)) *
+        (chartHeight - 2 * chartPadding);
+    return { x, y };
+  });
+
+  const linePoints = dataPoints.map((p) => `${p.x},${p.y}`).join(" ");
+  return `${chartPadding},${chartHeight - chartPadding} ${linePoints} ${
+    chartWidth - chartPadding
+  },${chartHeight - chartPadding}`;
+});
 
 const chartDataPoints = computed(() => {
-  if (!chartData.value.length) return []
-  
+  if (!chartData.value.length) return [];
+
   return chartData.value.map((entry, index) => {
-    const x = chartPadding + (index / (chartData.value.length - 1)) * (chartWidth - 2 * chartPadding)
-    const y = chartHeight - chartPadding - ((entry.price - minPrice.value) / (maxPrice.value - minPrice.value || 1)) * (chartHeight - 2 * chartPadding)
-    return { x, y, date: entry.date, price: entry.price }
-  })
-})
+    const x =
+      chartPadding +
+      (index / (chartData.value.length - 1)) * (chartWidth - 2 * chartPadding);
+    const y =
+      chartHeight -
+      chartPadding -
+      ((entry.price - minPrice.value) /
+        (maxPrice.value - minPrice.value || 1)) *
+        (chartHeight - 2 * chartPadding);
+    return { x, y, date: entry.date, price: entry.price };
+  });
+});
 
 const gridLines = computed(() => {
-  const lines = []
-  const lineCount = 4
+  const lines = [];
+  const lineCount = 4;
   for (let i = 0; i <= lineCount; i++) {
-    const y = chartPadding + (i / lineCount) * (chartHeight - 2 * chartPadding)
-    lines.push({ y })
+    const y = chartPadding + (i / lineCount) * (chartHeight - 2 * chartPadding);
+    lines.push({ y });
   }
-  return lines
-})
+  return lines;
+});
 
 const chartDates = computed(() => {
-  if (!chartData.value.length) return []
-  return chartData.value.map(entry => {
-    const date = new Date(entry.date)
-    return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
-  })
-})
+  if (!chartData.value.length) return [];
+  return chartData.value.map((entry) => {
+    const date = new Date(entry.date);
+    return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+  });
+});
 
 const getRatingClass = (rating: number): string => {
-  if (rating >= 4.5) return 'rating-excellent'
-  if (rating >= 3.5) return 'rating-good'
-  if (rating >= 2.5) return 'rating-average'
-  return 'rating-poor'
-}
+  if (rating >= 4.5) return "rating-excellent";
+  if (rating >= 3.5) return "rating-good";
+  if (rating >= 2.5) return "rating-average";
+  return "rating-poor";
+};
 
 // Zoom functions
 const enableZoom = () => {
-  isZoomed.value = true
-}
+  isZoomed.value = true;
+};
 
 const disableZoom = () => {
-  isZoomed.value = false
-}
+  isZoomed.value = false;
+};
 
 const handleZoom = (e: MouseEvent) => {
-  if (!mainImageRef.value) return
-  
-  const rect = mainImageRef.value.getBoundingClientRect()
-  const x = ((e.clientX - rect.left) / rect.width) * 100
-  const y = ((e.clientY - rect.top) / rect.height) * 100
-  
+  if (!mainImageRef.value) return;
+
+  const rect = mainImageRef.value.getBoundingClientRect();
+  const x = ((e.clientX - rect.left) / rect.width) * 100;
+  const y = ((e.clientY - rect.top) / rect.height) * 100;
+
   lensStyle.value = {
     left: `${x}%`,
     top: `${y}%`,
-  }
-}
+  };
+};
 
 // Scroll handler for sticky bar
 const handleScroll = () => {
-  const heroSection = document.querySelector('.hero-product') as HTMLElement | null
+  const heroSection = document.querySelector(
+    ".hero-product"
+  ) as HTMLElement | null;
   if (heroSection) {
-    const heroBottom = heroSection.offsetTop + heroSection.offsetHeight
-    showStickyBar.value = window.scrollY > heroBottom - 100
+    const heroBottom = heroSection.offsetTop + heroSection.offsetHeight;
+    showStickyBar.value = window.scrollY > heroBottom - 100;
   }
-}
+};
 
 const loadProduct = async () => {
   try {
-    const response = await getProduct(route.params.id as string)
-    product.value = response.data
-    relatedProducts.value = []
-    
+    const response = await getProduct(route.params.id as string);
+    product.value = response.data;
+    relatedProducts.value = [];
+
     if (product.value) {
-      isFavorite.value = favoritesStore.productIds.includes(product.value.id)
+      isFavorite.value = favoritesStore.productIds.includes(product.value.id);
     }
   } catch (error) {
-    console.error('Failed to load product:', error)
-    product.value = null
+    console.error("Failed to load product:", error);
+    product.value = null;
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('ru-RU')
-}
+  return price.toLocaleString("ru-RU");
+};
 
 const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ru-RU', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ru-RU", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
 const getInitials = (name: string): string => {
   return name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
     .toUpperCase()
-    .slice(0, 2)
-}
+    .slice(0, 2);
+};
 
 const hasTraitRatingsInReview = (review: Review): boolean => {
-  return review.traitRatings && Object.keys(review.traitRatings).length > 0
-}
+  return review.traitRatings && Object.keys(review.traitRatings).length > 0;
+};
 
 const canDeleteReview = (review: Review): boolean => {
-  if (!authStore.user) return false
-  return review.userId === authStore.user.id || authStore.user.role === 'admin'
-}
+  if (!authStore.user) return false;
+  return review.userId === authStore.user.id || authStore.user.role === "admin";
+};
 
 const toggleFavorite = async () => {
-  if (!product.value) return
-  
+  if (!product.value) return;
+
   try {
     if (isFavorite.value) {
-      await removeFromFavorites(product.value.id)
-      favoritesStore.removeFavorite(product.value.id)
+      await removeFromFavorites(product.value.id);
+      favoritesStore.removeFavorite(product.value.id);
     } else {
-      await addToFavorites(product.value.id)
-      favoritesStore.addFavorite(product.value.id)
+      await addToFavorites(product.value.id);
+      favoritesStore.addFavorite(product.value.id);
     }
-    isFavorite.value = !isFavorite.value
+    isFavorite.value = !isFavorite.value;
   } catch (error) {
-    console.error('Failed to toggle favorite:', error)
+    console.error("Failed to toggle favorite:", error);
   }
-}
+};
 
 const toggleCompare = () => {
-  if (!product.value) return
-  
+  if (!product.value) return;
+
   if (isInCompare.value) {
-    comparisonStore.removeFromCompare(product.value.id)
+    comparisonStore.removeFromCompare(product.value.id);
   } else {
     if (!comparisonStore.maxReached) {
-      comparisonStore.addToCompare(product.value.id)
+      comparisonStore.addToCompare(product.value.id);
     } else {
-      alert('Максимум 4 товара для сравнения')
+      alert("Максимум 4 товара для сравнения");
     }
   }
-}
+};
 
 const handleAddToCart = async () => {
-  if (!product.value || isInCart.value) return
-  
-  isAddingToCart.value = true
+  if (!product.value || isInCart.value) return;
+
+  isAddingToCart.value = true;
   try {
-    await cartStore.addToCart(product.value.id, 1)
+    await cartStore.addToCart(product.value.id, 1);
   } catch (error) {
-    console.error('Failed to add to cart:', error)
+    console.error("Failed to add to cart:", error);
   } finally {
-    isAddingToCart.value = false
+    isAddingToCart.value = false;
   }
-}
+};
 
 const setRating = (trait: string, rating: number) => {
-  reviewRatings.value[trait] = rating
-}
+  reviewRatings.value[trait] = rating;
+};
 
 const submitReview = async () => {
-  if (!product.value || !reviewText.value.trim()) return
-  
-  isSubmitting.value = true
+  if (!product.value || !reviewText.value.trim()) return;
+
+  isSubmitting.value = true;
   try {
     await addReview(product.value.id, {
       text: reviewText.value.trim(),
-      traitRatings: Object.keys(reviewRatings.value).length > 0 ? reviewRatings.value : undefined,
-    })
-    
-    await loadProduct()
-    
-    reviewText.value = ''
-    reviewRatings.value = {}
+      traitRatings:
+        Object.keys(reviewRatings.value).length > 0
+          ? reviewRatings.value
+          : undefined,
+    });
+
+    await loadProduct();
+
+    reviewText.value = "";
+    reviewRatings.value = {};
   } catch (error) {
-    console.error('Failed to submit review:', error)
+    console.error("Failed to submit review:", error);
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
-}
+};
 
 const deleteReviewById = async (reviewId: string) => {
-  if (!product.value) return
-  
-  if (!confirm('Вы уверены, что хотите удалить этот отзыв?')) return
-  
+  if (!product.value) return;
+
+  if (!confirm("Вы уверены, что хотите удалить этот отзыв?")) return;
+
   try {
-    await deleteReview(product.value.id, reviewId)
-    await loadProduct()
+    await deleteReview(product.value.id, reviewId);
+    await loadProduct();
   } catch (error) {
-    console.error('Failed to delete review:', error)
+    console.error("Failed to delete review:", error);
   }
-}
+};
 
 const openOrderModal = () => {
   if (!isAuthenticated.value) {
-    router.push('/auth/login')
-    return
+    router.push("/auth/login");
+    return;
   }
-  showOrderModal.value = true
-}
+  showOrderModal.value = true;
+};
 
 const closeOrderModal = () => {
-  showOrderModal.value = false
-  orderForm.pickupAt = ''
-  orderForm.contactPhone = ''
-  orderForm.comment = ''
-}
+  showOrderModal.value = false;
+  orderForm.pickupAt = "";
+  orderForm.contactPhone = "";
+  orderForm.comment = "";
+};
 
 const submitOrder = async () => {
-  if (!product.value || !orderForm.pickupAt) return
-  
-  isOrderSubmitting.value = true
+  if (!product.value || !orderForm.pickupAt) return;
+
+  isOrderSubmitting.value = true;
   try {
     await createOrder({
       productId: product.value.id,
       pickupAt: orderForm.pickupAt,
       contactPhone: orderForm.contactPhone || undefined,
       comment: orderForm.comment || undefined,
-    })
-    
-    closeOrderModal()
-    router.push('/orders')
+    });
+
+    closeOrderModal();
+    router.push("/orders");
   } catch (error) {
-    console.error('Failed to create order:', error)
+    console.error("Failed to create order:", error);
   } finally {
-    isOrderSubmitting.value = false
+    isOrderSubmitting.value = false;
   }
-}
+};
 
 onMounted(() => {
-  loadProduct()
-  window.addEventListener('scroll', handleScroll)
-})
+  loadProduct();
+  window.addEventListener("scroll", handleScroll);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <style scoped>
-/* Loading & Not Found */
 .loading-container,
 .not-found {
   display: flex;
@@ -993,7 +1190,9 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -1218,7 +1417,7 @@ onUnmounted(() => {
 .star-icon {
   width: 20px;
   height: 20px;
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .star-icon[fill="none"] {
@@ -1583,7 +1782,7 @@ onUnmounted(() => {
 }
 
 .trait-progress-bar.rating-average {
-  background: #FBBF24;
+  background: #fbbf24;
 }
 
 .trait-progress-bar.rating-poor {
@@ -1722,7 +1921,7 @@ onUnmounted(() => {
 }
 
 .star-btn.filled svg {
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .star-btn:hover {
@@ -1866,7 +2065,7 @@ onUnmounted(() => {
 .star-icon-small {
   width: 14px;
   height: 14px;
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .star-icon-small[fill="none"] {
@@ -2104,7 +2303,7 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
     gap: var(--spacing-8);
   }
-  
+
   .related-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -2114,11 +2313,11 @@ onUnmounted(() => {
   .price-analytics-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .characteristics-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .related-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -2128,27 +2327,27 @@ onUnmounted(() => {
   .product-detail {
     padding: var(--spacing-6) 0;
   }
-  
+
   .container {
     padding: 0 var(--spacing-4);
   }
-  
+
   .hero-title {
     font-size: var(--font-size-h2);
   }
-  
+
   .hero-quick-specs {
     grid-template-columns: 1fr;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .trait-ratings-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .reviews-header-block {
     flex-wrap: wrap;
   }
@@ -2158,30 +2357,30 @@ onUnmounted(() => {
   .gallery-thumbnails {
     overflow-x: auto;
   }
-  
+
   .thumbnail {
     flex-shrink: 0;
   }
-  
+
   .sticky-bar-content {
     flex-wrap: wrap;
     gap: var(--spacing-3);
   }
-  
+
   .sticky-bar-image {
     width: 50px;
     height: 50px;
   }
-  
+
   .sticky-bar-info {
     flex: 1;
   }
-  
+
   .sticky-bar-price {
     order: 3;
     width: 100%;
   }
-  
+
   .btn-buy {
     order: 4;
     width: 100%;

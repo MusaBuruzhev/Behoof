@@ -237,16 +237,24 @@ const changePage = (page: number) => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-// Watch для параметров роута
+// Watch для параметров роута и query
 watch(
-  () => [route.params.categoryId, route.params.subcategoryId],
-  () => {
+  () => [route.params.categoryId, route.params.subcategoryId, route.query.category],
+  ([_catId, _subcatId, queryCategory]) => {
+    // Если есть query параметр category, используем его
+    if (queryCategory && typeof queryCategory === 'string') {
+      selectedCategory.value = queryCategory;
+    }
     loadCatalog();
     loadProducts();
   }
 );
 
 onMounted(() => {
+  // Проверяем query параметр category при монтировании
+  if (route.query.category && typeof route.query.category === 'string') {
+    selectedCategory.value = route.query.category;
+  }
   loadCatalog();
   loadProducts();
 });

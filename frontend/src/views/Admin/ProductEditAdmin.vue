@@ -262,24 +262,25 @@
                 </div>
               </div>
               <button class="btn-link" @click="currentStep = 1">
-                ✏️ Изменить характеристики
+                Изменить характеристики
               </button>
             </div>
 
             <!-- Описание -->
-            <div class="preview-desc">
-              <h3>Описание</h3>
-              <div
-                class="desc-editor"
-                contenteditable
-                @blur="onDescEdit($event)"
-                v-html="form.description"
-                ref="descEditor"
-              ></div>
-              <p class="hint" v-if="!form.description">
-                Кликните чтобы добавить описание...
-              </p>
-            </div>
+          <div class="preview-desc">
+            <h3>Описание</h3>
+            <div
+              class="desc-editor"
+              contenteditable
+              @blur="onDescEdit($event)"
+              @paste="handleDescPaste"
+              v-html="form.description"
+              ref="descEditor"
+            ></div>
+            <p class="hint" v-if="!form.description">
+              Кликните чтобы добавить описание...
+            </p>
+          </div>
 
             <!-- Мета -->
             <div class="preview-meta">
@@ -331,7 +332,7 @@ const currentImageIndex = ref(0);
 const imageFiles = ref<File[]>([]);
 const existingImages = ref<string[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
-// descEditor используется для contenteditable в шаблоне
+const descEditor = ref<HTMLElement | null>(null);
 
 const form = ref({
   name: "",
@@ -490,9 +491,24 @@ const onTitleEdit = (event: Event) => {
   form.value.name = el.textContent?.trim() || "";
 };
 
+// Очищает HTML от всех тегов — возвращает чистый текст
+const cleanHtml = (html: string): string => {
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  // Возвращаем только текстовое содержимое без тегов
+  return temp.textContent?.trim() || "";
+};
+
+// Обработка вставки текста - вставляем только чистый текст
+const handleDescPaste = (event: ClipboardEvent) => {
+  event.preventDefault();
+  const text = event.clipboardData?.getData("text/plain") || "";
+  document.execCommand("insertText", false, text);
+};
+
 const onDescEdit = (event: Event) => {
   const el = event.target as HTMLElement;
-  form.value.description = el.innerHTML;
+  form.value.description = cleanHtml(el.innerHTML);
 };
 
 // Сохранение
@@ -1086,13 +1102,13 @@ select.input {
   font-weight: 600;
 }
 .desc-editor {
-  min-height: 60px;
+  min-height: 80px;
   border: 1px solid transparent;
   border-radius: 8px;
-  padding: 8px 10px;
+  padding: 12px 14px;
   outline: none;
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 16px;
+  line-height: 1.8;
   color: var(--color-text-primary);
 }
 .desc-editor:focus {
@@ -1100,7 +1116,7 @@ select.input {
   background: rgba(37, 99, 235, 0.02);
 }
 .desc-editor:empty::before {
-  content: "Добавьте описание...";
+  content: "Кликните чтобы добавить описание...";
   color: var(--color-text-tertiary);
 }
 .hint {
