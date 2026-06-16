@@ -384,7 +384,7 @@
     >
       <div class="modal">
         <div class="modal-header">
-          <h2>{{ editingBrand ? "Редактировать бренд" : "Новый бренд" }}</h2>
+          <h2>{{ editingBrand ? "Редактировать субкатегорию (бренд)" : "Новая субкатегория (бренд)" }}</h2>
           <button class="btn-close" @click="showBrandModal = false">
             <svg
               viewBox="0 0 24 24"
@@ -405,23 +405,6 @@
               type="text"
               class="input"
               required
-            />
-          </div>
-          <div class="form-group">
-            <label>Описание</label>
-            <textarea
-              v-model="brandForm.description"
-              class="input"
-              rows="2"
-            ></textarea>
-          </div>
-          <div class="form-group">
-            <label>Веб-сайт</label>
-            <input
-              v-model="brandForm.website"
-              type="url"
-              class="input"
-              placeholder="https://example.com"
             />
           </div>
           <div class="modal-footer">
@@ -519,8 +502,6 @@ const editingModel = ref<any>(null);
 const categoryForm = ref({ name: "" });
 const brandForm = ref({
   name: "",
-  description: "",
-  website: "",
   categoryId: "",
 });
 const modelForm = ref({ name: "", brandId: "", categoryId: "" });
@@ -640,7 +621,7 @@ const saveCategory = async () => {
 
 const openBrandModal = (categoryId: string) => {
   editingBrand.value = null;
-  brandForm.value = { name: "", description: "", website: "", categoryId };
+  brandForm.value = { name: "", categoryId };
   showBrandModal.value = true;
 };
 
@@ -648,8 +629,6 @@ const editBrand = (brand: any) => {
   editingBrand.value = brand;
   brandForm.value = {
     name: brand.name,
-    description: brand.description || "",
-    website: brand.website || "",
     categoryId: brand.categoryId,
   };
   showBrandModal.value = true;
@@ -708,9 +687,9 @@ const openProductModal = (model: any) => {
 };
 
 const loadCatalog = async () => {
-  await Promise.all([adminStore.fetchCategories(), adminStore.fetchBrands()]);
+  await Promise.all([adminStore.fetchCategories(), adminStore.fetchSubcategories()]);
   categories.value = adminStore.categories.items;
-  brands.value = adminStore.brands.items;
+  brands.value = adminStore.brands.items; // brands.items теперь заполняется из subcategories
 
   try {
     const modelsRes = await api.get("/admin/models");

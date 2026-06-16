@@ -1,4 +1,6 @@
 import { Category, Subcategory, Product, Model } from '../models/index.js'
+import CharacteristicGroup from '../models/CharacteristicGroup.js'
+import CharacteristicValue from '../models/CharacteristicValue.js'
 import { getNextId } from '../utils/idGenerator.js'
 import { CATEGORY_TRAITS } from '../config/categoryTraits.js'
 import multer from 'multer'
@@ -721,6 +723,8 @@ export const initializeData = async (req, res) => {
     await Subcategory.deleteMany({});
     await Model.deleteMany({});
     await Product.deleteMany({});
+    await CharacteristicGroup.deleteMany({});
+    await CharacteristicValue.deleteMany({});
 
     console.log('Initializing data...');
     const initialCategories = [
@@ -735,6 +739,371 @@ export const initializeData = async (req, res) => {
     ]
 
     await Category.insertMany(initialCategories)
+
+    // ===== ГРУППЫ ХАРАКТЕРИСТИК ДЛЯ СМАРТФОНОВ (cat1) =====
+    const phoneDisplayGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Дисплей (Смартфоны)',
+      slug: 'display-smartphones',
+      description: 'Характеристики экрана',
+      categoryId: 'cat1',
+      traitNames: ['Диагональ', 'Тип матрицы', 'Разрешение', 'Частота обновления'],
+      sortOrder: 1,
+      isActive: true,
+    })
+    await phoneDisplayGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Диагональ', value: '6.1"', unit: 'inch', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Диагональ', value: '6.7"', unit: 'inch', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Тип матрицы', value: 'OLED', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Тип матрицы', value: 'AMOLED', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Тип матрицы', value: 'IPS', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Разрешение', value: '2532x1170', unit: 'px', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Разрешение', value: '2796x1290', unit: 'px', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Частота обновления', value: '60 Гц', unit: 'Hz', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneDisplayGroup.id, traitName: 'Частота обновления', value: '120 Гц', unit: 'Hz', sortOrder: 2 },
+    ])
+
+    const phoneProcessorGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Производительность (Смартфоны)',
+      slug: 'performance-smartphones',
+      description: 'Процессор и память',
+      categoryId: 'cat1',
+      traitNames: ['Процессор', 'Оперативная память', 'Встроенная память'],
+      sortOrder: 2,
+      isActive: true,
+    })
+    await phoneProcessorGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Процессор', value: 'Apple A16 Bionic', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Процессор', value: 'Apple A17 Pro', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Процессор', value: 'Snapdragon 8 Gen 3', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Оперативная память', value: '6 ГБ', unit: 'GB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Оперативная память', value: '8 ГБ', unit: 'GB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Оперативная память', value: '12 ГБ', unit: 'GB', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Встроенная память', value: '128 ГБ', unit: 'GB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Встроенная память', value: '256 ГБ', unit: 'GB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneProcessorGroup.id, traitName: 'Встроенная память', value: '512 ГБ', unit: 'GB', sortOrder: 3 },
+    ])
+
+    const phoneCameraGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Камера (Смартфоны)',
+      slug: 'camera-smartphones',
+      description: 'Фото и видео возможности',
+      categoryId: 'cat1',
+      traitNames: ['Основная камера', 'Фронтальная камера', 'Видео'],
+      sortOrder: 3,
+      isActive: true,
+    })
+    await phoneCameraGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Основная камера', value: '48 МП', unit: 'MP', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Основная камера', value: '50 МП', unit: 'MP', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Основная камера', value: '200 МП', unit: 'MP', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Фронтальная камера', value: '12 МП', unit: 'MP', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Фронтальная камера', value: '32 МП', unit: 'MP', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '4K @ 60fps', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '8K @ 30fps', sortOrder: 2 },
+    ])
+
+    const phoneBatteryGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Автономность (Смартфоны)',
+      slug: 'battery-smartphones',
+      description: 'Батарея и зарядка',
+      categoryId: 'cat1',
+      traitNames: ['Ёмкость батареи', 'Быстрая зарядка', 'Беспроводная зарядка'],
+      sortOrder: 4,
+      isActive: true,
+    })
+    await phoneBatteryGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Ёмкость батареи', value: '3200 мАч', unit: 'mAh', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Ёмкость батареи', value: '4500 мАч', unit: 'mAh', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Ёмкость батареи', value: '5000 мАч', unit: 'mAh', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Быстрая зарядка', value: 'Да', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Быстрая зарядка', value: 'Нет', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Беспроводная зарядка', value: 'Да', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: phoneBatteryGroup.id, traitName: 'Беспроводная зарядка', value: 'Нет', sortOrder: 2 },
+    ])
+
+    // ===== ГРУППЫ ХАРАКТЕРИСТИК ДЛЯ НОУТБУКОВ (cat2) =====
+    const laptopDisplayGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Дисплей (Ноутбуки)',
+      slug: 'display-laptops',
+      description: 'Характеристики экрана',
+      categoryId: 'cat2',
+      traitNames: ['Диагональ', 'Тип матрицы', 'Разрешение', 'Частота обновления'],
+      sortOrder: 1,
+      isActive: true,
+    })
+    await laptopDisplayGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Диагональ', value: '13.6"', unit: 'inch', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Диагональ', value: '14.2"', unit: 'inch', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Диагональ', value: '15.6"', unit: 'inch', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Диагональ', value: '16.2"', unit: 'inch', sortOrder: 4 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Тип матрицы', value: 'IPS', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Тип матрицы', value: 'OLED', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Тип матрицы', value: 'Mini-LED', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Разрешение', value: '1920x1080', unit: 'px', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Разрешение', value: '2560x1600', unit: 'px', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Разрешение', value: '3456x2234', unit: 'px', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Частота обновления', value: '60 Гц', unit: 'Hz', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Частота обновления', value: '120 Гц', unit: 'Hz', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopDisplayGroup.id, traitName: 'Частота обновления', value: '144 Гц', unit: 'Hz', sortOrder: 3 },
+    ])
+
+    const laptopProcessorGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Производительность (Ноутбуки)',
+      slug: 'performance-laptops',
+      description: 'Процессор, память и накопитель',
+      categoryId: 'cat2',
+      traitNames: ['Процессор', 'Оперативная память', 'Накопитель'],
+      sortOrder: 2,
+      isActive: true,
+    })
+    await laptopProcessorGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Процессор', value: 'Apple M2', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Процессор', value: 'Apple M3', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Процессор', value: 'Intel Core i5-1335U', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Процессор', value: 'Intel Core i7-13700H', sortOrder: 4 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Процессор', value: 'AMD Ryzen 7 7735HS', sortOrder: 5 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Оперативная память', value: '8 ГБ', unit: 'GB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Оперативная память', value: '16 ГБ', unit: 'GB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Оперативная память', value: '32 ГБ', unit: 'GB', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Накопитель', value: '256 ГБ SSD', unit: 'GB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Накопитель', value: '512 ГБ SSD', unit: 'GB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopProcessorGroup.id, traitName: 'Накопитель', value: '1 ТБ SSD', unit: 'TB', sortOrder: 3 },
+    ])
+
+    const laptopGraphicsGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Графика (Ноутбуки)',
+      slug: 'graphics-laptops',
+      description: 'Видеокарта',
+      categoryId: 'cat2',
+      traitNames: ['Видеокарта'],
+      sortOrder: 3,
+      isActive: true,
+    })
+    await laptopGraphicsGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: laptopGraphicsGroup.id, traitName: 'Видеокарта', value: 'Интегрированная', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopGraphicsGroup.id, traitName: 'Видеокарта', value: 'NVIDIA GeForce RTX 3050', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopGraphicsGroup.id, traitName: 'Видеокарта', value: 'NVIDIA GeForce RTX 4050', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopGraphicsGroup.id, traitName: 'Видеокарта', value: 'NVIDIA GeForce RTX 4060', sortOrder: 4 },
+    ])
+
+    const laptopBatteryGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Автономность (Ноутбуки)',
+      slug: 'battery-laptops',
+      description: 'Батарея',
+      categoryId: 'cat2',
+      traitNames: ['Ёмкость батареи', 'Время работы'],
+      sortOrder: 4,
+      isActive: true,
+    })
+    await laptopBatteryGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: laptopBatteryGroup.id, traitName: 'Ёмкость батареи', value: '50 Вт⋅ч', unit: 'Wh', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopBatteryGroup.id, traitName: 'Ёмкость батареи', value: '70 Вт⋅ч', unit: 'Wh', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopBatteryGroup.id, traitName: 'Ёмкость батареи', value: '100 Вт⋅ч', unit: 'Wh', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: laptopBatteryGroup.id, traitName: 'Время работы', value: 'До 10 часов', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: laptopBatteryGroup.id, traitName: 'Время работы', value: 'До 15 часов', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: laptopBatteryGroup.id, traitName: 'Время работы', value: 'До 20 часов', sortOrder: 3 },
+    ])
+
+    // ===== ГРУППЫ ХАРАКТЕРИСТИК ДЛЯ НАУШНИКОВ (cat4) =====
+    const headphonesTypeGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Конструкция (Наушники)',
+      slug: 'construction-headphones',
+      description: 'Тип и конструкция',
+      categoryId: 'cat4',
+      traitNames: ['Тип наушников', 'Конструкция'],
+      sortOrder: 1,
+      isActive: true,
+    })
+    await headphonesTypeGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: headphonesTypeGroup.id, traitName: 'Тип наушников', value: 'Внутриканальные', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesTypeGroup.id, traitName: 'Тип наушников', value: 'Полноразмерные', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: headphonesTypeGroup.id, traitName: 'Тип наушников', value: 'Накладные', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: headphonesTypeGroup.id, traitName: 'Конструкция', value: 'Закрытые', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesTypeGroup.id, traitName: 'Конструкция', value: 'Открытые', sortOrder: 2 },
+    ])
+
+    const headphonesSoundGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Звук (Наушники)',
+      slug: 'sound-headphones',
+      description: 'Акустические характеристики',
+      categoryId: 'cat4',
+      traitNames: ['Чувствительность', 'Импеданс', 'Частотный диапазон'],
+      sortOrder: 2,
+      isActive: true,
+    })
+    await headphonesSoundGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: headphonesSoundGroup.id, traitName: 'Чувствительность', value: '98 дБ', unit: 'dB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesSoundGroup.id, traitName: 'Чувствительность', value: '105 дБ', unit: 'dB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: headphonesSoundGroup.id, traitName: 'Импеданс', value: '16 Ом', unit: 'Ω', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesSoundGroup.id, traitName: 'Импеданс', value: '32 Ом', unit: 'Ω', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: headphonesSoundGroup.id, traitName: 'Частотный диапазон', value: '20-20000 Гц', unit: 'Hz', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesSoundGroup.id, traitName: 'Частотный диапазон', value: '10-40000 Гц', unit: 'Hz', sortOrder: 2 },
+    ])
+
+    const headphonesConnectivityGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Подключение (Наушники)',
+      slug: 'connectivity-headphones',
+      description: 'Тип подключения',
+      categoryId: 'cat4',
+      traitNames: ['Тип подключения', 'Bluetooth', 'Время работы'],
+      sortOrder: 3,
+      isActive: true,
+    })
+    await headphonesConnectivityGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Тип подключения', value: 'Проводные', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Тип подключения', value: 'Беспроводные', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Bluetooth', value: '5.0', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Bluetooth', value: '5.2', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Bluetooth', value: '5.3', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Время работы', value: 'До 20 часов', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Время работы', value: 'До 30 часов', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: headphonesConnectivityGroup.id, traitName: 'Время работы', value: 'До 40 часов', sortOrder: 3 },
+    ])
+
+    // ===== ГРУППЫ ХАРАКТЕРИСТИК ДЛЯ УМНЫХ ЧАСОВ (cat5) =====
+    const watchDisplayGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Дисплей (Часы)',
+      slug: 'display-watches',
+      description: 'Характеристики экрана',
+      categoryId: 'cat5',
+      traitNames: ['Диагональ', 'Тип дисплея', 'Разрешение'],
+      sortOrder: 1,
+      isActive: true,
+    })
+    await watchDisplayGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Диагональ', value: '1.3"', unit: 'inch', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Диагональ', value: '1.9"', unit: 'inch', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Тип дисплея', value: 'AMOLED', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Тип дисплея', value: 'OLED', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Тип дисплея', value: 'IPS', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Разрешение', value: '396x484', unit: 'px', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchDisplayGroup.id, traitName: 'Разрешение', value: '484x396', unit: 'px', sortOrder: 2 },
+    ])
+
+    const watchFeaturesGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Функции (Часы)',
+      slug: 'features-watches',
+      description: 'Возможности и датчики',
+      categoryId: 'cat5',
+      traitNames: ['Пульсометр', 'GPS', 'NFC', 'Водозащита'],
+      sortOrder: 2,
+      isActive: true,
+    })
+    await watchFeaturesGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'Пульсометр', value: 'Да', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'Пульсометр', value: 'Нет', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'GPS', value: 'Да', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'GPS', value: 'Нет', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'NFC', value: 'Да', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'NFC', value: 'Нет', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'Водозащита', value: '5 ATM', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchFeaturesGroup.id, traitName: 'Водозащита', value: '10 ATM', sortOrder: 2 },
+    ])
+
+    const watchBatteryGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Автономность (Часы)',
+      slug: 'battery-watches',
+      description: 'Батарея',
+      categoryId: 'cat5',
+      traitNames: ['Время работы'],
+      sortOrder: 3,
+      isActive: true,
+    })
+    await watchBatteryGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: watchBatteryGroup.id, traitName: 'Время работы', value: 'До 1 дня', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: watchBatteryGroup.id, traitName: 'Время работы', value: 'До 3 дней', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: watchBatteryGroup.id, traitName: 'Время работы', value: 'До 7 дней', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: watchBatteryGroup.id, traitName: 'Время работы', value: 'До 14 дней', sortOrder: 4 },
+    ])
+
+    // ===== ГРУППЫ ХАРАКТЕРИСТИК ДЛЯ ПЛАНШЕТОВ (cat3) =====
+    const tabletDisplayGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Дисплей (Планшеты)',
+      slug: 'display-tablets',
+      description: 'Характеристики экрана',
+      categoryId: 'cat3',
+      traitNames: ['Диагональ', 'Тип матрицы', 'Разрешение'],
+      sortOrder: 1,
+      isActive: true,
+    })
+    await tabletDisplayGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Диагональ', value: '10.2"', unit: 'inch', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Диагональ', value: '11"', unit: 'inch', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Диагональ', value: '12.9"', unit: 'inch', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Тип матрицы', value: 'IPS', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Тип матрицы', value: 'OLED', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Тип матрицы', value: 'Mini-LED', sortOrder: 3 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Разрешение', value: '2160x1620', unit: 'px', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Разрешение', value: '2732x2048', unit: 'px', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: tabletDisplayGroup.id, traitName: 'Разрешение', value: '2868x2152', unit: 'px', sortOrder: 3 },
+    ])
+
+    const tabletPerformanceGroup = new CharacteristicGroup({
+      id: await getNextId('cg'),
+      name: 'Производительность (Планшеты)',
+      slug: 'performance-tablets',
+      description: 'Процессор и память',
+      categoryId: 'cat3',
+      traitNames: ['Процессор', 'Оперативная память', 'Встроенная память'],
+      sortOrder: 2,
+      isActive: true,
+    })
+    await tabletPerformanceGroup.save()
+
+    await CharacteristicValue.insertMany([
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Процессор', value: 'Apple M2', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Процессор', value: 'Snapdragon 8 Gen 1', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Оперативная память', value: '6 ГБ', unit: 'GB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Оперативная память', value: '8 ГБ', unit: 'GB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Встроенная память', value: '128 ГБ', unit: 'GB', sortOrder: 1 },
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Встроенная память', value: '256 ГБ', unit: 'GB', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: tabletPerformanceGroup.id, traitName: 'Встроенная память', value: '512 ГБ', unit: 'GB', sortOrder: 3 },
+    ])
 
     // Инициализация брендов и моделей для смартфонов
     const phoneBrands = [
@@ -822,7 +1191,10 @@ export const initializeData = async (req, res) => {
       )
     }
 
-    res.json({ message: 'Начальные данные инициализированы' })
+    res.json({ 
+      message: 'Начальные данные инициализированы',
+      details: 'Созданы категории, бренды, модели, группы характеристик и значения'
+    })
   } catch (error) {
     console.error('Ошибка инициализации данных:', error)
     res.status(500).json({ error: 'Ошибка инициализации данных' })

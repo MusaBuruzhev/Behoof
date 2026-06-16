@@ -179,19 +179,19 @@ export const getAllNotificationsAdmin = () =>
 export const getUsersForNotifications = () =>
   api.get('/admin/users-list')
 
-/** Получить все бренды (только админ) */
-export const getBrands = () => api.get('/admin/brands')
+/** Получить все субкатегории (только админ) */
+export const getSubcategories = () => api.get('/admin/subcategories')
 
-/** Создать бренд (только админ) */
-export const createBrand = (data: { name: string; description?: string }) =>
-  api.post('/admin/brands', data)
+/** Создать субкатегорию/бренд (только админ) */
+export const createSubcategory = (data: { name: string; categoryId: string }) =>
+  api.post('/admin/subcategories', data)
 
-/** Обновить бренд (только админ) */
-export const updateBrand = (id: string, data: { name?: string; description?: string }) =>
-  api.put(`/admin/brands/${id}`, data)
+/** Обновить субкатегорию/бренд (только админ) */
+export const updateSubcategory = (id: string, data: { name?: string }) =>
+  api.put(`/admin/subcategories/${id}`, data)
 
-/** Удалить бренд (только админ) */
-export const deleteBrand = (id: string) => api.delete(`/admin/brands/${id}`)
+/** Удалить субкатегорию/бренд (только админ) */
+export const deleteSubcategory = (id: string) => api.delete(`/admin/subcategories/${id}`)
 
 /** Получить все категории (только админ) */
 export const getCategories = () => api.get('/admin/categories')

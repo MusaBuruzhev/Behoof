@@ -29,7 +29,7 @@
         <span>Товары</span>
       </router-link>
 
-      <router-link to="/admin/catalog" class="nav-link" :class="{ active: isActive('/admin/catalog') || isActive('/admin/categories') || isActive('/admin/brands') }">
+      <router-link to="/admin/catalog" class="nav-link" :class="{ active: isActive('/admin/catalog') || isActive('/admin/categories') || isActive('/admin/subcategories') }">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>
         </svg>

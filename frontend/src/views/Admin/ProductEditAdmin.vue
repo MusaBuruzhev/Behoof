@@ -176,7 +176,7 @@
           </div>
 
           <div v-if="previewImages.length > 1" class="gallery-thumbs">
-            <button
+            <div
               v-for="(img, idx) in previewImages"
               :key="idx"
               :class="['thumb', { active: currentImageIndex === idx }]"
@@ -186,7 +186,7 @@
               <button class="thumb-remove" @click.stop="removeImage(idx)">
                 ×
               </button>
-            </button>
+            </div>
           </div>
 
           <div class="upload-zone">
@@ -948,6 +948,7 @@ select.input {
   padding: 0;
   background: none;
   transition: border-color 0.15s;
+  flex-shrink: 0;
 }
 .thumb.active {
   border-color: var(--color-primary);

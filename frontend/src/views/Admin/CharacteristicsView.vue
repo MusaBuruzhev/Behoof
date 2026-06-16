@@ -611,6 +611,7 @@ const saveGroup = async () => {
       name: groupForm.value.name,
       description: groupForm.value.description,
       categoryId: groupForm.value.categoryId,
+      traitNames: groupForm.value.traitNames || [""],
     };
     if (editingGroup.value) {
       await api.put(

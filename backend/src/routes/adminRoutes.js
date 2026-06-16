@@ -1,13 +1,9 @@
 import express from 'express';
 import {
+  getAdminStats,
   getAdminUsers,
   updateUserRole,
   deleteUserByAdmin,
-  getAdminStats,
-  getBrands,
-  createBrand,
-  updateBrand,
-  deleteBrand,
   getCategories,
   createCategory,
   updateCategory,
@@ -39,11 +35,84 @@ router.get('/users-list', authenticate, requireAdmin, async (req, res) => {
 router.put('/users/:id/role', authenticate, requireAdmin, updateUserRole);
 router.delete('/users/:id', authenticate, requireAdmin, deleteUserByAdmin);
 
-// Brands management
-router.get('/brands', authenticate, requireAdmin, getBrands);
-router.post('/brands', authenticate, requireAdmin, createBrand);
-router.put('/brands/:id', authenticate, requireAdmin, updateBrand);
-router.delete('/brands/:id', authenticate, requireAdmin, deleteBrand);
+// Subcategories management (Бренды = Субкатегории)
+router.get('/subcategories', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const subcategories = await Subcategory.find({}).sort({ name: 1 });
+    res.json({ subcategories });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Ошибка получения субкатегорий' });
+  }
+});
+
+router.post('/subcategories', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { name, categoryId } = req.body;
+    if (!name || !categoryId) {
+      return res.status(400).json({ error: 'name и categoryId обязательны' });
+    }
+
+    const existing = await Subcategory.findOne({ name, categoryId });
+    if (existing) {
+      return res.status(409).json({ error: 'Субкатегория с таким названием уже существует' });
+    }
+
+    const subcategoryId = await getNextId('sub');
+    const subcategory = new Subcategory({
+      id: subcategoryId,
+      name: name.trim(),
+      categoryId,
+      productIds: [],
+    });
+
+    await subcategory.save();
+    res.status(201).json({ message: 'Субкатегория (бренд) создана', subcategory });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Ошибка создания субкатегории' });
+  }
+});
+
+router.put('/subcategories/:id', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+
+    const subcategory = await Subcategory.findOne({ id });
+    if (!subcategory) {
+      return res.status(404).json({ error: 'Субкатегория не найдена' });
+    }
+
+    if (name) subcategory.name = name.trim();
+    await subcategory.save();
+
+    res.json({ message: 'Субкатегория обновлена', subcategory });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Ошибка обновления субкатегории' });
+  }
+});
+
+router.delete('/subcategories/:id', authenticate, requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const subcategory = await Subcategory.findOne({ id });
+    if (!subcategory) {
+      return res.status(404).json({ error: 'Субкатегория не найдена' });
+    }
+
+    const productsCount = await Subcategory.countDocuments({ productIds: id });
+    if (productsCount > 0) {
+      return res.status(400).json({ 
+        error: `Нельзя удалить субкатегорию: привязано ${productsCount} товаров` 
+      });
+    }
+
+    await Subcategory.deleteOne({ id });
+    res.json({ message: 'Субкатегория удалена' });
+  } catch (err) {
+    res.status(500).json({ error: err.message || 'Ошибка удаления субкатегории' });
+  }
+});
 
 // Categories management
 router.get('/categories', authenticate, requireAdmin, getCategories);
@@ -87,7 +156,7 @@ router.post('/models', authenticate, requireAdmin, async (req, res) => {
 router.put('/models/:id', authenticate, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, subcategoryId } = req.body;
 
     const model = await Model.findOne({ id });
     if (!model) {
@@ -95,6 +164,7 @@ router.put('/models/:id', authenticate, requireAdmin, async (req, res) => {
     }
 
     if (name) model.name = name.trim();
+    if (subcategoryId) model.subcategoryId = subcategoryId;
     await model.save();
 
     res.json({ message: 'Модель обновлена', model });

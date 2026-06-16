@@ -161,19 +161,14 @@ const router = createRouter({
           component: () => import('@/views/Admin/CategoriesAdmin.vue'),
         },
         {
-          path: 'brands',
-          name: 'admin-brands',
-          component: () => import('@/views/Admin/BrandsAdmin.vue'),
+          path: 'characteristics',
+          name: 'admin-characteristics',
+          component: () => import('@/views/Admin/CharacteristicsView.vue'),
         },
         {
           path: 'notifications',
           name: 'admin-notifications',
           component: () => import('@/views/Admin/NotificationsAdmin.vue'),
-        },
-        {
-          path: 'characteristics',
-          name: 'admin-characteristics',
-          component: () => import('@/views/Admin/CharacteristicsView.vue'),
         },
       ],
     },

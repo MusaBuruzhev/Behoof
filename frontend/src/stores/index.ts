@@ -569,8 +569,22 @@ export const useAdminStore = defineStore('admin', {
         this.setCategories(response.data.categories || response.data || [])
       } catch (error) {
         // error handled silently
+        throw error
       } finally {
         this.categories.isLoading = false
+      }
+    },
+
+    async fetchSubcategories() {
+      this.brands.isLoading = true
+      try {
+        const response = await api.get('/admin/subcategories')
+        this.brands.items = response.data.subcategories || response.data || []
+      } catch (error) {
+        // error handled silently
+        throw error
+      } finally {
+        this.brands.isLoading = false
       }
     },
 
@@ -602,48 +616,25 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    // Brands
+    // Brands = Subcategories (legacy naming for backwards compatibility)
     setBrands(items: any[]) {
       this.brands.items = items
     },
 
     async fetchBrands() {
-      this.brands.isLoading = true
-      try {
-        const response = await api.get('/admin/brands')
-        this.setBrands(response.data.brands || response.data || [])
-      } catch (error) {
-        // error handled silently
-      } finally {
-        this.brands.isLoading = false
-      }
+      return this.fetchSubcategories()
     },
 
     async createBrand(brandData: any) {
-      try {
-        await api.post('/admin/brands', brandData)
-        await this.fetchBrands()
-      } catch (error) {
-        throw error
-      }
+      return api.post('/admin/subcategories', brandData)
     },
 
     async updateBrand(brandId: string, brandData: any) {
-      try {
-        await api.put(`/admin/brands/${brandId}`, brandData)
-        await this.fetchBrands()
-      } catch (error) {
-        throw error
-      }
+      return api.put(`/admin/subcategories/${brandId}`, brandData)
     },
 
     async deleteBrand(brandId: string) {
-      try {
-        await api.delete(`/admin/brands/${brandId}`)
-        await this.fetchBrands()
-      } catch (error) {
-        throw error
-      }
+      return api.delete(`/admin/subcategories/${brandId}`)
     },
   },
 })

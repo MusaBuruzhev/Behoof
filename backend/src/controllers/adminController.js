@@ -2,27 +2,24 @@ import User from '../models/User.js';
 import Product from '../models/Product.js';
 import Order from '../models/Order.js';
 import Category from '../models/Category.js';
-import Brand from '../models/Brand.js';
+import Subcategory from '../models/Subcategory.js';
 import { getNextId } from '../utils/idGenerator.js';
 
 // Stats
 export const getAdminStats = async (req, res) => {
   try {
-    const [totalUsers, adminsCount, totalProducts, totalOrders, pendingOrdersCount, totalCategories, brandsCount, recentOrders, recentUsers, recentProducts] = await Promise.all([
+    const [totalUsers, adminsCount, totalProducts, totalOrders, pendingOrdersCount, totalCategories, totalBrands, recentOrders, recentUsers, recentProducts] = await Promise.all([
       User.countDocuments({}),
       User.countDocuments({ role: 'admin' }),
       Product.countDocuments({}),
       Order.countDocuments({}),
       Order.countDocuments({ status: 'pending' }),
       Category.countDocuments({}),
-      Brand.countDocuments({}),
+      Subcategory.countDocuments({}), // Бренды = субкатегории
       Order.find({}).sort({ createdAt: -1 }).limit(5),
       User.find({}).sort({ createdAt: -1 }).limit(5),
       Product.find({}).sort({ createdAt: -1 }).limit(5),
     ]);
-
-    const productBrands = await Product.distinct('brand');
-    const totalBrands = Math.max(brandsCount, productBrands.length);
 
     res.json({
       totalUsers,
@@ -104,110 +101,7 @@ export const deleteUserByAdmin = async (req, res) => {
   }
 };
 
-// Brands management
-export const getBrands = async (req, res) => {
-  try {
-    const brands = await Brand.find({}).sort({ name: 1 });
-    res.json({ brands });
-  } catch (err) {
-    res.status(500).json({ error: err.message || 'Ошибка получения брендов' });
-  }
-};
-
-export const createBrand = async (req, res) => {
-  try {
-    const { name, description, categoryId, logo, website } = req.body;
-
-    if (!name) {
-      return res.status(400).json({ error: 'Название бренда обязательно' });
-    }
-
-    const existingBrand = await Brand.findOne({ name: { $regex: new RegExp('^' + name + '$', 'i') } });
-    if (existingBrand) {
-      return res.status(409).json({ error: 'Бренд с таким названием уже существует' });
-    }
-
-    const brandId = await getNextId('brand');
-    const brand = new Brand({
-      id: brandId,
-      name: name.trim(),
-      description: description || '',
-      categoryId: categoryId || null,
-      logo: logo || '',
-      website: website || '',
-    });
-
-    await brand.save();
-
-    res.status(201).json({
-      message: 'Бренд создан успешно',
-      brand,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message || 'Ошибка создания бренда' });
-  }
-};
-
-export const updateBrand = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, categoryId, logo, website } = req.body;
-
-    const brand = await Brand.findOne({ id });
-    if (!brand) {
-      return res.status(404).json({ error: 'Бренд не найден' });
-    }
-
-    if (name !== undefined) {
-      const existingBrand = await Brand.findOne({ 
-        id: { $ne: id },
-        name: { $regex: new RegExp('^' + name + '$', 'i') }
-      });
-      if (existingBrand) {
-        return res.status(409).json({ error: 'Бренд с таким названием уже существует' });
-      }
-      brand.name = name.trim();
-    }
-
-    if (description !== undefined) brand.description = description;
-    if (categoryId !== undefined) brand.categoryId = categoryId;
-    if (logo !== undefined) brand.logo = logo;
-    if (website !== undefined) brand.website = website;
-
-    await brand.save();
-
-    res.json({
-      message: 'Бренд обновлён',
-      brand,
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message || 'Ошибка обновления бренда' });
-  }
-};
-
-export const deleteBrand = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const brand = await Brand.findOne({ id });
-    if (!brand) {
-      return res.status(404).json({ error: 'Бренд не найден' });
-    }
-
-    const productsCount = await Product.countDocuments({ brand: brand.name });
-    if (productsCount > 0) {
-      return res.status(400).json({ 
-        error: `Нельзя удалить бренд: привязано ${productsCount} товаров` 
-      });
-    }
-
-    await Brand.deleteOne({ id });
-
-    res.json({ message: 'Бренд удалён' });
-  } catch (err) {
-    res.status(500).json({ error: err.message || 'Ошибка удаления бренда' });
-  }
-};
+// Бренды = Субкатегории. Управление через /admin/subcategories
 
 // Categories management
 export const getCategories = async (req, res) => {
