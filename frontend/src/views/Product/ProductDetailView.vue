@@ -1642,7 +1642,7 @@ onUnmounted(() => {
 
 .price-chart {
   width: 100%;
-  height: 200px;
+  min-height: 200px;
 }
 
 .chart-grid {

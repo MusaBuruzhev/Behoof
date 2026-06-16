@@ -179,6 +179,14 @@ export const getAllNotificationsAdmin = () =>
 export const getUsersForNotifications = () =>
   api.get('/admin/users-list')
 
+/** Отправить уведомление пользователю (только админ) */
+export const sendAdminNotification = (data: {
+  userId?: string;
+  type: string;
+  title: string;
+  message: string;
+}) => api.post('/admin/notifications', data)
+
 /** Получить все субкатегории (только админ) */
 export const getSubcategories = () => api.get('/admin/subcategories')
 

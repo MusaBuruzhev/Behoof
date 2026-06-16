@@ -176,6 +176,7 @@ import {
   getAllNotificationsAdmin,
   deleteNotification,
   getAdminUsers,
+  sendAdminNotification,
 } from "@/api";
 
 const showModal = ref(false);
@@ -243,15 +244,29 @@ const deleteHandler = async (notif: any) => {
 
 const sendNotification = async () => {
   if (form.value.recipientType === "user" && !form.value.userId) {
+    alert("Выберите пользователя");
     return;
   }
   try {
-    // API call would go here
+    const payload: any = {
+      type: form.value.type,
+      title: form.value.title,
+      message: form.value.message,
+    };
+    
+    // Отправляем userId только если выбран конкретный пользователь
+    if (form.value.recipientType === "user" && form.value.userId) {
+      payload.userId = form.value.userId;
+    }
+    
+    await sendAdminNotification(payload);
+    
     showModal.value = false;
     resetForm();
     await loadNotifications();
-  } catch (err) {
-    // error handled silently
+    alert("Уведомление отправлено!");
+  } catch (err: any) {
+    alert("Ошибка: " + (err.response?.data?.error || "Не удалось отправить"));
   }
 };
 

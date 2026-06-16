@@ -216,8 +216,7 @@ const deleteNotificationById = async (notificationId: string) => {
 const clearRead = async () => {
   try {
     await clearReadNotifications()
-    notifications.value = notifications.value.filter(n => !n.isRead)
-    notificationsStore.setUnreadCount(0)
+    await loadNotifications()
   } catch (error) {
     console.error('Failed to clear read notifications:', error)
   }

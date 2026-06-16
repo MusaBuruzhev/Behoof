@@ -232,12 +232,31 @@ export const sendNotificationToUser = async (req, res) => {
   try {
     const { userId, type, title, message, relatedId, relatedType } = req.body;
 
-    if (!userId) {
-      return res.status(400).json({ error: 'userId обязателен' });
-    }
-
     if (!title || !message) {
       return res.status(400).json({ error: 'title и message обязательны' });
+    }
+
+    // Если userId не указан — отправляем всем пользователям
+    if (!userId) {
+      const allUsers = await User.find({ role: 'user' }).select('_id');
+      
+      const notifications = await Promise.all(
+        allUsers.map(user => 
+          createNotification(
+            user._id,
+            type || 'promo',
+            title,
+            message,
+            relatedId || null,
+            relatedType || null
+          )
+        )
+      );
+
+      return res.status(201).json({
+        message: `Уведомление отправлено ${notifications.length} пользователям`,
+        count: notifications.length,
+      });
     }
 
     // Проверяем существование пользователя
