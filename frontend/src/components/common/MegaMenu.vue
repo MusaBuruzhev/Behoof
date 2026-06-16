@@ -12,7 +12,7 @@
             <router-link
               v-for="cat in categories"
               :key="cat.id"
-              :to="`/catalog/${cat.id}`"
+              :to="{ path: '/catalog', query: { category: cat.id } }"
               :class="['category-link', { hover: hoveredCategory === cat.id }]"
               @mouseenter="onCategoryHover(cat)"
               @click="closeMenu"
@@ -30,7 +30,7 @@
           <div class="col-header">
             {{ getCategoryName(hoveredCategory) }}
             <router-link
-              :to="`/catalog/${hoveredCategory}`"
+              :to="{ path: '/catalog', query: { category: hoveredCategory } }"
               class="see-all"
               @click="closeMenu"
             >Все товары →</router-link>
@@ -39,7 +39,7 @@
             <router-link
               v-for="brand in visibleBrands"
               :key="brand.id"
-              :to="`/catalog/${hoveredCategory}?brand=${encodeURIComponent(brand.name)}`"
+              :to="{ path: '/catalog', query: { category: hoveredCategory, brand: brand.name } }"
               :class="['brand-link', { hover: hoveredBrand === brand.id }]"
               @mouseenter="onBrandHover(brand)"
               @click="closeMenu"
@@ -71,7 +71,7 @@
           <div class="col-header">
             {{ getBrandName(hoveredBrand) }}
             <router-link
-              :to="`/catalog/${hoveredCategory}?brand=${encodeURIComponent(getBrandName(hoveredBrand))}`"
+              :to="{ path: '/catalog', query: { category: hoveredCategory, brand: getBrandName(hoveredBrand) } }"
               class="see-all"
               @click="closeMenu"
             >Все товары →</router-link>
