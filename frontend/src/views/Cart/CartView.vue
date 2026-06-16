@@ -1,13 +1,10 @@
 <template>
   <div class="cart-view">
     <div class="container">
-      <!-- Header -->
       <div class="cart-header">
         <div class="header-content">
           <h1 class="cart-title">Корзина</h1>
-          <p class="cart-subtitle">
-            Проверьте товары перед оформлением заказа
-          </p>
+          <p class="cart-subtitle">Проверьте товары перед оформлением заказа</p>
         </div>
         <div v-if="!cartStore.isEmpty" class="cart-summary-header">
           <span class="summary-count">{{ cartStore.itemCount }} товаров</span>
@@ -15,12 +12,17 @@
         </div>
       </div>
 
-      <!-- Empty State -->
       <div v-if="cartStore.isEmpty && !cartStore.isLoading" class="empty-state">
-        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-          <line x1="3" y1="6" x2="21" y2="6"/>
-          <path d="M16 10a4 4 0 0 1-8 0"/>
+        <svg
+          class="empty-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <path d="M16 10a4 4 0 0 1-8 0" />
         </svg>
         <h2 class="empty-title">Корзина пуста</h2>
         <p class="empty-description">
@@ -28,14 +30,19 @@
         </p>
         <router-link to="/catalog" class="btn btn-primary btn-lg">
           Перейти в каталог
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="btn-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </router-link>
       </div>
 
       <div v-else class="cart-content">
-        <!-- Cart Items -->
         <div class="cart-items-section">
           <div class="cart-items">
             <div
@@ -79,7 +86,12 @@
                     @click="decreaseQuantity(item.productId)"
                     :disabled="item.quantity <= 1"
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <path d="M5 12h14" />
                     </svg>
                   </button>
@@ -89,15 +101,24 @@
                     class="qty-btn"
                     @click="increaseQuantity(item.productId)"
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <path d="M12 5v14M5 12h14" />
                     </svg>
                   </button>
                 </div>
 
                 <div class="item-price-block">
-                  <div class="item-price">{{ formatPrice(item.product?.price || 0) }} ₽</div>
-                  <div class="item-subtotal">{{ formatPrice(item.subtotal) }} ₽</div>
+                  <div class="item-price">
+                    {{ formatPrice(item.product?.price || 0) }} ₽
+                  </div>
+                  <div class="item-subtotal">
+                    {{ formatPrice(item.subtotal) }} ₽
+                  </div>
                 </div>
 
                 <div class="item-buttons">
@@ -108,7 +129,12 @@
                     @click="toggleCompare(item.productId)"
                     title="Сравнить"
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
                     </svg>
                   </button>
@@ -118,7 +144,12 @@
                     @click="removeItem(item.productId)"
                     title="Удалить товар"
                   >
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
                       <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
                   </button>
@@ -127,28 +158,38 @@
             </div>
           </div>
 
-          <!-- Clear Cart -->
+        
           <button
             v-if="!cartStore.isEmpty"
             type="button"
             class="clear-cart-btn"
             @click="confirmClearCart"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              />
             </svg>
             Очистить корзину
           </button>
         </div>
 
-        <!-- Sticky Order Summary -->
         <div class="order-summary-sticky" ref="stickySummary">
           <div class="order-summary">
             <h3 class="summary-title">Ваш заказ</h3>
 
             <div class="summary-row">
-              <span class="summary-label">Товары ({{ cartStore.itemCount }})</span>
-              <span class="summary-value">{{ cartStore.formattedTotal }} ₽</span>
+              <span class="summary-label"
+                >Товары ({{ cartStore.itemCount }})</span
+              >
+              <span class="summary-value"
+                >{{ cartStore.formattedTotal }} ₽</span
+              >
             </div>
 
             <div class="summary-row summary-discount">
@@ -160,12 +201,12 @@
 
             <div class="summary-row summary-total">
               <span class="summary-label">Итого</span>
-              <span class="summary-value total">{{ cartStore.formattedTotal }} ₽</span>
+              <span class="summary-value total"
+                >{{ cartStore.formattedTotal }} ₽</span
+              >
             </div>
 
-            <p class="summary-note">
-              Доставка рассчитывается при оформлении
-            </p>
+            <p class="summary-note">Доставка рассчитывается при оформлении</p>
 
             <button
               type="button"
@@ -173,10 +214,15 @@
               :disabled="cartStore.isEmpty || cartStore.isLoading"
               @click="proceedToCheckout"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-                <line x1="3" y1="6" x2="21" y2="6"/>
-                <path d="M16 10a4 4 0 0 1-8 0"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
               Оформить заказ
             </button>
@@ -192,8 +238,10 @@
         </div>
       </div>
 
-      <!-- Related Products -->
-      <section v-if="relatedProducts.length > 0 && !cartStore.isEmpty" class="related-section">
+      <section
+        v-if="relatedProducts.length > 0 && !cartStore.isEmpty"
+        class="related-section"
+      >
         <div class="section-header">
           <h2 class="section-title">Вам может понравиться</h2>
         </div>
@@ -211,116 +259,117 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCartStore, useAuthStore, useComparisonStore } from '@/stores'
-import { createOrder } from '@/api'
-import type { Product } from '@/types'
-import ProductCard from '@/components/catalog/ProductCard.vue'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useCartStore, useAuthStore, useComparisonStore } from "@/stores";
+import { createOrder } from "@/api";
+import type { Product } from "@/types";
+import ProductCard from "@/components/catalog/ProductCard.vue";
 
-const router = useRouter()
-const cartStore = useCartStore()
-const authStore = useAuthStore()
-const comparisonStore = useComparisonStore()
+const router = useRouter();
+const cartStore = useCartStore();
+const authStore = useAuthStore();
+const comparisonStore = useComparisonStore();
 
-const relatedProducts = ref<Product[]>([])
+const relatedProducts = ref<Product[]>([]);
 
 const getProductImage = (product: Product | null): string => {
   if (product?.images && product.images.length > 0) {
-    return `http://localhost:5000${product.images[0]}`
+    return `http://localhost:5000${product.images[0]}`;
   }
-  return 'https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product'
-}
+  return "https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product";
+};
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('ru-RU')
-}
+  return price.toLocaleString("ru-RU");
+};
 
 const getShortSpecs = (product: Product | null) => {
-  if (!product?.characteristics) return []
-  return product.characteristics.slice(0, 2)
-}
+  if (!product?.characteristics) return [];
+  return product.characteristics.slice(0, 2);
+};
 
 const increaseQuantity = async (productId: string) => {
-  const item = cartStore.items.find(i => i.productId === productId)
+  const item = cartStore.items.find((i) => i.productId === productId);
   if (item) {
-    await cartStore.updateQuantity(productId, item.quantity + 1)
+    await cartStore.updateQuantity(productId, item.quantity + 1);
   }
-}
+};
 
 const decreaseQuantity = async (productId: string) => {
-  const item = cartStore.items.find(i => i.productId === productId)
+  const item = cartStore.items.find((i) => i.productId === productId);
   if (item && item.quantity > 1) {
-    await cartStore.updateQuantity(productId, item.quantity - 1)
+    await cartStore.updateQuantity(productId, item.quantity - 1);
   }
-}
+};
 
 const removeItem = async (productId: string) => {
-  await cartStore.removeFromCart(productId)
-}
+  await cartStore.removeFromCart(productId);
+};
 
 const confirmClearCart = () => {
-  if (confirm('Вы уверены, что хотите очистить корзину?')) {
-    cartStore.clearCart()
+  if (confirm("Вы уверены, что хотите очистить корзину?")) {
+    cartStore.clearCart();
   }
-}
+};
 
-const isInCompare = (productId: string) => comparisonStore.isInCompare(productId)
+const isInCompare = (productId: string) =>
+  comparisonStore.isInCompare(productId);
 
 const toggleCompare = (productId: string) => {
   if (isInCompare(productId)) {
-    comparisonStore.removeFromCompare(productId)
+    comparisonStore.removeFromCompare(productId);
   } else {
     if (!comparisonStore.maxReached) {
-      comparisonStore.addToCompare(productId)
+      comparisonStore.addToCompare(productId);
     } else {
-      alert('Максимум 4 товара для сравнения')
+      alert("Максимум 4 товара для сравнения");
     }
   }
-}
+};
 
 const proceedToCheckout = async () => {
   if (!authStore.isAuthenticated) {
-    router.push('/auth/login?redirect=/cart')
-    return
+    router.push("/auth/login?redirect=/cart");
+    return;
   }
 
-  if (cartStore.isEmpty) return
+  if (cartStore.isEmpty) return;
 
   try {
     // Создаём заказ для первого товара в корзине
     // В реальной реализации нужно создать модальное окно с выбором способа доставки
-    const firstItem = cartStore.items[0]
-    if (!firstItem) return
+    const firstItem = cartStore.items[0];
+    if (!firstItem) return;
 
     await createOrder({
       productId: firstItem.productId,
       pickupAt: new Date(Date.now() + 86400000).toISOString(), // Завтра
       contactPhone: authStore.user?.phoneNumber || undefined,
       comment: `Заказ из корзины (${cartStore.items.length} товаров)`,
-    })
+    });
 
     // Очищаем корзину после успешного заказа
-    await cartStore.clearCart()
+    await cartStore.clearCart();
 
     // Перенаправляем на страницу заказов
-    router.push('/orders')
+    router.push("/orders");
   } catch (error) {
-    console.error('Failed to create order:', error)
-    alert('Не удалось оформить заказ. Попробуйте позже.')
+    console.error("Failed to create order:", error);
+    alert("Не удалось оформить заказ. Попробуйте позже.");
   }
-}
+};
 
 // Load related products (mock for now)
 const loadRelatedProducts = async () => {
   // В реальной реализации здесь будет API запрос
-  relatedProducts.value = []
-}
+  relatedProducts.value = [];
+};
 
 onMounted(async () => {
-  await cartStore.fetchCart()
-  await loadRelatedProducts()
-})
+  await cartStore.fetchCart();
+  await loadRelatedProducts();
+});
 </script>
 
 <style scoped>

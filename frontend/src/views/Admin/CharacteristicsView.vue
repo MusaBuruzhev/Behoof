@@ -3,19 +3,45 @@
     <div class="page-header">
       <div>
         <h1 class="page-title">Характеристики</h1>
-        <p class="page-subtitle">Группы характеристик и значения для категорий товаров</p>
+        <p class="page-subtitle">
+          Группы характеристик и значения для категорий товаров
+        </p>
       </div>
     </div>
 
     <!-- Вкладки -->
     <div class="tabs">
-      <button class="tab" :class="{ active: activeTab === 'groups' }" @click="activeTab = 'groups'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+      <button
+        class="tab"
+        :class="{ active: activeTab === 'groups' }"
+        @click="activeTab = 'groups'"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="3" y1="9" x2="21" y2="9" />
+          <line x1="9" y1="21" x2="9" y2="9" />
+        </svg>
         Группы
         <span class="tab-count">{{ groups.length }}</span>
       </button>
-      <button class="tab" :class="{ active: activeTab === 'values' }" @click="activeTab = 'values'">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      <button
+        class="tab"
+        :class="{ active: activeTab === 'values' }"
+        @click="activeTab = 'values'"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M4 7h16M4 12h16M4 17h10" />
+        </svg>
         Значения
         <span class="tab-count">{{ totalValues }}</span>
       </button>
@@ -25,40 +51,96 @@
     <div v-if="activeTab === 'groups'" class="tab-content">
       <div class="toolbar">
         <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input v-model="groupSearch" type="text" placeholder="Поиск групп..." />
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            v-model="groupSearch"
+            type="text"
+            placeholder="Поиск групп..."
+          />
         </div>
         <button class="btn-primary" @click="openGroupModal(null)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
           Новая группа
         </button>
       </div>
 
       <div v-if="filteredGroups.length === 0" class="empty-state">
         <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+          >
+            <circle cx="12" cy="12" r="3" />
+            <path
+              d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"
+            />
+          </svg>
         </div>
         <h3>Нет групп характеристик</h3>
-        <p>Создайте первую группу, чтобы начать добавлять характеристики для товаров</p>
-        <button class="btn-primary" @click="openGroupModal(null)">Создать группу</button>
+        <p>
+          Создайте первую группу, чтобы начать добавлять характеристики для
+          товаров
+        </p>
+        <button class="btn-primary" @click="openGroupModal(null)">
+          Создать группу
+        </button>
       </div>
 
       <div v-else class="groups-grid">
-        <div v-for="group in filteredGroups" :key="group.id" class="group-card" @click="selectGroup(group)">
+        <div
+          v-for="group in filteredGroups"
+          :key="group.id"
+          class="group-card"
+          @click="selectGroup(group)"
+        >
           <div class="group-card-header">
             <h3>{{ group.name }}</h3>
             <span v-if="group.categoryId" class="badge">Категория</span>
             <span v-else class="badge badge-global">Глобальная</span>
           </div>
-          <p v-if="group.description" class="group-description">{{ group.description }}</p>
+          <p v-if="group.description" class="group-description">
+            {{ group.description }}
+          </p>
           <div class="traits-tags">
-            <span v-for="trait in group.traitNames" :key="trait" class="traits-tag">{{ trait }}</span>
+            <span
+              v-for="trait in group.traitNames"
+              :key="trait"
+              class="traits-tag"
+              >{{ trait }}</span
+            >
           </div>
           <div class="group-card-footer">
-            <span class="values-count">{{ getGroupValuesCount(group.id) }} значений</span>
+            <span class="values-count"
+              >{{ getGroupValuesCount(group.id) }} значений</span
+            >
             <div class="group-actions" @click.stop>
-              <button class="btn-ghost" @click="openGroupModal(group)">✏️</button>
-              <button class="btn-ghost btn-danger" @click="deleteGroupHandler(group.id)">🗑️</button>
+              <button class="btn-ghost" @click="openGroupModal(group)">
+                ✏️
+              </button>
+              <button
+                class="btn-ghost btn-danger"
+                @click="deleteGroupHandler(group.id)"
+              >
+                🗑️
+              </button>
             </div>
           </div>
         </div>
@@ -69,28 +151,67 @@
     <div v-if="activeTab === 'values'" class="tab-content">
       <div class="toolbar">
         <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input v-model="valueSearch" type="text" placeholder="Поиск значений..." />
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            v-model="valueSearch"
+            type="text"
+            placeholder="Поиск значений..."
+          />
         </div>
         <div class="filter-group">
           <label>Группа:</label>
           <select v-model="selectedGroupFilter">
             <option value="">Все группы</option>
-            <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
+            <option v-for="group in groups" :key="group.id" :value="group.id">
+              {{ group.name }}
+            </option>
           </select>
         </div>
-        <button class="btn-primary" @click="openValueModal(null)" :disabled="!selectedGroupFilter && groups.length > 0">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <button
+          class="btn-primary"
+          @click="openValueModal(null)"
+          :disabled="!selectedGroupFilter && groups.length > 0"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
           Новое значение
         </button>
       </div>
 
       <div v-if="filteredValues.length === 0" class="empty-state">
         <div class="empty-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+          >
+            <path d="M4 7h16M4 12h16M4 17h10" />
+          </svg>
         </div>
         <h3>Нет значений</h3>
-        <p>{{ selectedGroupFilter ? 'Добавьте значения в выбранную группу' : 'Выберите группу для просмотра значений' }}</p>
+        <p>
+          {{
+            selectedGroupFilter
+              ? "Добавьте значения в выбранную группу"
+              : "Выберите группу для просмотра значений"
+          }}
+        </p>
       </div>
 
       <div v-else class="values-table-wrapper">
@@ -108,14 +229,23 @@
           <tbody>
             <tr v-for="val in filteredValues" :key="val.id">
               <td class="value-name">{{ val.value }}</td>
-              <td><span class="trait-badge">{{ val.traitName }}</span></td>
+              <td>
+                <span class="trait-badge">{{ val.traitName }}</span>
+              </td>
               <td class="muted">{{ getGroupName(val.groupId) }}</td>
-              <td class="muted">{{ val.unit || '—' }}</td>
+              <td class="muted">{{ val.unit || "—" }}</td>
               <td class="muted">{{ val.usageCount || 0 }}</td>
               <td>
                 <div class="row-actions">
-                  <button class="btn-ghost" @click="openValueModal(val)">✏️</button>
-                  <button class="btn-ghost btn-danger" @click="deleteValueHandler(val.id)">🗑️</button>
+                  <button class="btn-ghost" @click="openValueModal(val)">
+                    ✏️
+                  </button>
+                  <button
+                    class="btn-ghost btn-danger"
+                    @click="deleteValueHandler(val.id)"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </td>
             </tr>
@@ -125,63 +255,141 @@
     </div>
 
     <!-- Модальное окно группы -->
-    <div v-if="showGroupModal" class="modal-overlay" @click.self="showGroupModal = false">
+    <div
+      v-if="showGroupModal"
+      class="modal-overlay"
+      @click.self="showGroupModal = false"
+    >
       <div class="modal">
         <div class="modal-header">
-          <h2>{{ editingGroup ? 'Редактировать группу' : 'Новая группа' }}</h2>
+          <h2>{{ editingGroup ? "Редактировать группу" : "Новая группа" }}</h2>
           <button class="btn-close" @click="showGroupModal = false">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
         <form @submit.prevent="saveGroup" class="modal-body">
           <div class="form-group">
             <label>Название *</label>
-            <input v-model="groupForm.name" type="text" class="input" placeholder="Например: Процессоры" required />
+            <input
+              v-model="groupForm.name"
+              type="text"
+              class="input"
+              placeholder="Например: Процессоры"
+              required
+            />
           </div>
           <div class="form-group">
             <label>Slug</label>
-            <input v-model="groupForm.slug" type="text" class="input" placeholder="processors" />
+            <input
+              v-model="groupForm.slug"
+              type="text"
+              class="input"
+              placeholder="processors"
+            />
           </div>
           <div class="form-group">
             <label>Описание</label>
-            <textarea v-model="groupForm.description" class="input" rows="2" placeholder="Краткое описание группы..."></textarea>
+            <textarea
+              v-model="groupForm.description"
+              class="input"
+              rows="2"
+              placeholder="Краткое описание группы..."
+            ></textarea>
           </div>
           <div class="form-group">
             <label>Категория</label>
             <select v-model="groupForm.categoryId" class="input">
               <option :value="null">Глобальная (для всех категорий)</option>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+              <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                {{ cat.name }}
+              </option>
             </select>
           </div>
           <div class="form-group">
             <label>Характеристики *</label>
             <div class="traits-editor">
-              <div v-for="(_trait, index) in groupForm.traitNames" :key="index" class="trait-input-row">
-                <input v-model="groupForm.traitNames[index]" type="text" class="input" placeholder="Название характеристики" />
-                <button type="button" class="btn-ghost btn-danger" @click="groupForm.traitNames.splice(index, 1)">×</button>
+              <div
+                v-for="(_trait, index) in groupForm.traitNames"
+                :key="index"
+                class="trait-input-row"
+              >
+                <input
+                  v-model="groupForm.traitNames[index]"
+                  type="text"
+                  class="input"
+                  placeholder="Название характеристики"
+                />
+                <button
+                  type="button"
+                  class="btn-ghost btn-danger"
+                  @click="groupForm.traitNames.splice(index, 1)"
+                >
+                  ×
+                </button>
               </div>
-              <button type="button" class="btn-ghost" @click="groupForm.traitNames.push('')">+ Добавить характеристику</button>
+              <button
+                type="button"
+                class="btn-ghost"
+                @click="groupForm.traitNames.push('')"
+              >
+                + Добавить характеристику
+              </button>
             </div>
           </div>
           <div class="form-group">
             <label>Порядок сортировки</label>
-            <input v-model.number="groupForm.sortOrder" type="number" class="input" min="0" />
+            <input
+              v-model.number="groupForm.sortOrder"
+              type="number"
+              class="input"
+              min="0"
+            />
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn-ghost" @click="showGroupModal = false">Отмена</button>
-            <button type="submit" class="btn-primary">{{ editingGroup ? 'Сохранить' : 'Создать' }}</button>
+            <button
+              type="button"
+              class="btn-ghost"
+              @click="showGroupModal = false"
+            >
+              Отмена
+            </button>
+            <button type="submit" class="btn-primary">
+              {{ editingGroup ? "Сохранить" : "Создать" }}
+            </button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Модальное окно значения -->
-    <div v-if="showValueModal" class="modal-overlay" @click.self="showValueModal = false">
+    <div
+      v-if="showValueModal"
+      class="modal-overlay"
+      @click.self="showValueModal = false"
+    >
       <div class="modal">
         <div class="modal-header">
-          <h2>{{ editingValue ? 'Редактировать значение' : 'Новое значение' }}</h2>
+          <h2>
+            {{ editingValue ? "Редактировать значение" : "Новое значение" }}
+          </h2>
           <button class="btn-close" @click="showValueModal = false">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
           </button>
         </div>
         <form @submit.prevent="saveValue" class="modal-body">
@@ -189,33 +397,65 @@
             <label>Группа *</label>
             <select v-model="valueForm.groupId" class="input" required>
               <option value="">Выберите группу</option>
-              <option v-for="group in groups" :key="group.id" :value="group.id">{{ group.name }}</option>
+              <option v-for="group in groups" :key="group.id" :value="group.id">
+                {{ group.name }}
+              </option>
             </select>
           </div>
           <div v-if="valueForm.groupId" class="form-group">
             <label>Характеристика *</label>
             <select v-model="valueForm.traitName" class="input" required>
               <option value="">Выберите характеристику</option>
-              <option v-for="trait in availableTraitsForGroup" :key="trait" :value="trait">{{ trait }}</option>
+              <option
+                v-for="trait in availableTraitsForGroup"
+                :key="trait"
+                :value="trait"
+              >
+                {{ trait }}
+              </option>
             </select>
           </div>
           <div class="form-group">
             <label>Значение *</label>
-            <input v-model="valueForm.value" type="text" class="input" placeholder="Например: Snapdragon 8 Gen 3" required />
+            <input
+              v-model="valueForm.value"
+              type="text"
+              class="input"
+              placeholder="Например: Snapdragon 8 Gen 3"
+              required
+            />
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>Единица измерения</label>
-              <input v-model="valueForm.unit" type="text" class="input" placeholder="gb, mAh, inch..." />
+              <input
+                v-model="valueForm.unit"
+                type="text"
+                class="input"
+                placeholder="gb, mAh, inch..."
+              />
             </div>
             <div class="form-group">
               <label>Сорт.</label>
-              <input v-model.number="valueForm.sortOrder" type="number" class="input" min="0" />
+              <input
+                v-model.number="valueForm.sortOrder"
+                type="number"
+                class="input"
+                min="0"
+              />
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn-ghost" @click="showValueModal = false">Отмена</button>
-            <button type="submit" class="btn-primary">{{ editingValue ? 'Сохранить' : 'Создать' }}</button>
+            <button
+              type="button"
+              class="btn-ghost"
+              @click="showValueModal = false"
+            >
+              Отмена
+            </button>
+            <button type="submit" class="btn-primary">
+              {{ editingValue ? "Сохранить" : "Создать" }}
+            </button>
           </div>
         </form>
       </div>
@@ -224,131 +464,146 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import api from '@/api/axios'
+import { ref, computed, onMounted } from "vue";
+import api from "@/api/axios";
 
 // --- Data ---
-const groups = ref<any[]>([])
-const allValues = ref<any[]>([])
-const categories = ref<any[]>([])
-const activeTab = ref<'groups' | 'values'>('groups')
+const groups = ref<any[]>([]);
+const allValues = ref<any[]>([]);
+const categories = ref<any[]>([]);
+const activeTab = ref<"groups" | "values">("groups");
 
-const groupSearch = ref('')
-const valueSearch = ref('')
-const selectedGroupFilter = ref('')
+const groupSearch = ref("");
+const valueSearch = ref("");
+const selectedGroupFilter = ref("");
 
-const showGroupModal = ref(false)
-const showValueModal = ref(false)
-const editingGroup = ref<any>(null)
-const editingValue = ref<any>(null)
+const showGroupModal = ref(false);
+const showValueModal = ref(false);
+const editingGroup = ref<any>(null);
+const editingValue = ref<any>(null);
 
 const groupForm = ref({
-  name: '',
-  slug: '',
-  description: '',
+  name: "",
+  slug: "",
+  description: "",
   categoryId: null as string | null,
-  traitNames: [''] as string[],
+  traitNames: [""] as string[],
   sortOrder: 0,
-})
+});
 
 const valueForm = ref({
-  groupId: '',
-  traitName: '',
-  value: '',
-  unit: '',
+  groupId: "",
+  traitName: "",
+  value: "",
+  unit: "",
   sortOrder: 0,
-})
+});
 
 // --- Computed ---
 const filteredGroups = computed(() => {
-  if (!groupSearch.value) return groups.value
-  const q = groupSearch.value.toLowerCase()
+  if (!groupSearch.value) return groups.value;
+  const q = groupSearch.value.toLowerCase();
   return groups.value.filter(
     (g) =>
       g.name.toLowerCase().includes(q) ||
       g.description?.toLowerCase().includes(q) ||
-      g.traitNames.some((t: string) => t.toLowerCase().includes(q)),
-  )
-})
+      g.traitNames.some((t: string) => t.toLowerCase().includes(q))
+  );
+});
 
 const filteredValues = computed(() => {
-  let vals = allValues.value
+  let vals = allValues.value;
   if (selectedGroupFilter.value) {
-    vals = vals.filter((v) => v.groupId === selectedGroupFilter.value)
+    vals = vals.filter((v) => v.groupId === selectedGroupFilter.value);
   }
   if (valueSearch.value) {
-    const q = valueSearch.value.toLowerCase()
-    vals = vals.filter((v) => v.value.toLowerCase().includes(q) || v.traitName.toLowerCase().includes(q))
+    const q = valueSearch.value.toLowerCase();
+    vals = vals.filter(
+      (v) =>
+        v.value.toLowerCase().includes(q) ||
+        v.traitName.toLowerCase().includes(q)
+    );
   }
-  return vals
-})
+  return vals;
+});
 
-const totalValues = computed(() => allValues.value.length)
+const totalValues = computed(() => allValues.value.length);
 
 const availableTraitsForGroup = computed(() => {
-  if (!valueForm.value.groupId) return []
-  const group = groups.value.find((g) => g.id === valueForm.value.groupId)
-  return group?.traitNames || []
-})
+  if (!valueForm.value.groupId) return [];
+  const group = groups.value.find((g) => g.id === valueForm.value.groupId);
+  return group?.traitNames || [];
+});
 
 // --- Methods ---
 const fetchGroups = async () => {
   try {
-    const res = await api.get('/admin/characteristic-groups')
-    groups.value = res.data.groups || []
+    const res = await api.get("/admin/characteristic-groups");
+    groups.value = res.data.groups || [];
   } catch (err) {
-    console.error('Failed to fetch groups:', err)
+    console.error("Failed to fetch groups:", err);
   }
-}
+};
 
 const fetchAllValues = async () => {
   try {
-    const all: any[] = []
+    const all: any[] = [];
     for (const group of groups.value) {
-      const res = await api.get(`/admin/characteristic-groups/${group.id}/values`)
-      all.push(...(res.data.values || []))
+      const res = await api.get(
+        `/admin/characteristic-groups/${group.id}/values`
+      );
+      all.push(...(res.data.values || []));
     }
-    allValues.value = all
+    allValues.value = all;
   } catch (err) {
-    console.error('Failed to fetch values:', err)
+    console.error("Failed to fetch values:", err);
   }
-}
+};
 
 const fetchCategories = async () => {
   try {
-    const res = await api.get('/admin/categories')
-    categories.value = res.data.categories || []
+    const res = await api.get("/admin/categories");
+    categories.value = res.data.categories || [];
   } catch (err) {
-    console.error('Failed to fetch categories:', err)
+    console.error("Failed to fetch categories:", err);
   }
-}
+};
 
-const getGroupName = (groupId: string) => groups.value.find((g) => g.id === groupId)?.name || groupId
+const getGroupName = (groupId: string) =>
+  groups.value.find((g) => g.id === groupId)?.name || groupId;
 
-const getGroupValuesCount = (groupId: string) => allValues.value.filter((v) => v.groupId === groupId).length
+const getGroupValuesCount = (groupId: string) =>
+  allValues.value.filter((v) => v.groupId === groupId).length;
 
 const selectGroup = (group: any) => {
-  selectedGroupFilter.value = group.id
-  activeTab.value = 'values'
-}
+  selectedGroupFilter.value = group.id;
+  activeTab.value = "values";
+};
 
 // Group CRUD
 const openGroupModal = (group: any | null) => {
-  editingGroup.value = group
+  editingGroup.value = group;
   if (group) {
     groupForm.value = {
       name: group.name,
       slug: group.slug,
-      description: group.description || '',
+      description: group.description || "",
       categoryId: group.categoryId || null,
       traitNames: [...group.traitNames],
       sortOrder: group.sortOrder || 0,
-    }
+    };
   } else {
-    groupForm.value = { name: '', slug: '', description: '', categoryId: null, traitNames: [''], sortOrder: 0 }
+    groupForm.value = {
+      name: "",
+      slug: "",
+      description: "",
+      categoryId: null,
+      traitNames: [""],
+      sortOrder: 0,
+    };
   }
-  showGroupModal.value = true
-}
+  showGroupModal.value = true;
+};
 
 const saveGroup = async () => {
   try {
@@ -356,82 +611,91 @@ const saveGroup = async () => {
       name: groupForm.value.name,
       description: groupForm.value.description,
       categoryId: groupForm.value.categoryId,
-    }
+    };
     if (editingGroup.value) {
-      await api.put(`/admin/characteristic-groups/${editingGroup.value.id}`, payload)
+      await api.put(
+        `/admin/characteristic-groups/${editingGroup.value.id}`,
+        payload
+      );
     } else {
-      await api.post('/admin/characteristic-groups', payload)
+      await api.post("/admin/characteristic-groups", payload);
     }
-    showGroupModal.value = false
-    editingGroup.value = null
-    await fetchGroups()
-    await fetchAllValues()
+    showGroupModal.value = false;
+    editingGroup.value = null;
+    await fetchGroups();
+    await fetchAllValues();
   } catch (err: any) {
     // error handled silently
   }
-}
+};
 
 const deleteGroupHandler = async (groupId: string) => {
   try {
-    await api.delete(`/admin/characteristic-groups/${groupId}`)
-    await fetchGroups()
-    await fetchAllValues()
+    await api.delete(`/admin/characteristic-groups/${groupId}`);
+    await fetchGroups();
+    await fetchAllValues();
   } catch (err: any) {
     // error handled silently
   }
-}
+};
 
 // Value CRUD
 const openValueModal = (val: any | null) => {
-  editingValue.value = val
+  editingValue.value = val;
   if (val) {
     valueForm.value = {
       groupId: val.groupId,
       traitName: val.traitName,
       value: val.value,
-      unit: val.unit || '',
+      unit: val.unit || "",
       sortOrder: val.sortOrder || 0,
-    }
+    };
   } else {
     valueForm.value = {
-      groupId: selectedGroupFilter.value || '',
-      traitName: '',
-      value: '',
-      unit: '',
+      groupId: selectedGroupFilter.value || "",
+      traitName: "",
+      value: "",
+      unit: "",
       sortOrder: 0,
-    }
+    };
   }
-  showValueModal.value = true
-}
+  showValueModal.value = true;
+};
 
 const saveValue = async () => {
   try {
     if (editingValue.value) {
-      await api.put(`/admin/characteristic-values/${editingValue.value.id}`, valueForm.value)
+      await api.put(
+        `/admin/characteristic-values/${editingValue.value.id}`,
+        valueForm.value
+      );
     } else {
-      await api.post(`/admin/characteristic-groups/${valueForm.value.groupId}/values`, valueForm.value)
+      await api.post(
+        `/admin/characteristic-groups/${valueForm.value.groupId}/values`,
+        valueForm.value
+      );
     }
-    showValueModal.value = false
-    editingValue.value = null
-    await fetchAllValues()
+    showValueModal.value = false;
+    editingValue.value = null;
+    await fetchAllValues();
   } catch (err: any) {
     // error handled silently
   }
-}
+};
 
 const deleteValueHandler = async (valueId: string) => {
   try {
-    await api.delete(`/admin/characteristic-values/${valueId}`)
-    await fetchAllValues()
+    await api.delete(`/admin/characteristic-values/${valueId}`);
+    await fetchAllValues();
   } catch (err: any) {
     // error handled silently
   }
-}
+};
 
 onMounted(async () => {
-  await Promise.all([fetchGroups(), fetchCategories()])
-  await fetchAllValues()
-})
+  await Promise.all([fetchGroups(), fetchCategories()]);
+  await fetchAllValues();
+});
 </script>
 
 <style scoped>
@@ -465,7 +729,7 @@ onMounted(async () => {
 .tabs {
   display: flex;
   gap: 4px;
-  background: var(--color-surface-secondary, #F9FAFB);
+  background: var(--color-surface-secondary, #f9fafb);
   padding: 4px;
   border-radius: 10px;
   width: fit-content;
@@ -507,7 +771,7 @@ onMounted(async () => {
 }
 
 .tab.active .tab-count {
-  background: var(--color-primary-light, #DBEAFE);
+  background: var(--color-primary-light, #dbeafe);
   color: var(--color-primary);
 }
 
@@ -614,13 +878,13 @@ onMounted(async () => {
 }
 
 .btn-ghost:hover {
-  background: var(--color-surface-secondary, #F9FAFB);
+  background: var(--color-surface-secondary, #f9fafb);
   color: var(--color-text-primary);
 }
 
 .btn-danger:hover {
   color: var(--color-error);
-  background: var(--color-error-light, #FEE2E2);
+  background: var(--color-error-light, #fee2e2);
 }
 
 /* Empty state */
@@ -637,7 +901,7 @@ onMounted(async () => {
   width: 56px;
   height: 56px;
   border-radius: 14px;
-  background: var(--color-surface-secondary, #F9FAFB);
+  background: var(--color-surface-secondary, #f9fafb);
   margin-bottom: 16px;
 }
 
@@ -697,13 +961,13 @@ onMounted(async () => {
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 10px;
-  background: var(--color-primary-light, #DBEAFE);
+  background: var(--color-primary-light, #dbeafe);
   color: var(--color-primary);
   font-weight: 500;
 }
 
 .badge-global {
-  background: var(--color-surface-secondary, #F9FAFB);
+  background: var(--color-surface-secondary, #f9fafb);
   color: var(--color-text-secondary);
 }
 
@@ -734,7 +998,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid var(--color-border-light, #F3F4F6);
+  border-top: 1px solid var(--color-border-light, #f3f4f6);
 }
 
 .values-count {
@@ -769,7 +1033,7 @@ onMounted(async () => {
 
 .values-table td {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--color-border-light, #F3F4F6);
+  border-bottom: 1px solid var(--color-border-light, #f3f4f6);
 }
 
 .value-name {
@@ -780,7 +1044,7 @@ onMounted(async () => {
 .trait-badge {
   font-size: 12px;
   padding: 2px 8px;
-  background: var(--color-surface-secondary, #F9FAFB);
+  background: var(--color-surface-secondary, #f9fafb);
   border-radius: 5px;
   color: var(--color-text-secondary);
 }
@@ -841,7 +1105,7 @@ onMounted(async () => {
   width: 32px;
   height: 32px;
   border: none;
-  background: var(--color-surface-secondary, #F9FAFB);
+  background: var(--color-surface-secondary, #f9fafb);
   border-radius: 8px;
   cursor: pointer;
   color: var(--color-text-secondary);
@@ -942,7 +1206,7 @@ select.input {
   justify-content: flex-end;
   gap: 8px;
   padding-top: 8px;
-  border-top: 1px solid var(--color-border-light, #F3F4F6);
+  border-top: 1px solid var(--color-border-light, #f3f4f6);
   margin-top: 4px;
 }
 

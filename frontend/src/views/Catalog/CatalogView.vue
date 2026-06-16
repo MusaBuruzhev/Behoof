@@ -7,8 +7,7 @@
         :current-subcategory="currentSubcategory"
         :total-products="productsResponse.total"
       />
-      
-      <!-- Панель управления: поиск, сортировка, вид -->
+
       <CatalogControls
         v-model:search="searchQuery"
         v-model:sort="sortOption"
@@ -17,10 +16,8 @@
         @search="handleSearch"
         @sort="handleSort"
       />
-      
-      <!-- Основная область: фильтры + сетка товаров -->
+
       <div class="catalog-content">
-        <!-- Левая колонка: фильтры -->
         <CatalogFilters
           v-model:price-range="priceRange"
           v-model:selected-brands="selectedBrands"
@@ -31,17 +28,27 @@
           @apply-filters="applyFilters"
           @reset-filters="resetFilters"
         />
-        
-        <!-- Правая колонка: товары -->
+
         <div class="catalog-products">
           <div v-if="loading" class="products-loading">
             <div class="loading-spinner"></div>
             <p>Загрузка товаров...</p>
           </div>
-          
-          <div v-else-if="productsResponse.products.length === 0" class="products-empty">
-            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414A1 1 0 0 0 6.586 13H4" />
+
+          <div
+            v-else-if="productsResponse.products.length === 0"
+            class="products-empty"
+          >
+            <svg
+              class="empty-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path
+                d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414A1 1 0 0 0 6.586 13H4"
+              />
             </svg>
             <h3>Товары не найдены</h3>
             <p>Попробуйте изменить параметры поиска или фильтры</p>
@@ -49,15 +56,19 @@
               Сбросить фильтры
             </button>
           </div>
-          
-          <div v-else class="products-grid" :class="`products-grid--${viewMode}`">
+
+          <div
+            v-else
+            class="products-grid"
+            :class="`products-grid--${viewMode}`"
+          >
             <ProductCard
               v-for="product in productsResponse.products"
               :key="product.id"
               :product="product"
             />
           </div>
-          
+
           <!-- Пагинация -->
           <CatalogPagination
             v-if="productsResponse.total > 0"
@@ -73,168 +84,172 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { getCatalog, getProducts } from '@/api'
-import { useCatalogStore } from '@/stores'
-import type { Category, Subcategory, Product } from '@/types'
+import { ref, reactive, computed, onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
+import { getCatalog, getProducts } from "@/api";
+import { useCatalogStore } from "@/stores";
+import type { Category, Subcategory, Product } from "@/types";
 
-import CatalogHeader from '@/components/catalog/CatalogHeader.vue'
-import CatalogControls from '@/components/catalog/CatalogControls.vue'
-import CatalogFilters from '@/components/catalog/CatalogFilters.vue'
-import CatalogPagination from '@/components/catalog/CatalogPagination.vue'
-import ProductCard from '@/components/catalog/ProductCard.vue'
+import CatalogHeader from "@/components/catalog/CatalogHeader.vue";
+import CatalogControls from "@/components/catalog/CatalogControls.vue";
+import CatalogFilters from "@/components/catalog/CatalogFilters.vue";
+import CatalogPagination from "@/components/catalog/CatalogPagination.vue";
+import ProductCard from "@/components/catalog/ProductCard.vue";
 
-const route = useRoute()
-const catalogStore = useCatalogStore()
+const route = useRoute();
+const catalogStore = useCatalogStore();
 
 // Состояние
-const loading = ref(false)
-const categories = ref<Category[]>([])
-const currentCategory = ref<Category | null>(null)
-const currentSubcategory = ref<Subcategory | null>(null)
-const availableBrands = ref<string[]>([])
+const loading = ref(false);
+const categories = ref<Category[]>([]);
+const currentCategory = ref<Category | null>(null);
+const currentSubcategory = ref<Subcategory | null>(null);
+const availableBrands = ref<string[]>([]);
 
-const searchQuery = ref('')
-const sortOption = ref('date-desc')
-const viewMode = ref<'grid' | 'list'>('grid')
-const priceRange = ref<[number, number]>([0, 500000])
-const selectedBrands = ref<string[]>([])
-const selectedCategory = ref<string>('')
-const selectedSubcategory = ref<string>('')
+const searchQuery = ref("");
+const sortOption = ref("date-desc");
+const viewMode = ref<"grid" | "list">("grid");
+const priceRange = ref<[number, number]>([0, 500000]);
+const selectedBrands = ref<string[]>([]);
+const selectedCategory = ref<string>("");
+const selectedSubcategory = ref<string>("");
 
 const productsResponse = reactive({
   products: [] as Product[],
   total: 0,
   page: 1,
   limit: 20,
-})
+});
 
-const currentPage = computed(() => productsResponse.page)
-const totalPages = computed(() => Math.ceil(productsResponse.total / productsResponse.limit))
+const currentPage = computed(() => productsResponse.page);
+const totalPages = computed(() =>
+  Math.ceil(productsResponse.total / productsResponse.limit)
+);
 
 // Загрузка каталога
 const loadCatalog = async () => {
   try {
-    const response = await getCatalog()
-    categories.value = response.data.categories || []
-    
+    const response = await getCatalog();
+    categories.value = response.data.categories || [];
+
     // Сохраняем в store
-    catalogStore.setCatalog(response.data)
-    
+    catalogStore.setCatalog(response.data);
+
     // Получаем все бренды
-    const products = Object.values(response.data.products || {}) as Product[]
-    availableBrands.value = [...new Set(products.map(p => p.brand))]
-    
+    const products = Object.values(response.data.products || {}) as Product[];
+    availableBrands.value = [...new Set(products.map((p) => p.brand))];
+
     // Определяем текущую категорию из роута
     if (route.params.categoryId) {
-      currentCategory.value = categories.value.find(c => c.id === route.params.categoryId) || null
+      currentCategory.value =
+        categories.value.find((c) => c.id === route.params.categoryId) || null;
     }
-    
+
     if (route.params.subcategoryId) {
-      const subcategories = response.data.subcategories || {}
-      currentSubcategory.value = subcategories[route.params.subcategoryId as string] || null
+      const subcategories = response.data.subcategories || {};
+      currentSubcategory.value =
+        subcategories[route.params.subcategoryId as string] || null;
     }
   } catch (error) {
-    console.error('Failed to load catalog:', error)
+    console.error("Failed to load catalog:", error);
   }
-}
+};
 
 // Загрузка товаров
 const loadProducts = async () => {
-  loading.value = true
-  
+  loading.value = true;
+
   try {
     const params: Record<string, any> = {
       page: currentPage.value,
       limit: productsResponse.limit,
       sortBy: sortOption.value,
-    }
-    
+    };
+
     if (searchQuery.value) {
-      params.q = searchQuery.value
+      params.q = searchQuery.value;
     }
-    
+
     if (selectedCategory.value) {
-      params.categoryId = selectedCategory.value
+      params.categoryId = selectedCategory.value;
     }
-    
+
     if (selectedSubcategory.value) {
-      params.subcategoryId = selectedSubcategory.value
+      params.subcategoryId = selectedSubcategory.value;
     }
-    
+
     if (selectedBrands.value.length > 0) {
-      params.brand = selectedBrands.value.join(',')
+      params.brand = selectedBrands.value.join(",");
     }
-    
+
     if (priceRange.value[0] > 0 || priceRange.value[1] < 500000) {
-      params.priceMin = priceRange.value[0]
-      params.priceMax = priceRange.value[1]
+      params.priceMin = priceRange.value[0];
+      params.priceMax = priceRange.value[1];
     }
-    
-    const response = await getProducts(params)
-    
-    productsResponse.products = response.data.products || []
-    productsResponse.total = response.data.total || 0
-    productsResponse.page = response.data.page || 1
-    productsResponse.limit = response.data.limit || 20
+
+    const response = await getProducts(params);
+
+    productsResponse.products = response.data.products || [];
+    productsResponse.total = response.data.total || 0;
+    productsResponse.page = response.data.page || 1;
+    productsResponse.limit = response.data.limit || 20;
   } catch (error) {
-    console.error('Failed to load products:', error)
-    productsResponse.products = []
-    productsResponse.total = 0
+    console.error("Failed to load products:", error);
+    productsResponse.products = [];
+    productsResponse.total = 0;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 // Обработчики
 const handleSearch = () => {
-  productsResponse.page = 1
-  loadProducts()
-}
+  productsResponse.page = 1;
+  loadProducts();
+};
 
 const handleSort = () => {
-  productsResponse.page = 1
-  loadProducts()
-}
+  productsResponse.page = 1;
+  loadProducts();
+};
 
 const applyFilters = () => {
-  productsResponse.page = 1
-  loadProducts()
-}
+  productsResponse.page = 1;
+  loadProducts();
+};
 
 const resetFilters = () => {
-  searchQuery.value = ''
-  sortOption.value = 'date-desc'
-  priceRange.value = [0, 500000]
-  selectedBrands.value = []
-  selectedCategory.value = ''
-  selectedSubcategory.value = ''
-  productsResponse.page = 1
-  loadProducts()
-}
+  searchQuery.value = "";
+  sortOption.value = "date-desc";
+  priceRange.value = [0, 500000];
+  selectedBrands.value = [];
+  selectedCategory.value = "";
+  selectedSubcategory.value = "";
+  productsResponse.page = 1;
+  loadProducts();
+};
 
 const changePage = (page: number) => {
-  productsResponse.page = page
-  loadProducts()
-  
+  productsResponse.page = page;
+  loadProducts();
+
   // Скролл к началу
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
 // Watch для параметров роута
 watch(
   () => [route.params.categoryId, route.params.subcategoryId],
   () => {
-    loadCatalog()
-    loadProducts()
+    loadCatalog();
+    loadProducts();
   }
-)
+);
 
 onMounted(() => {
-  loadCatalog()
-  loadProducts()
-})
+  loadCatalog();
+  loadProducts();
+});
 </script>
 
 <style scoped>
@@ -328,7 +343,7 @@ onMounted(() => {
   .catalog-content {
     grid-template-columns: 260px 1fr;
   }
-  
+
   .products-grid--grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -338,7 +353,7 @@ onMounted(() => {
   .catalog-content {
     grid-template-columns: 1fr;
   }
-  
+
   .products-grid--grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -348,7 +363,7 @@ onMounted(() => {
   .catalog-view {
     padding: var(--spacing-8) 0;
   }
-  
+
   .products-grid--grid {
     grid-template-columns: 1fr;
   }

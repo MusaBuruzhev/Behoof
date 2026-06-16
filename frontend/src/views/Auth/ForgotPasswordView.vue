@@ -4,9 +4,14 @@
       <div class="auth-card">
         <div class="auth-header">
           <router-link to="/" class="auth-logo">
-            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="40" height="40" rx="8" fill="currentColor"/>
-              <path d="M20 10L30 20L20 30L10 20L20 10Z" fill="white"/>
+            <svg
+              class="logo-icon"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="40" height="40" rx="8" fill="currentColor" />
+              <path d="M20 10L30 20L20 30L10 20L20 10Z" fill="white" />
             </svg>
             <span class="logo-text">Behoof</span>
           </router-link>
@@ -27,7 +32,9 @@
               autocomplete="email"
               :disabled="isSubmitting"
             />
-            <span v-if="errors.email" class="form-error">{{ errors.email }}</span>
+            <span v-if="errors.email" class="form-error">{{
+              errors.email
+            }}</span>
           </div>
 
           <button
@@ -44,10 +51,15 @@
           </button>
 
           <div v-if="serverError" class="server-error">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             {{ serverError }}
           </div>
@@ -62,14 +74,22 @@
 
         <div v-else class="success-message">
           <div class="success-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              />
             </svg>
           </div>
           <h2 class="success-title">Письмо отправлено</h2>
           <p class="success-text">
-            Если аккаунт с email <strong>{{ formData.email }}</strong> существует, 
-            вы получите инструкцию по восстановлению пароля.
+            Если аккаунт с email
+            <strong>{{ formData.email }}</strong> существует, вы получите
+            инструкцию по восстановлению пароля.
           </p>
           <div class="success-actions">
             <router-link to="/auth/login" class="btn btn-primary">
@@ -86,56 +106,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive } from "vue";
 
 const formData = reactive({
-  email: '',
-})
+  email: "",
+});
 
-const isSubmitting = ref(false)
-const isSubmitted = ref(false)
-const serverError = ref('')
-const errors = reactive<Record<string, string>>({})
+const isSubmitting = ref(false);
+const isSubmitted = ref(false);
+const serverError = ref("");
+const errors = reactive<Record<string, string>>({});
 
 const validateEmail = (email: string): string | null => {
-  if (!email) return 'Email обязателен'
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) return 'Некорректный формат email'
-  return null
-}
+  if (!email) return "Email обязателен";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return "Некорректный формат email";
+  return null;
+};
 
 const handleSubmit = async () => {
-  serverError.value = ''
-  errors.email = ''
-  
-  const emailError = validateEmail(formData.email)
+  serverError.value = "";
+  errors.email = "";
+
+  const emailError = validateEmail(formData.email);
   if (emailError) {
-    errors.email = emailError
-    return
+    errors.email = emailError;
+    return;
   }
-  
-  isSubmitting.value = true
-  
+
+  isSubmitting.value = true;
+
   try {
     // TODO: Реализовать endpoint forgot password на backend
     // const response = await forgotPassword({ email: formData.email })
-    
+
     // Имитация успешного ответа (backend может вернуть заглушку)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    isSubmitted.value = true
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    isSubmitted.value = true;
   } catch (error: any) {
-    console.error('Forgot password error:', error)
-    
+    console.error("Forgot password error:", error);
+
     if (error.response?.data?.error) {
-      serverError.value = error.response.data.error
+      serverError.value = error.response.data.error;
     } else {
-      serverError.value = 'Ошибка подключения. Попробуйте позже.'
+      serverError.value = "Ошибка подключения. Попробуйте позже.";
     }
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -274,7 +294,9 @@ const handleSubmit = async () => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Server Error */
@@ -377,11 +399,11 @@ const handleSubmit = async () => {
   .auth-card {
     padding: var(--spacing-6);
   }
-  
+
   .auth-title {
     font-size: var(--font-size-h3);
   }
-  
+
   .success-actions {
     flex-direction: column;
   }

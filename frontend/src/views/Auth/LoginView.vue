@@ -4,9 +4,14 @@
       <div class="auth-card">
         <div class="auth-header">
           <router-link to="/" class="auth-logo">
-            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="40" height="40" rx="8" fill="currentColor"/>
-              <path d="M20 10L30 20L20 30L10 20L20 10Z" fill="white"/>
+            <svg
+              class="logo-icon"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="40" height="40" rx="8" fill="currentColor" />
+              <path d="M20 10L30 20L20 30L10 20L20 10Z" fill="white" />
             </svg>
             <span class="logo-text">Behoof</span>
           </router-link>
@@ -27,7 +32,9 @@
               autocomplete="email"
               :disabled="isSubmitting"
             />
-            <span v-if="errors.email" class="form-error">{{ errors.email }}</span>
+            <span v-if="errors.email" class="form-error">{{
+              errors.email
+            }}</span>
           </div>
 
           <div class="form-group">
@@ -49,17 +56,33 @@
                 @click="showPassword = !showPassword"
                 tabindex="-1"
               >
-                <svg v-if="!showPassword" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
+                <svg
+                  v-if="!showPassword"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
                 </svg>
-                <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
+                <svg
+                  v-else
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                  />
+                  <line x1="1" y1="1" x2="23" y2="23" />
                 </svg>
               </button>
             </div>
-            <span v-if="errors.password" class="form-error">{{ errors.password }}</span>
+            <span v-if="errors.password" class="form-error">{{
+              errors.password
+            }}</span>
           </div>
 
           <div class="form-options">
@@ -89,10 +112,15 @@
           </button>
 
           <div v-if="serverError" class="server-error">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
             {{ serverError }}
           </div>
@@ -110,102 +138,102 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores'
-import { login } from '@/api'
-import type { User } from '@/types'
+import { ref, reactive, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "@/stores";
+import { login } from "@/api";
+import type { User } from "@/types";
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 
 const formData = reactive({
-  email: '',
-  password: '',
+  email: "",
+  password: "",
   rememberMe: false,
-})
+});
 
-const showPassword = ref(false)
-const isSubmitting = ref(false)
-const serverError = ref('')
-const errors = reactive<Record<string, string>>({})
+const showPassword = ref(false);
+const isSubmitting = ref(false);
+const serverError = ref("");
+const errors = reactive<Record<string, string>>({});
 
 interface LoginResponse {
-  user: User
-  token: string
-  message?: string
+  user: User;
+  token: string;
+  message?: string;
 }
 
 const validateEmail = (email: string): string | null => {
-  if (!email) return 'Email обязателен'
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(email)) return 'Некорректный формат email'
-  return null
-}
+  if (!email) return "Email обязателен";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return "Некорректный формат email";
+  return null;
+};
 
 const validatePassword = (password: string): string | null => {
-  if (!password) return 'Пароль обязателен'
-  if (password.length < 6) return 'Пароль должен содержать минимум 6 символов'
-  return null
-}
+  if (!password) return "Пароль обязателен";
+  if (password.length < 6) return "Пароль должен содержать минимум 6 символов";
+  return null;
+};
 
 const validateForm = (): boolean => {
-  errors.email = ''
-  errors.password = ''
-  
-  const emailError = validateEmail(formData.email)
-  if (emailError) errors.email = emailError
-  
-  const passwordError = validatePassword(formData.password)
-  if (passwordError) errors.password = passwordError
-  
-  return !errors.email && !errors.password
-}
+  errors.email = "";
+  errors.password = "";
+
+  const emailError = validateEmail(formData.email);
+  if (emailError) errors.email = emailError;
+
+  const passwordError = validatePassword(formData.password);
+  if (passwordError) errors.password = passwordError;
+
+  return !errors.email && !errors.password;
+};
 
 const handleSubmit = async () => {
-  serverError.value = ''
-  
-  if (!validateForm()) return
-  
-  isSubmitting.value = true
-  
+  serverError.value = "";
+
+  if (!validateForm()) return;
+
+  isSubmitting.value = true;
+
   try {
     const response = await login({
       email: formData.email,
       password: formData.password,
-    })
-    
-    const { user, token } = response.data as LoginResponse
-    authStore.setAuth(user, token)
-    
+    });
+
+    const { user, token } = response.data as LoginResponse;
+    authStore.setAuth(user, token);
+
     // Redirect to intended page or profile
-    const redirect = route.query.redirect as string || '/profile'
-    router.push(redirect)
+    const redirect = (route.query.redirect as string) || "/profile";
+    router.push(redirect);
   } catch (error: any) {
-    console.error('Login error:', error)
-    
+    console.error("Login error:", error);
+
     if (error.response?.status === 401) {
-      serverError.value = 'Неверный email или пароль'
+      serverError.value = "Неверный email или пароль";
     } else if (error.response?.status === 403) {
-      serverError.value = 'Аккаунт заблокирован'
+      serverError.value = "Аккаунт заблокирован";
     } else if (error.response?.data?.error) {
-      serverError.value = error.response.data.error
+      serverError.value = error.response.data.error;
     } else {
-      serverError.value = 'Ошибка подключения. Попробуйте позже.'
+      serverError.value = "Ошибка подключения. Попробуйте позже.";
     }
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
-}
+};
 
 onMounted(() => {
   // If already logged in, redirect to profile
   if (authStore.isAuthenticated) {
-    const redirect = route.query.redirect as string || '/profile'
-    router.push(redirect)
+    const redirect = (route.query.redirect as string) || "/profile";
+    router.push(redirect);
   }
-})
+});
 </script>
 
 <style scoped>
@@ -409,7 +437,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Server Error */
@@ -461,11 +491,11 @@ onMounted(() => {
   .auth-card {
     padding: var(--spacing-6);
   }
-  
+
   .auth-title {
     font-size: var(--font-size-h3);
   }
-  
+
   .form-options {
     flex-direction: column;
     align-items: flex-start;
@@ -473,4 +503,3 @@ onMounted(() => {
   }
 }
 </style>
-

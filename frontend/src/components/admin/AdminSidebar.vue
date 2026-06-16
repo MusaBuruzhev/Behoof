@@ -143,7 +143,7 @@ const logout = () => {
 }
 
 .sidebar-title {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   color: var(--color-text-primary);
   letter-spacing: -0.01em;
@@ -162,12 +162,12 @@ const logout = () => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px;
+  padding: 12px 14px;
   border-radius: 6px;
   color: var(--color-text-secondary);
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 450;
+  font-size: 16px;
+  font-weight: 500;
   transition: all 0.15s ease;
   cursor: pointer;
   border: none;

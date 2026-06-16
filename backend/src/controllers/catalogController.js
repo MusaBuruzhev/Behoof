@@ -757,7 +757,8 @@ export const initializeData = async (req, res) => {
         const model = new Model({
           id: await getNextId('mod'),
           name: modelName,
-          subcategoryId: subcategory.id,
+          brandId: subcategory.id,
+          categoryId: 'cat1',
           productIds: [],
         })
         await model.save()
@@ -790,7 +791,8 @@ export const initializeData = async (req, res) => {
         const model = new Model({
           id: await getNextId('mod'),
           name: modelName,
-          subcategoryId: subcategory.id,
+          brandId: subcategory.id,
+          categoryId: 'cat2',
           productIds: [],
         })
         await model.save()

@@ -160,7 +160,7 @@ const features = [
 .feature-icon {
   width: 32px;
   height: 32px;
-  color: var(--color-primary);
+  color: #ffffff;
 }
 
 .feature-title {
