@@ -136,6 +136,55 @@
           </button>
         </div>
       </div>
+
+      <div v-if="order.status === 'ready_for_pickup'" class="verify-code-section">
+        <h3 class="section-title">Подтверждение выдачи заказа</h3>
+        <div class="verify-code-card">
+          <div class="verify-code-info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <p>Попросите клиента назвать 5-значный код подтверждения. При верном коде заказ будет автоматически переведён в статус «Получен».</p>
+          </div>
+          <div class="verify-code-display" v-if="order.verificationCode">
+            <span class="code-label">Код клиента:</span>
+            <span class="code-value">{{ order.verificationCode }}</span>
+          </div>
+          <div class="verify-code-input">
+            <input
+              v-model="adminCodeInput"
+              type="text"
+              maxlength="5"
+              class="code-input-field"
+              placeholder="Введите код клиента"
+              @keyup.enter="verifyAndComplete"
+            />
+            <button
+              class="btn-verify-complete"
+              @click="verifyAndComplete"
+              :disabled="!isCodeValid || isVerifying"
+            >
+              {{ isVerifying ? 'Проверка...' : 'Проверить и завершить' }}
+            </button>
+          </div>
+          <div v-if="verifyError" class="verify-error">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            {{ verifyError }}
+          </div>
+          <div v-if="verifySuccess" class="verify-success">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            Заказ успешно получен!
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="showPreorderModal" class="modal-overlay" @click.self="showPreorderModal = false">
@@ -168,7 +217,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAdminStore } from '@/stores'
-import { getAllOrdersAdmin } from '@/api'
+import { getAllOrdersAdmin, verifyOrderCodeAdmin } from '@/api'
 
 const route = useRoute()
 const adminStore = useAdminStore()
@@ -179,6 +228,10 @@ const showPreorderModal = ref(false)
 const showUnavailableModal = ref(false)
 const preorderMessage = ref('')
 const cancelMessage = ref('')
+const adminCodeInput = ref('')
+const verifyError = ref('')
+const verifySuccess = ref(false)
+const isVerifying = ref(false)
 
 const orderId = computed(() => route.params.id as string)
 
@@ -250,6 +303,34 @@ const formatPhone = (phone: string) => {
 }
 
 const getImageUrl = (path: string) => path?.startsWith('/uploads/') ? `http://localhost:5000${path}` : path
+
+const isCodeValid = computed(() => {
+  return /^\d{5}$/.test(adminCodeInput.value)
+})
+
+const verifyAndComplete = async () => {
+  if (!isCodeValid.value) return
+  if (!order.value.verificationCode) {
+    verifyError.value = 'У заказа отсутствует код подтверждения'
+    return
+  }
+  
+  verifyError.value = ''
+  verifySuccess.value = false
+  isVerifying.value = true
+
+  try {
+    await verifyOrderCodeAdmin(orderId.value, adminCodeInput.value)
+    verifySuccess.value = true
+    adminCodeInput.value = ''
+    await loadOrder()
+    setTimeout(() => { verifySuccess.value = false }, 5000)
+  } catch (err: any) {
+    verifyError.value = err.response?.data?.error || 'Неверный код подтверждения'
+  } finally {
+    isVerifying.value = false
+  }
+}
 
 onMounted(() => {
   loadOrder()
@@ -681,5 +762,161 @@ onMounted(() => {
   .availability-buttons {
     flex-direction: column;
   }
+}
+
+.verify-code-section {
+  background: var(--color-surface);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.verify-code-card {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.verify-code-info {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  background: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 12px;
+}
+
+.verify-code-info svg {
+  width: 24px;
+  height: 24px;
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.verify-code-info p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.verify-code-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 2px dashed #fbbf24;
+  border-radius: 12px;
+}
+
+.code-label {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.code-value {
+  font-size: 36px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #fbbf24;
+  letter-spacing: 8px;
+}
+
+.verify-code-input {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.code-input-field {
+  flex: 1;
+  max-width: 200px;
+  padding: 14px 20px;
+  border: 2px solid var(--color-border);
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: center;
+  letter-spacing: 8px;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  transition: all 0.2s;
+}
+
+.code-input-field:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.code-input-field::placeholder {
+  font-size: 14px;
+  letter-spacing: 0;
+  font-family: inherit;
+  color: var(--color-text-tertiary);
+}
+
+.btn-verify-complete {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-verify-complete:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-verify-complete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.verify-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--color-error);
+}
+
+.verify-error svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.verify-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(5, 150, 105, 0.08);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #059669;
+}
+
+.verify-success svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 </style>

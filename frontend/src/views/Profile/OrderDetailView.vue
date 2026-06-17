@@ -455,10 +455,9 @@ const deliveryForm = ref({
 });
 
 const timelineStages = [
-  { id: "pending", label: "На рассмотрении" },
+  { id: "pending", label: "В обработке" },
   { id: "confirmed", label: "Подтверждён" },
   { id: "ready_for_pickup", label: "Готов к выдаче" },
-  { id: "delivering", label: "Доставляется" },
   { id: "completed", label: "Получен" },
 ];
 
@@ -481,10 +480,11 @@ const isStageCompleted = (status: OrderStatus, stageIndex: number): boolean => {
     "pending",
     "confirmed",
     "ready_for_pickup",
-    "delivering",
     "completed",
   ];
   const statusIndex = stageOrder.indexOf(status);
+  // Отменённый заказ - все этапы пройдены
+  if (status === 'cancelled') return stageIndex < 3;
   return statusIndex > stageIndex;
 };
 
@@ -493,11 +493,12 @@ const isStageCurrent = (status: OrderStatus, stageIndex: number): boolean => {
     "pending",
     "confirmed",
     "ready_for_pickup",
-    "delivering",
     "completed",
   ];
   const statusIndex = stageOrder.indexOf(status);
-  return statusIndex === stageIndex && status !== "cancelled";
+  // Для отменённого - не показываем текущий этап
+  if (status === 'cancelled') return false;
+  return statusIndex === stageIndex;
 };
 
 const canCancel = computed(() => {

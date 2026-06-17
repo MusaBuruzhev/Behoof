@@ -296,10 +296,15 @@ export const updateOrderStatusAdmin = async (req, res) => {
  return res.status(404).json({ error: 'Заказ не найден' });
  }
 
- const oldStatus = order.status;
+const oldStatus = order.status;
  order.status = status;
  if (preorderMessage) {
    order.preorderMessage = preorderMessage;
+ }
+
+ // Генерируем код подтверждения при установке статуса ready_for_pickup
+ if (status === 'ready_for_pickup' && !order.verificationCode) {
+   order.verificationCode = generateVerificationCode();
  }
 
  // Автоматически перемещаем в историю при завершении
