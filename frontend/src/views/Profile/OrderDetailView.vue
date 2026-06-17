@@ -38,7 +38,6 @@
     </div>
     
     <div v-else class="order-detail-content">
-      <!-- Информация о предзаказе -->
       <div v-if="order.status === 'preorder' && order.preorderMessage" class="preorder-banner">
         <div class="banner-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -58,7 +57,6 @@
         </div>
       </div>
       
-      <!-- Код подтверждения - для ready_for_pickup -->
       <div v-if="order.status === 'ready_for_pickup' && order.verificationCode" class="code-banner">
         <div class="banner-icon code">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -73,7 +71,6 @@
         </div>
       </div>
       
-      <!-- Товары -->
       <div class="products-section">
         <h2 class="section-title">Товары в заказе</h2>
         
@@ -115,7 +112,6 @@
         </div>
       </div>
       
-      <!-- Информация о заказе -->
       <div class="info-section">
         <div class="info-grid">
           <div class="info-card">
@@ -200,7 +196,6 @@
         </div>
       </div>
       
-      <!-- Timeline -->
       <div class="timeline-section">
         <h2 class="section-title">Статус заказа</h2>
         
@@ -228,7 +223,6 @@
         </div>
       </div>
       
-      <!-- Форма выбора доставки для confirmed -->
       <div v-if="canChooseDelivery" class="delivery-form-section">
         <div class="message-banner info">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -297,7 +291,6 @@
         </button>
       </div>
       
-      <!-- Actions -->
       <div v-if="canCancel" class="actions-section">
         <button class="btn btn-outline btn-danger" @click="cancelOrder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -589,7 +582,6 @@ onMounted(() => {
   background: currentColor;
 }
 
-/* Loading & Not Found */
 .loading-state,
 .not-found {
   display: flex;
@@ -641,21 +633,18 @@ onMounted(() => {
   margin: 0 0 var(--spacing-6) 0;
 }
 
-/* Order Detail Content */
 .order-detail-content {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-8);
 }
 
-/* Products Section */
 .products-section {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
 }
 
-/* Preorder Banner */
 .preorder-banner {
   display: flex;
   gap: var(--spacing-4);
@@ -869,7 +858,6 @@ onMounted(() => {
   height: 20px;
 }
 
-/* Info Section */
 .info-section {
   display: flex;
   flex-direction: column;
@@ -933,7 +921,6 @@ onMounted(() => {
   color: var(--color-primary);
 }
 
-/* Timeline Section */
 .timeline-section {
   display: flex;
   flex-direction: column;
@@ -1029,7 +1016,6 @@ onMounted(() => {
   font-weight: var(--font-weight-semibold);
 }
 
-/* Delivery Form Section */
 .delivery-form-section {
   display: flex;
   flex-direction: column;
@@ -1145,7 +1131,6 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* Actions Section */
 .actions-section {
   display: flex;
   justify-content: center;
@@ -1164,7 +1149,6 @@ onMounted(() => {
   color: white;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;

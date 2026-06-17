@@ -25,23 +25,11 @@
       </div>
     </header>
     
-    <!-- Loading State -->
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
       <p>Загрузка уведомлений...</p>
     </div>
     
-    <!-- Empty State -->
-    <div v-else-if="notifications.length === 0" class="empty-state">
-      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-      </svg>
-      <h3 class="empty-title">Нет уведомлений</h3>
-      <p class="empty-text">Здесь будут появляться уведомления о заказах и акциях</p>
-    </div>
-    
-    <!-- Notifications List -->
     <div v-else class="notifications-list">
       <div
         v-for="(group, date) in groupedNotifications"
@@ -305,7 +293,6 @@ onMounted(() => {
   font-size: var(--font-size-small);
 }
 
-/* Loading & Empty States */
 .loading-state,
 .empty-state {
   display: flex;
@@ -357,7 +344,6 @@ onMounted(() => {
   margin: 0 0 var(--spacing-6) 0;
 }
 
-/* Notifications List */
 .notifications-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -382,7 +368,6 @@ onMounted(() => {
   display: contents;
 }
 
-/* Notification Card */
 .notification-card {
   display: flex;
   gap: var(--spacing-6);
@@ -496,7 +481,6 @@ onMounted(() => {
   border-radius: var(--radius-md);
 }
 
-/* Notification Actions */
 .notification-actions {
   display: flex;
   flex-direction: column;
@@ -532,7 +516,6 @@ onMounted(() => {
   height: 18px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .notifications-view {
     padding: var(--spacing-6) var(--spacing-4);
