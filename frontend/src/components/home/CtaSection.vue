@@ -8,7 +8,13 @@
         </p>
         <router-link to="/catalog" class="btn btn-primary btn-lg">
           Перейти в каталог
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="btn-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </router-link>
@@ -18,12 +24,15 @@
 </template>
 
 <script setup lang="ts">
-// CTA section - финальный призыв к действию
 </script>
 
 <style scoped>
 .cta-section {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
   padding: var(--spacing-24) 0;
 }
 
@@ -69,11 +78,11 @@
   .cta-section {
     padding: var(--spacing-16) 0;
   }
-  
+
   .cta-title {
     font-size: var(--font-size-h3);
   }
-  
+
   .cta-description {
     font-size: var(--font-size-body);
   }

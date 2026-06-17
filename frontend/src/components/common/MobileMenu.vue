@@ -3,26 +3,44 @@
     <transition name="mobile-menu">
       <div v-if="visible" class="mobile-menu-overlay" @click="closeMenu">
         <div class="mobile-menu" @click.stop>
-          <!-- Header мобильного меню -->
+         
           <div class="mobile-menu-header">
             <router-link to="/" class="mobile-logo" @click="closeMenu">
-              <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="40" height="40" rx="10" fill="#2563EB"/>
-                <path d="M12 28V12h8c4.4 0 8 3.6 8 8s-3.6 8-8 8h-8zm4-4h4c2.2 0 4-1.8 4-4s-1.8-4-4-4h-4v8z" fill="white"/>
+              <svg
+                class="logo-icon"
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect width="40" height="40" rx="10" fill="#2563EB" />
+                <path
+                  d="M12 28V12h8c4.4 0 8 3.6 8 8s-3.6 8-8 8h-8zm4-4h4c2.2 0 4-1.8 4-4s-1.8-4-4-4h-4v8z"
+                  fill="white"
+                />
               </svg>
               <span class="logo-text">Behoof</span>
             </router-link>
             <button class="close-btn" @click="closeMenu">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
           </div>
-          
-          <!-- Поиск -->
+
           <div class="mobile-search">
             <div class="search-wrapper">
-              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="search-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -35,11 +53,16 @@
               />
             </div>
           </div>
-          
-          <!-- Навигация -->
+
           <nav class="mobile-nav">
             <router-link to="/catalog" class="nav-item" @click="closeMenu">
-              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <rect x="3" y="3" width="7" height="7" />
                 <rect x="14" y="3" width="7" height="7" />
                 <rect x="3" y="14" width="7" height="7" />
@@ -47,32 +70,57 @@
               </svg>
               <span>Каталог</span>
             </router-link>
-            
+
             <router-link to="/favorites" class="nav-item" @click="closeMenu">
-              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                />
               </svg>
               <span>Избранное</span>
-              <span v-if="favoritesCount > 0" class="nav-badge">{{ favoritesCount }}</span>
+              <span v-if="favoritesCount > 0" class="nav-badge">{{
+                favoritesCount
+              }}</span>
             </router-link>
-            
+
             <router-link to="/comparison" class="nav-item" @click="closeMenu">
-              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
               </svg>
               <span>Сравнение</span>
-              <span v-if="compareCount > 0" class="nav-badge">{{ compareCount }}</span>
+              <span v-if="compareCount > 0" class="nav-badge">{{
+                compareCount
+              }}</span>
             </router-link>
-            
+
             <router-link to="/orders" class="nav-item" @click="closeMenu">
-              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414A1 1 0 0 0 6.586 13H4" />
+              <svg
+                class="nav-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414A1 1 0 0 0 6.586 13H4"
+                />
               </svg>
               <span>Заказы</span>
             </router-link>
           </nav>
-          
-          <!-- Категории -->
+
           <div class="mobile-categories">
             <h3 class="categories-title">Категории</h3>
             <div class="categories-list">
@@ -84,14 +132,19 @@
                 @click="closeMenu"
               >
                 <span class="category-name">{{ category.name }}</span>
-                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  class="chevron-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <path d="M9 18l6-6-6-6" />
                 </svg>
               </router-link>
             </div>
           </div>
-          
-          <!-- Профиль -->
+
           <div class="mobile-profile">
             <template v-if="isAuthenticated">
               <div class="profile-info">
@@ -104,15 +157,17 @@
               <router-link to="/profile" class="profile-btn" @click="closeMenu">
                 Профиль
               </router-link>
-              <button class="logout-btn" @click="handleLogout">
-                Выйти
-              </button>
+              <button class="logout-btn" @click="handleLogout">Выйти</button>
             </template>
             <template v-else>
               <router-link to="/auth/login" class="auth-btn" @click="closeMenu">
                 Войти
               </router-link>
-              <router-link to="/auth/register" class="auth-btn auth-btn-secondary" @click="closeMenu">
+              <router-link
+                to="/auth/register"
+                class="auth-btn auth-btn-secondary"
+                @click="closeMenu"
+              >
                 Регистрация
               </router-link>
             </template>
@@ -124,54 +179,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore, useFavoritesStore, useComparisonStore } from '@/stores'
-import type { Category } from '@/types'
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore, useFavoritesStore, useComparisonStore } from "@/stores";
+import type { Category } from "@/types";
 
-const router = useRouter()
-const authStore = useAuthStore()
-const favoritesStore = useFavoritesStore()
-const comparisonStore = useComparisonStore()
+const router = useRouter();
+const authStore = useAuthStore();
+const favoritesStore = useFavoritesStore();
+const comparisonStore = useComparisonStore();
 
 const props = defineProps<{
-  visible: boolean
-  categories: Category[]
-}>()
+  visible: boolean;
+  categories: Category[];
+}>();
 
 const emit = defineEmits<{
-  close: []
-}>()
+  close: [];
+}>();
 
-const searchQuery = ref('')
+const searchQuery = ref("");
 
-const isAuthenticated = computed(() => authStore.isAuthenticated)
-const favoritesCount = computed(() => favoritesStore.favoritesCount)
-const compareCount = computed(() => comparisonStore.compareCount)
+const isAuthenticated = computed(() => authStore.isAuthenticated);
+const favoritesCount = computed(() => favoritesStore.favoritesCount);
+const compareCount = computed(() => comparisonStore.compareCount);
 const userInitials = computed(() => {
-  if (!authStore.user) return ''
-  return `${authStore.user.firstName[0]}${authStore.user.lastName[0]}`.toUpperCase()
-})
-const userName = computed(() => authStore.userName)
-const userEmail = computed(() => authStore.user?.email || '')
+  if (!authStore.user) return "";
+  return `${authStore.user.firstName[0]}${authStore.user.lastName[0]}`.toUpperCase();
+});
+const userName = computed(() => authStore.userName);
+const userEmail = computed(() => authStore.user?.email || "");
 
 const closeMenu = () => {
-  emit('close')
-  searchQuery.value = ''
-}
+  emit("close");
+  searchQuery.value = "";
+};
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    router.push(`/catalog?q=${encodeURIComponent(searchQuery.value.trim())}`)
-    closeMenu()
+    router.push(`/catalog?q=${encodeURIComponent(searchQuery.value.trim())}`);
+    closeMenu();
   }
-}
+};
 
 const handleLogout = () => {
-  authStore.logout()
-  closeMenu()
-  router.push('/')
-}
+  authStore.logout();
+  closeMenu();
+  router.push("/");
+};
 </script>
 
 <style scoped>
@@ -269,7 +324,8 @@ const handleLogout = () => {
 
 .search-input {
   width: 100%;
-  padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) calc(var(--spacing-3) + 18px + var(--spacing-2));
+  padding: var(--spacing-3) var(--spacing-3) var(--spacing-3)
+    calc(var(--spacing-3) + 18px + var(--spacing-2));
   font-size: var(--font-size-body);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);

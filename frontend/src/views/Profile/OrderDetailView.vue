@@ -1,32 +1,45 @@
 <template>
   <div class="order-detail-view">
     <router-link to="/profile/orders" class="back-link">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <polyline points="15 18 9 12 15 6" />
       </svg>
       Назад к заказам
     </router-link>
-    
-      <header class="page-header">
-        <div class="header-content">
-          <div>
-            <h1 class="page-title">Заказ #{{ orderId }}</h1>
-            <p class="page-subtitle">{{ order ? formatDate(order.createdAt) : '' }}</p>
-          </div>
-          <div v-if="order" :class="['status-badge-large', order.status]">
-            <span class="status-dot"></span>
-            {{ getStatusTitle(order.status) }}
-          </div>
+
+    <header class="page-header">
+      <div class="header-content">
+        <div>
+          <h1 class="page-title">Заказ #{{ orderId }}</h1>
+          <p class="page-subtitle">
+            {{ order ? formatDate(order.createdAt) : "" }}
+          </p>
         </div>
-      </header>
-    
+        <div v-if="order" :class="['status-badge-large', order.status]">
+          <span class="status-dot"></span>
+          {{ getStatusTitle(order.status) }}
+        </div>
+      </div>
+    </header>
+
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
       <p>Загрузка деталей заказа...</p>
     </div>
-    
+
     <div v-else-if="!order" class="not-found">
-      <svg class="not-found-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <svg
+        class="not-found-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
         <circle cx="12" cy="12" r="10" />
         <path d="M12 8v4M12 16h.01" />
       </svg>
@@ -36,11 +49,19 @@
         Вернуться к заказам
       </router-link>
     </div>
-    
+
     <div v-else class="order-detail-content">
-      <div v-if="order.status === 'preorder' && order.preorderMessage" class="preorder-banner">
+      <div
+        v-if="order.status === 'preorder' && order.preorderMessage"
+        class="preorder-banner"
+      >
         <div class="banner-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="16" x2="12" y2="12" />
             <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -56,24 +77,34 @@
           </div>
         </div>
       </div>
-      
-      <div v-if="order.status === 'ready_for_pickup' && order.verificationCode" class="code-banner">
+
+      <div
+        v-if="order.status === 'ready_for_pickup' && order.verificationCode"
+        class="code-banner"
+      >
         <div class="banner-icon code">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
         </div>
         <div class="banner-content">
           <h3 class="banner-title">Заказ готов к выдаче!</h3>
-          <p class="banner-message">Покажите этот код сотруднику при получении</p>
+          <p class="banner-message">
+            Покажите этот код сотруднику при получении
+          </p>
           <div class="verification-code">{{ order.verificationCode }}</div>
         </div>
       </div>
-      
+
       <div class="products-section">
         <h2 class="section-title">Товары в заказе</h2>
-        
+
         <div class="products-grid">
           <div
             v-for="(item, index) in order.items"
@@ -88,7 +119,12 @@
                 :alt="item.name"
               />
               <div v-else class="product-image-placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                   <circle cx="8.5" cy="8.5" r="1.5" />
                   <polyline points="21 15 16 10 5 21" />
@@ -96,28 +132,42 @@
               </div>
               <span class="product-qty">× {{ item.quantity }}</span>
             </div>
-            
+
             <div class="product-info">
               <h3 class="product-name">{{ item.name }}</h3>
               <p class="product-price">{{ formatPrice(item.price) }} ₽</p>
-              <p class="product-total">Итого: {{ formatPrice(item.price * item.quantity) }} ₽</p>
+              <p class="product-total">
+                Итого: {{ formatPrice(item.price * item.quantity) }} ₽
+              </p>
             </div>
-            
+
             <div class="product-arrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polyline points="9 18 15 12 9 6" />
               </svg>
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="info-section">
         <div class="info-grid">
           <div class="info-card">
             <div class="info-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                />
               </svg>
             </div>
             <div class="info-content">
@@ -125,22 +175,36 @@
               <span class="info-value">{{ order.contactName }}</span>
             </div>
           </div>
-          
+
           <div class="info-card">
             <div class="info-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                />
               </svg>
             </div>
             <div class="info-content">
               <span class="info-label">Телефон</span>
-              <span class="info-value">{{ formatPhone(order.contactPhone) }}</span>
+              <span class="info-value">{{
+                formatPhone(order.contactPhone)
+              }}</span>
             </div>
           </div>
-          
+
           <div class="info-card">
             <div class="info-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <rect x="1" y="3" width="15" height="13" />
                 <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
                 <circle cx="5.5" cy="18.5" r="2.5" />
@@ -149,13 +213,20 @@
             </div>
             <div class="info-content">
               <span class="info-label">Способ получения</span>
-              <span class="info-value">{{ order.deliveryType === 'pickup' ? 'Самовывоз' : 'Доставка' }}</span>
+              <span class="info-value">{{
+                order.deliveryType === "pickup" ? "Самовывоз" : "Доставка"
+              }}</span>
             </div>
           </div>
-          
+
           <div v-if="order.deliveryAddress" class="info-card">
             <div class="info-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
@@ -165,10 +236,15 @@
               <span class="info-value">{{ order.deliveryAddress }}</span>
             </div>
           </div>
-          
+
           <div v-if="order.pickupDate" class="info-card">
             <div class="info-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                 <line x1="16" y1="2" x2="16" y2="6" />
                 <line x1="8" y1="2" x2="8" y2="6" />
@@ -177,44 +253,65 @@
             </div>
             <div class="info-content">
               <span class="info-label">Дата получения</span>
-              <span class="info-value">{{ formatDateTime(order.pickupDate) }}</span>
+              <span class="info-value">{{
+                formatDateTime(order.pickupDate)
+              }}</span>
             </div>
           </div>
-          
+
           <div class="info-card">
             <div class="info-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="12" y1="1" x2="12" y2="23" />
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               </svg>
             </div>
             <div class="info-content">
               <span class="info-label">Сумма заказа</span>
-              <span class="info-value total">{{ formatPrice(order.totalAmount) }} ₽</span>
+              <span class="info-value total"
+                >{{ formatPrice(order.totalAmount) }} ₽</span
+              >
             </div>
           </div>
         </div>
       </div>
-      
+
       <div class="timeline-section">
         <h2 class="section-title">Статус заказа</h2>
-        
+
         <div class="timeline">
           <div
             v-for="(stage, index) in timelineStages"
             :key="stage.id"
-            :class="['timeline-stage', {
-              completed: isStageCompleted(order.status, index),
-              current: isStageCurrent(order.status, index)
-            }]"
+            :class="[
+              'timeline-stage',
+              {
+                completed: isStageCompleted(order.status, index),
+                current: isStageCurrent(order.status, index),
+              },
+            ]"
           >
             <div class="timeline-marker">
               <div class="marker-dot">
-                <svg v-if="isStageCompleted(order.status, index)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <svg
+                  v-if="isStageCompleted(order.status, index)"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                >
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
-              <div v-if="index < timelineStages.length - 1" class="marker-line"></div>
+              <div
+                v-if="index < timelineStages.length - 1"
+                class="marker-line"
+              ></div>
             </div>
             <div class="timeline-content">
               <span class="timeline-label">{{ stage.label }}</span>
@@ -222,24 +319,37 @@
           </div>
         </div>
       </div>
-      
+
       <div v-if="canChooseDelivery" class="delivery-form-section">
         <div class="message-banner info">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="16" x2="12" y2="12" />
             <line x1="12" y1="8" x2="12.01" y2="8" />
           </svg>
           <p>Ваш заказ подтверждён! Выберите способ получения</p>
         </div>
-        
+
         <div class="delivery-type-selector">
           <button
             type="button"
-            :class="['delivery-type-btn', { active: deliveryForm.deliveryType === 'pickup' }]"
+            :class="[
+              'delivery-type-btn',
+              { active: deliveryForm.deliveryType === 'pickup' },
+            ]"
             @click="deliveryForm.deliveryType = 'pickup'"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
@@ -247,10 +357,18 @@
           </button>
           <button
             type="button"
-            :class="['delivery-type-btn', { active: deliveryForm.deliveryType === 'delivery' }]"
+            :class="[
+              'delivery-type-btn',
+              { active: deliveryForm.deliveryType === 'delivery' },
+            ]"
             @click="deliveryForm.deliveryType = 'delivery'"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <rect x="1" y="3" width="15" height="13" />
               <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
               <circle cx="5.5" cy="18.5" r="2.5" />
@@ -272,7 +390,9 @@
         </div>
 
         <div v-if="deliveryForm.deliveryType === 'delivery'" class="form-group">
-          <label for="delivery-address" class="form-label">Адрес доставки *</label>
+          <label for="delivery-address" class="form-label"
+            >Адрес доставки *</label
+          >
           <input
             id="delivery-address"
             v-model="deliveryForm.deliveryAddress"
@@ -287,13 +407,22 @@
           @click="handleDeliverySubmit"
           :disabled="isDeliverySubmitting || !isDeliveryFormValid"
         >
-          {{ isDeliverySubmitting ? 'Сохранение...' : 'Сохранить способ получения' }}
+          {{
+            isDeliverySubmitting
+              ? "Сохранение..."
+              : "Сохранить способ получения"
+          }}
         </button>
       </div>
-      
+
       <div v-if="canCancel" class="actions-section">
         <button class="btn btn-outline btn-danger" @click="cancelOrder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -305,175 +434,202 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { getMyOrderById, cancelMyOrder, updateOrderDelivery } from '@/api'
-import type { Order, OrderStatus } from '@/types'
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { getMyOrderById, cancelMyOrder, updateOrderDelivery } from "@/api";
+import type { Order, OrderStatus } from "@/types";
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
+const route = useRoute();
 
-const order = ref<Order | null>(null)
-const isLoading = ref(true)
-const isDeliverySubmitting = ref(false)
+const order = ref<Order | null>(null);
+const isLoading = ref(true);
+const isDeliverySubmitting = ref(false);
 
-const orderId = computed(() => route.params.id as string)
+const orderId = computed(() => route.params.id as string);
 
 const deliveryForm = ref({
-  deliveryType: 'pickup' as 'pickup' | 'delivery',
-  deliveryAddress: '',
-  pickupDate: '',
-})
+  deliveryType: "pickup" as "pickup" | "delivery",
+  deliveryAddress: "",
+  pickupDate: "",
+});
 
 const timelineStages = [
-  { id: 'pending', label: 'На рассмотрении' },
-  { id: 'confirmed', label: 'Подтверждён' },
-  { id: 'ready_for_pickup', label: 'Готов к выдаче' },
-  { id: 'delivering', label: 'Доставляется' },
-  { id: 'completed', label: 'Получен' },
-]
+  { id: "pending", label: "На рассмотрении" },
+  { id: "confirmed", label: "Подтверждён" },
+  { id: "ready_for_pickup", label: "Готов к выдаче" },
+  { id: "delivering", label: "Доставляется" },
+  { id: "completed", label: "Получен" },
+];
 
 const getStatusTitle = (status: OrderStatus): string => {
   const titles: Record<OrderStatus, string> = {
-    pending: 'В обработке',
-    processing: 'Проверка продавцом',
-    confirmed: 'Подтверждение',
-    preorder: 'Предзаказ',
-    ready_for_pickup: 'Готов к выдаче',
-    delivering: 'Доставляется',
-    completed: 'Получен',
-    cancelled: 'Отменён',
-  }
-  return titles[status] || status
-}
+    pending: "В обработке",
+    processing: "Проверка продавцом",
+    confirmed: "Подтверждение",
+    preorder: "Предзаказ",
+    ready_for_pickup: "Готов к выдаче",
+    delivering: "Доставляется",
+    completed: "Получен",
+    cancelled: "Отменён",
+  };
+  return titles[status] || status;
+};
 
 const isStageCompleted = (status: OrderStatus, stageIndex: number): boolean => {
-  const stageOrder = ['pending', 'confirmed', 'ready_for_pickup', 'delivering', 'completed']
-  const statusIndex = stageOrder.indexOf(status)
-  return statusIndex > stageIndex
-}
+  const stageOrder = [
+    "pending",
+    "confirmed",
+    "ready_for_pickup",
+    "delivering",
+    "completed",
+  ];
+  const statusIndex = stageOrder.indexOf(status);
+  return statusIndex > stageIndex;
+};
 
 const isStageCurrent = (status: OrderStatus, stageIndex: number): boolean => {
-  const stageOrder = ['pending', 'confirmed', 'ready_for_pickup', 'delivering', 'completed']
-  const statusIndex = stageOrder.indexOf(status)
-  return statusIndex === stageIndex && status !== 'cancelled'
-}
+  const stageOrder = [
+    "pending",
+    "confirmed",
+    "ready_for_pickup",
+    "delivering",
+    "completed",
+  ];
+  const statusIndex = stageOrder.indexOf(status);
+  return statusIndex === stageIndex && status !== "cancelled";
+};
 
 const canCancel = computed(() => {
-  if (!order.value) return false
-  return ['pending', 'confirmed', 'preorder'].includes(order.value.status)
-})
+  if (!order.value) return false;
+  return ["pending", "confirmed", "preorder"].includes(order.value.status);
+});
 
 const canChooseDelivery = computed(() => {
-  if (!order.value) return false
-  return order.value.status === 'confirmed' && !order.value.pickupDate && !order.value.deliveryAddress
-})
+  if (!order.value) return false;
+  return (
+    order.value.status === "confirmed" &&
+    !order.value.pickupDate &&
+    !order.value.deliveryAddress
+  );
+});
 
 const minPickupDate = computed(() => {
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-  return now.toISOString().slice(0, 16)
-})
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 16);
+});
 
 const isDeliveryFormValid = computed(() => {
-  if (deliveryForm.value.deliveryType === 'pickup') {
-    return !!deliveryForm.value.pickupDate
+  if (deliveryForm.value.deliveryType === "pickup") {
+    return !!deliveryForm.value.pickupDate;
   }
-  return !!deliveryForm.value.deliveryAddress
-})
+  return !!deliveryForm.value.deliveryAddress;
+});
 
 const loadOrder = async () => {
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    const response = await getMyOrderById(orderId.value)
-    order.value = response.data.order
+    const response = await getMyOrderById(orderId.value);
+    order.value = response.data.order;
     if (order.value?.deliveryType) {
-      deliveryForm.value.deliveryType = order.value.deliveryType
+      deliveryForm.value.deliveryType = order.value.deliveryType;
     }
   } catch (error) {
-    console.error('Failed to load order:', error)
+    console.error("Failed to load order:", error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 const cancelOrder = async () => {
-  if (!confirm('Вы уверены, что хотите отменить заказ?')) return
-  
+  if (!confirm("Вы уверены, что хотите отменить заказ?")) return;
+
   try {
-    await cancelMyOrder(orderId.value)
-    await loadOrder()
+    await cancelMyOrder(orderId.value);
+    await loadOrder();
   } catch (error: any) {
-    alert('Не удалось отменить заказ: ' + (error.response?.data?.error || 'Ошибка'))
+    alert(
+      "Не удалось отменить заказ: " + (error.response?.data?.error || "Ошибка")
+    );
   }
-}
+};
 
 const handleDeliverySubmit = async () => {
-  if (!isDeliveryFormValid.value) return
-  
-  isDeliverySubmitting.value = true
+  if (!isDeliveryFormValid.value) return;
+
+  isDeliverySubmitting.value = true;
   try {
     await updateOrderDelivery(orderId.value, {
       deliveryType: deliveryForm.value.deliveryType,
-      deliveryAddress: deliveryForm.value.deliveryType === 'delivery' ? deliveryForm.value.deliveryAddress : undefined,
-      pickupDate: deliveryForm.value.deliveryType === 'pickup' ? deliveryForm.value.pickupDate : undefined,
-    })
-    await loadOrder()
-    alert('Способ получения сохранён')
+      deliveryAddress:
+        deliveryForm.value.deliveryType === "delivery"
+          ? deliveryForm.value.deliveryAddress
+          : undefined,
+      pickupDate:
+        deliveryForm.value.deliveryType === "pickup"
+          ? deliveryForm.value.pickupDate
+          : undefined,
+    });
+    await loadOrder();
+    alert("Способ получения сохранён");
   } catch (error: any) {
-    alert('Не удалось сохранить: ' + (error.response?.data?.error || 'Ошибка'))
+    alert("Не удалось сохранить: " + (error.response?.data?.error || "Ошибка"));
   } finally {
-    isDeliverySubmitting.value = false
+    isDeliverySubmitting.value = false;
   }
-}
+};
 
 const goToProduct = (productId: string) => {
-  router.push(`/product/${productId}`)
-}
+  router.push(`/product/${productId}`);
+};
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('ru-RU')
-}
+  return price.toLocaleString("ru-RU");
+};
 
 const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
 
 const formatDateTime = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const formatPhone = (phone: string): string => {
-  if (!phone) return ''
-  const cleaned = phone.replace(/\D/g, '')
+  if (!phone) return "";
+  const cleaned = phone.replace(/\D/g, "");
   if (cleaned.length === 11) {
-    return `+7 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(7, 9)}-${cleaned.slice(9)}`
+    return `+7 (${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)}-${cleaned.slice(
+      7,
+      9
+    )}-${cleaned.slice(9)}`;
   }
-  return phone
-}
+  return phone;
+};
 
 const getProductImage = (imagePath: string): string => {
-  if (imagePath.startsWith('/uploads/')) {
-    return `http://localhost:5000${imagePath}`
+  if (imagePath.startsWith("/uploads/")) {
+    return `http://localhost:5000${imagePath}`;
   }
-  return imagePath
-}
+  return imagePath;
+};
 
 onMounted(() => {
-  loadOrder()
-})
+  loadOrder();
+});
 </script>
 
 <style scoped>
@@ -542,7 +698,7 @@ onMounted(() => {
 
 .status-badge-large.pending {
   background: rgba(251, 191, 36, 0.1);
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .status-badge-large.confirmed {
@@ -552,7 +708,7 @@ onMounted(() => {
 
 .status-badge-large.preorder {
   background: rgba(139, 92, 246, 0.1);
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 .status-badge-large.ready_for_pickup {
@@ -604,7 +760,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-state p {
@@ -685,7 +843,7 @@ onMounted(() => {
 .banner-icon svg {
   width: 24px;
   height: 24px;
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 .banner-icon.success svg {
@@ -693,18 +851,18 @@ onMounted(() => {
 }
 
 .banner-icon.code svg {
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .verification-code {
   display: inline-block;
   padding: var(--spacing-3) var(--spacing-6);
   background: rgba(251, 191, 36, 0.2);
-  border: 2px dashed #FBBF24;
+  border: 2px dashed #fbbf24;
   border-radius: var(--radius-lg);
   font-size: 32px;
   font-weight: var(--font-weight-bold);
-  color: #FBBF24;
+  color: #fbbf24;
   letter-spacing: 8px;
   margin-top: var(--spacing-3);
 }
@@ -1155,20 +1313,20 @@ onMounted(() => {
     align-items: flex-start;
     gap: var(--spacing-3);
   }
-  
+
   .info-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .timeline {
     overflow-x: auto;
     padding: var(--spacing-4);
   }
-  
+
   .timeline-stage {
     min-width: 100px;
   }
-  
+
   .delivery-type-selector {
     grid-template-columns: 1fr;
   }

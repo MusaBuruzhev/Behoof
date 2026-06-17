@@ -137,10 +137,6 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    // TODO: Реализовать endpoint forgot password на backend
-    // const response = await forgotPassword({ email: formData.email })
-
-    // Имитация успешного ответа (backend может вернуть заглушку)
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     isSubmitted.value = true;

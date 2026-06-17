@@ -3,19 +3,50 @@
     <div class="loading-spinner"></div>
     <p class="loading-text">Загрузка коллекции...</p>
   </div>
-  
+
   <div v-else-if="products.length === 0" class="empty-state">
     <div class="empty-illustration">
       <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="80" stroke="currentColor" stroke-width="2" stroke-dasharray="8 8" opacity="0.3"/>
-        <path d="M100 60C100 60 80 80 80 100C80 120 100 140 100 140C100 140 120 120 120 100C120 80 100 60 100 60Z" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="100" cy="90" r="8" fill="currentColor" opacity="0.6"/>
-        <path d="M100 110V130" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-        <path d="M70 100H90" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
-        <path d="M130 100H110" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
-        <circle cx="140" cy="70" r="6" fill="currentColor" opacity="0.4"/>
-        <circle cx="60" cy="130" r="4" fill="currentColor" opacity="0.4"/>
-        <circle cx="150" cy="120" r="5" fill="currentColor" opacity="0.3"/>
+        <circle
+          cx="100"
+          cy="100"
+          r="80"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-dasharray="8 8"
+          opacity="0.3"
+        />
+        <path
+          d="M100 60C100 60 80 80 80 100C80 120 100 140 100 140C100 140 120 120 120 100C120 80 100 60 100 60Z"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <circle cx="100" cy="90" r="8" fill="currentColor" opacity="0.6" />
+        <path
+          d="M100 110V130"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+        />
+        <path
+          d="M70 100H90"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          opacity="0.5"
+        />
+        <path
+          d="M130 100H110"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          opacity="0.5"
+        />
+        <circle cx="140" cy="70" r="6" fill="currentColor" opacity="0.4" />
+        <circle cx="60" cy="130" r="4" fill="currentColor" opacity="0.4" />
+        <circle cx="150" cy="120" r="5" fill="currentColor" opacity="0.3" />
       </svg>
     </div>
     <h1 class="empty-title">Ваша коллекция пуста</h1>
@@ -24,27 +55,47 @@
       Здесь будет ваша персональная подборка техники.
     </p>
     <router-link to="/catalog" class="btn btn-primary btn-lg">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
       </svg>
       Перейти в каталог
     </router-link>
   </div>
-  
+
   <div v-else class="favorites-view">
     <div class="container">
-      <!-- Header -->
       <header class="favorites-header">
         <div class="header-content">
           <h1 class="favorites-title">
-            <svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            <svg
+              class="title-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
             </svg>
             Избранное
           </h1>
           <p class="favorites-subtitle">
-            {{ products.length }} {{ declension(products.length, ['товар сохранён', 'товара сохранено', 'товаров сохранено']) }} для дальнейшего сравнения и покупки
+            {{ products.length }}
+            {{
+              declension(products.length, [
+                "товар сохранён",
+                "товара сохранено",
+                "товаров сохранено",
+              ])
+            }}
+            для дальнейшего сравнения и покупки
           </p>
         </div>
         <button
@@ -52,20 +103,31 @@
           class="btn btn-outline"
           @click="clearAll"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+            />
           </svg>
           Очистить всё
         </button>
       </header>
-      
-      <!-- Quick Stats -->
+
       <section class="quick-stats">
         <div class="stat-card">
           <div class="stat-icon stat-icon-products">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </div>
           <div class="stat-content">
@@ -73,12 +135,17 @@
             <span class="stat-label">Товаров</span>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon stat-icon-price">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
             </svg>
           </div>
           <div class="stat-content">
@@ -86,12 +153,17 @@
             <span class="stat-label">Средняя цена</span>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon stat-icon-expensive">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M16 12l-4-4-4 4M12 16V8"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M16 12l-4-4-4 4M12 16V8" />
             </svg>
           </div>
           <div class="stat-content">
@@ -99,13 +171,18 @@
             <span class="stat-label">Макс. цена</span>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-icon stat-icon-brands">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
             </svg>
           </div>
           <div class="stat-content">
@@ -114,13 +191,17 @@
           </div>
         </div>
       </section>
-      
-      <!-- Collection Insights -->
+
       <section v-if="insights.length > 0" class="collection-insights">
         <div class="insights-header">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
-            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+            <path d="M22 12A10 10 0 0 0 12 2v10z" />
           </svg>
           <span class="insights-title">Аналитика коллекции</span>
         </div>
@@ -131,7 +212,7 @@
             class="insight-card"
           >
             <div class="insight-icon" :class="insight.iconClass">
-              <component :is="insight.icon"/>
+              <component :is="insight.icon" />
             </div>
             <div class="insight-content">
               <p class="insight-text">{{ insight.text }}</p>
@@ -139,14 +220,19 @@
           </div>
         </div>
       </section>
-      
-      <!-- Controls Panel -->
+
       <section class="controls-panel">
         <div class="controls-left">
           <div class="search-wrapper">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"/>
-              <path d="m21 21-4.35-4.35"/>
+            <svg
+              class="search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
             </svg>
             <input
               v-model="searchQuery"
@@ -159,12 +245,17 @@
               class="clear-search"
               @click="searchQuery = ''"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 6L6 18M6 6l12 12"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
           </div>
-          
+
           <div class="filters-wrapper">
             <select v-model="sortBy" class="filter-select">
               <option value="newest">Сначала новые</option>
@@ -172,36 +263,40 @@
               <option value="price-desc">По цене (убывание)</option>
               <option value="name">По названию</option>
             </select>
-            
+
             <select v-model="filterBrand" class="filter-select">
               <option value="">Все бренды</option>
               <option v-for="brand in sortedBrands" :key="brand" :value="brand">
                 {{ brand }}
               </option>
             </select>
-            
+
             <button
               v-if="hasActiveFilters"
               class="btn btn-reset"
               @click="resetFilters"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12"/>
-                <path d="M3 3v9h9"/>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 12" />
+                <path d="M3 3v9h9" />
               </svg>
               Сбросить
             </button>
           </div>
         </div>
-        
+
         <div class="controls-right">
           <span class="results-count">
             {{ filteredProducts.length }} из {{ products.length }}
           </span>
         </div>
       </section>
-      
-      <!-- Products Grid -->
+
       <section class="products-section">
         <div class="products-grid">
           <ProductCard
@@ -217,229 +312,249 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, h } from 'vue'
-import { getFavorites, getProductsByIds } from '@/api'
-import { useFavoritesStore } from '@/stores'
-import type { Product } from '@/types'
-import ProductCard from '@/components/catalog/ProductCard.vue'
+import { ref, computed, onMounted, h } from "vue";
+import { getFavorites, getProductsByIds } from "@/api";
+import { useFavoritesStore } from "@/stores";
+import type { Product } from "@/types";
+import ProductCard from "@/components/catalog/ProductCard.vue";
 
-const favoritesStore = useFavoritesStore()
+const favoritesStore = useFavoritesStore();
 
-const products = ref<Product[]>([])
-const isLoading = ref(true)
-const searchQuery = ref('')
-const sortBy = ref('newest')
-const filterBrand = ref('')
+const products = ref<Product[]>([]);
+const isLoading = ref(true);
+const searchQuery = ref("");
+const sortBy = ref("newest");
+const filterBrand = ref("");
 
-// Загрузка избранного
 const loadFavorites = async () => {
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    const response = await getFavorites()
-    const favoriteIds = response.data.favorites || []
-    
+    const response = await getFavorites();
+    const favoriteIds = response.data.favorites || [];
+
     if (favoriteIds.length > 0) {
-      const productsResponse = await getProductsByIds(favoriteIds)
-      products.value = productsResponse.data.products || []
+      const productsResponse = await getProductsByIds(favoriteIds);
+      products.value = productsResponse.data.products || [];
     } else {
-      products.value = []
+      products.value = [];
     }
   } catch (error) {
-    console.error('Failed to load favorites:', error)
-    products.value = []
+    console.error("Failed to load favorites:", error);
+    products.value = [];
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
-// Склонение слов
 const declension = (number: number, words: string[]): string => {
-  const cases = [2, 0, 1, 1, 1, 2]
-  const index = (number % 100 < 4 || number % 100 > 20) ? cases[number % 10] : 2
-  return words[index]
-}
+  const cases = [2, 0, 1, 1, 1, 2];
+  const index = number % 100 < 4 || number % 100 > 20 ? cases[number % 10] : 2;
+  return words[index];
+};
 
-// Форматирование цены
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('ru-RU')
-}
+  return price.toLocaleString("ru-RU");
+};
 
-// Статистика
 const averagePrice = computed(() => {
-  if (products.value.length === 0) return 0
-  const sum = products.value.reduce((acc, p) => acc + p.price, 0)
-  return Math.round(sum / products.value.length)
-})
+  if (products.value.length === 0) return 0;
+  const sum = products.value.reduce((acc, p) => acc + p.price, 0);
+  return Math.round(sum / products.value.length);
+});
 
 const maxPrice = computed(() => {
-  if (products.value.length === 0) return 0
-  return Math.max(...products.value.map(p => p.price))
-})
+  if (products.value.length === 0) return 0;
+  return Math.max(...products.value.map((p) => p.price));
+});
 
 const uniqueBrands = computed(() => {
-  const brands = new Set(products.value.map(p => p.brand))
-  return brands.size
-})
+  const brands = new Set(products.value.map((p) => p.brand));
+  return brands.size;
+});
 
 const allBrands = computed(() => {
-  return [...new Set(products.value.map(p => p.brand))].sort()
-})
+  return [...new Set(products.value.map((p) => p.brand))].sort();
+});
 
 const sortedBrands = computed(() => {
-  return allBrands.value.sort((a, b) => a.localeCompare(b))
-})
+  return allBrands.value.sort((a, b) => a.localeCompare(b));
+});
 
-// Фильтрация и сортировка
 const filteredProducts = computed(() => {
-  let result = [...products.value]
-  
-  // Поиск
+  let result = [...products.value];
+
   if (searchQuery.value.trim()) {
-    const query = searchQuery.value.toLowerCase().trim()
-    result = result.filter(p =>
-      p.name.toLowerCase().includes(query) ||
-      p.brand.toLowerCase().includes(query) ||
-      p.description.toLowerCase().includes(query)
-    )
+    const query = searchQuery.value.toLowerCase().trim();
+    result = result.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.brand.toLowerCase().includes(query) ||
+        p.description.toLowerCase().includes(query)
+    );
   }
-  
-  // Бренд
+
   if (filterBrand.value) {
-    result = result.filter(p => p.brand === filterBrand.value)
+    result = result.filter((p) => p.brand === filterBrand.value);
   }
-  
-  // Сортировка
+
   switch (sortBy.value) {
-    case 'price-asc':
-      result.sort((a, b) => a.price - b.price)
-      break
-    case 'price-desc':
-      result.sort((a, b) => b.price - a.price)
-      break
-    case 'name':
-      result.sort((a, b) => a.name.localeCompare(b.name))
-      break
-    case 'newest':
+    case "price-asc":
+      result.sort((a, b) => a.price - b.price);
+      break;
+    case "price-desc":
+      result.sort((a, b) => b.price - a.price);
+      break;
+    case "name":
+      result.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "newest":
     default:
-      // По умолчанию - порядок добавления (как в API)
-      break
+      break;
   }
-  
-  return result
-})
+
+  return result;
+});
 
 const hasActiveFilters = computed(() => {
-  return searchQuery.value || filterBrand.value || sortBy.value !== 'newest'
-})
+  return searchQuery.value || filterBrand.value || sortBy.value !== "newest";
+});
 
 const resetFilters = () => {
-  searchQuery.value = ''
-  filterBrand.value = ''
-  sortBy.value = 'newest'
-}
+  searchQuery.value = "";
+  filterBrand.value = "";
+  sortBy.value = "newest";
+};
 
-// Удаление из избранного
 const removeFromFavorites = async (productId: string) => {
   try {
-    products.value = products.value.filter(p => p.id !== productId)
-    favoritesStore.removeFavorite(productId)
+    products.value = products.value.filter((p) => p.id !== productId);
+    favoritesStore.removeFavorite(productId);
   } catch (error) {
-    console.error('Failed to remove from favorites:', error)
+    console.error("Failed to remove from favorites:", error);
   }
-}
+};
 
-// Очистка всего
 const clearAll = async () => {
-  if (!confirm('Вы уверены, что хотите очистить всё избранное?')) return
-  
-  try {
-    products.value = []
-    favoritesStore.productIds.forEach(id => {
-      favoritesStore.removeFavorite(id)
-    })
-  } catch (error) {
-    console.error('Failed to clear favorites:', error)
-  }
-}
+  if (!confirm("Вы уверены, что хотите очистить всё избранное?")) return;
 
-// Collection Insights
+  try {
+    products.value = [];
+    favoritesStore.productIds.forEach((id) => {
+      favoritesStore.removeFavorite(id);
+    });
+  } catch (error) {
+    console.error("Failed to clear favorites:", error);
+  }
+};
+
 const insights = computed(() => {
   const result: Array<{
-    id: string
-    text: string
-    icon: any
-    iconClass: string
-  }> = []
-  
-  if (products.value.length === 0) return result
-  
-  // Бренд
+    id: string;
+    text: string;
+    icon: any;
+    iconClass: string;
+  }> = [];
+
+  if (products.value.length === 0) return result;
+
   const brandCounts = products.value.reduce((acc, p) => {
-    acc[p.brand] = (acc[p.brand] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-  
-  const topBrand = Object.entries(brandCounts).sort((a, b) => b[1] - a[1])[0]
+    acc[p.brand] = (acc[p.brand] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const topBrand = Object.entries(brandCounts).sort((a, b) => b[1] - a[1])[0];
   if (topBrand && topBrand[1] > 1) {
     result.push({
-      id: 'brand',
+      id: "brand",
       text: `Большинство сохранённых товаров — ${topBrand[0]} (${topBrand[1]} шт.)`,
-      icon: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-        h('path', { d: 'M12 2L2 7l10 5 10-5-10-5z' }),
-        h('path', { d: 'M2 17l10 5 10-5' }),
-        h('path', { d: 'M2 12l10 5 10-5' }),
-      ]),
-      iconClass: 'insight-icon-brand',
-    })
+      icon: () =>
+        h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "2",
+          },
+          [
+            h("path", { d: "M12 2L2 7l10 5 10-5-10-5z" }),
+            h("path", { d: "M2 17l10 5 10-5" }),
+            h("path", { d: "M2 12l10 5 10-5" }),
+          ]
+        ),
+      iconClass: "insight-icon-brand",
+    });
   }
-  
-  // Средняя цена
-  const avg = averagePrice.value
+
+  const avg = averagePrice.value;
   if (avg > 0) {
     result.push({
-      id: 'price',
+      id: "price",
       text: `Средняя стоимость товаров — ${formatPrice(avg)} ₽`,
-      icon: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-        h('line', { x1: '12', y1: '1', x2: '12', y2: '23' }),
-        h('path', { d: 'M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' }),
-      ]),
-      iconClass: 'insight-icon-price',
-    })
+      icon: () =>
+        h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "2",
+          },
+          [
+            h("line", { x1: "12", y1: "1", x2: "12", y2: "23" }),
+            h("path", {
+              d: "M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6",
+            }),
+          ]
+        ),
+      iconClass: "insight-icon-price",
+    });
   }
-  
-  // Категории
+
   const categoryCounts = products.value.reduce((acc, p) => {
-    const cat = p.categoryId
-    acc[cat] = (acc[cat] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
-  
-  const categoryNames: Record<string, string> = {}
-  products.value.forEach(p => {
+    const cat = p.categoryId;
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const categoryNames: Record<string, string> = {};
+  products.value.forEach((p) => {
     if (!categoryNames[p.categoryId]) {
-      categoryNames[p.categoryId] = p.categoryId
+      categoryNames[p.categoryId] = p.categoryId;
     }
-  })
-  
-  const topCategory = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]
+  });
+
+  const topCategory = Object.entries(categoryCounts).sort(
+    (a, b) => b[1] - a[1]
+  )[0];
   if (topCategory && topCategory[1] > 1) {
     result.push({
-      id: 'category',
+      id: "category",
       text: `Основная категория — ${topCategory[1]} товаров`,
-      icon: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-        h('path', { d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' }),
-        h('polyline', { points: '9 22 9 12 15 12 15 22' }),
-      ]),
-      iconClass: 'insight-icon-category',
-    })
+      icon: () =>
+        h(
+          "svg",
+          {
+            viewBox: "0 0 24 24",
+            fill: "none",
+            stroke: "currentColor",
+            "stroke-width": "2",
+          },
+          [
+            h("path", { d: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" }),
+            h("polyline", { points: "9 22 9 12 15 12 15 22" }),
+          ]
+        ),
+      iconClass: "insight-icon-category",
+    });
   }
-  
-  return result
-})
+
+  return result;
+});
 
 onMounted(() => {
-  loadFavorites()
-})
+  loadFavorites();
+});
 </script>
 
 <style scoped>
@@ -463,7 +578,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-text {
@@ -622,12 +739,12 @@ onMounted(() => {
 
 .stat-icon-expensive {
   background: rgba(168, 85, 247, 0.1);
-  color: #A855F7;
+  color: #a855f7;
 }
 
 .stat-icon-brands {
   background: rgba(251, 191, 36, 0.1);
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .stat-content {
@@ -717,7 +834,7 @@ onMounted(() => {
 
 .insight-icon-category {
   background: rgba(168, 85, 247, 0.1);
-  color: #A855F7;
+  color: #a855f7;
 }
 
 .insight-content {
@@ -768,7 +885,8 @@ onMounted(() => {
 
 .search-input {
   width: 100%;
-  padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) calc(var(--spacing-3) + 18px + var(--spacing-2));
+  padding: var(--spacing-3) var(--spacing-3) var(--spacing-3)
+    calc(var(--spacing-3) + 18px + var(--spacing-2));
   font-size: var(--font-size-body);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -892,7 +1010,7 @@ onMounted(() => {
   .quick-stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -904,25 +1022,25 @@ onMounted(() => {
     align-items: flex-start;
     gap: var(--spacing-4);
   }
-  
+
   .controls-panel {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .controls-left {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .search-wrapper {
     max-width: none;
   }
-  
+
   .filters-wrapper {
     flex-wrap: wrap;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-4);
@@ -933,33 +1051,33 @@ onMounted(() => {
   .favorites-view {
     padding: var(--spacing-6) 0;
   }
-  
+
   .container {
     padding: 0 var(--spacing-4);
   }
-  
+
   .favorites-title {
     font-size: var(--font-size-h2);
   }
-  
+
   .quick-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .stat-card {
     padding: var(--spacing-4);
   }
-  
+
   .stat-icon {
     width: 48px;
     height: 48px;
   }
-  
+
   .stat-icon svg {
     width: 24px;
     height: 24px;
   }
-  
+
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-3);
@@ -971,20 +1089,20 @@ onMounted(() => {
     width: 160px;
     height: 160px;
   }
-  
+
   .btn-lg {
     padding: var(--spacing-3) var(--spacing-6);
     font-size: var(--font-size-small);
   }
-  
+
   .products-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .filter-select {
     width: 100%;
   }
-  
+
   .controls-right {
     text-align: center;
   }

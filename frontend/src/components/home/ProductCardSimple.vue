@@ -7,22 +7,27 @@
         class="product-image"
         loading="lazy"
       />
-      <div v-if="product.priceHistory && product.priceHistory.length > 1" class="price-badge">
+      <div
+        v-if="product.priceHistory && product.priceHistory.length > 1"
+        class="price-badge"
+      >
         {{ priceChange }}%
       </div>
     </div>
-    
+
     <div class="product-info">
       <div class="product-brand">{{ product.brand }}</div>
       <h3 class="product-name">{{ product.name }}</h3>
-      
+
       <div class="product-price">
         <span class="price-current">{{ formatPrice(product.price) }} ₽</span>
       </div>
-      
+
       <div class="product-rating" v-if="hasRatings">
         <svg class="star-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+          <path
+            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+          />
         </svg>
         <span class="rating-value">{{ averageRating }}</span>
       </div>
@@ -31,46 +36,49 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { Product } from '@/types'
+import { computed } from "vue";
+import type { Product } from "@/types";
 
 const props = defineProps<{
-  product: Product
-}>()
+  product: Product;
+}>();
 
 const productImage = computed(() => {
   if (props.product.images && props.product.images.length > 0) {
-    return `http://localhost:5000${props.product.images[0]}`
+    return `http://localhost:5000${props.product.images[0]}`;
   }
-  return 'https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product'
-})
+  return "https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product";
+});
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('ru-RU')
-}
+  return price.toLocaleString("ru-RU");
+};
 
 const priceChange = computed(() => {
-  const history = props.product.priceHistory
-  if (!history || history.length < 2) return 0
-  
-  const current = history[history.length - 1].price
-  const previous = history[history.length - 2].price
-  
-  const change = ((current - previous) / previous) * 100
-  return Math.round(Math.abs(change))
-})
+  const history = props.product.priceHistory;
+  if (!history || history.length < 2) return 0;
+
+  const current = history[history.length - 1].price;
+  const previous = history[history.length - 2].price;
+
+  const change = ((current - previous) / previous) * 100;
+  return Math.round(Math.abs(change));
+});
 
 const hasRatings = computed(() => {
-  return props.product.traitRatings && Object.keys(props.product.traitRatings).length > 0
-})
+  return (
+    props.product.traitRatings &&
+    Object.keys(props.product.traitRatings).length > 0
+  );
+});
 
 const averageRating = computed(() => {
-  if (!hasRatings.value) return 0
-  
-  const ratings = Object.values(props.product.traitRatings)
-  const sum = ratings.reduce((acc, val) => acc + val, 0)
-  return (sum / ratings.length).toFixed(1)
-})
+  if (!hasRatings.value) return 0;
+
+  const ratings = Object.values(props.product.traitRatings);
+  const sum = ratings.reduce((acc, val) => acc + val, 0);
+  return (sum / ratings.length).toFixed(1);
+});
 </script>
 
 <style scoped>
@@ -164,7 +172,7 @@ const averageRating = computed(() => {
 .star-icon {
   width: 16px;
   height: 16px;
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .rating-value {

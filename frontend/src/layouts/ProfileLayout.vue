@@ -10,10 +10,10 @@
         </div>
         <div class="user-info-mini">
           <h3 class="user-name">{{ userName }}</h3>
-          <p class="user-email">{{ user?.email || '' }}</p>
+          <p class="user-email">{{ user?.email || "" }}</p>
         </div>
       </div>
-      
+
       <nav class="sidebar-nav">
         <router-link
           v-for="item in navItems"
@@ -29,10 +29,16 @@
           </span>
         </router-link>
       </nav>
-      
+
       <div class="sidebar-footer">
         <button class="logout-btn" @click="handleLogout">
-          <svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="logout-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
@@ -41,7 +47,7 @@
         </button>
       </div>
     </aside>
-    
+
     <main class="profile-content">
       <div class="content-container">
         <RouterView />
@@ -51,76 +57,151 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore, useNotificationsStore } from '@/stores'
+import { computed, h } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthStore, useNotificationsStore } from "@/stores";
 
-const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
-const notificationsStore = useNotificationsStore()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+const notificationsStore = useNotificationsStore();
 
-const user = computed(() => authStore.user)
+const user = computed(() => authStore.user);
 
 const userName = computed(() => {
-  if (!user.value) return ''
-  return `${user.value.firstName} ${user.value.lastName}`.trim() || user.value.email
-})
+  if (!user.value) return "";
+  return (
+    `${user.value.firstName} ${user.value.lastName}`.trim() || user.value.email
+  );
+});
 
 const userInitials = computed(() => {
-  if (!user.value) return ''
-  const parts = userName.value.split(' ')
-  return parts.map(p => p[0]).join('').toUpperCase().slice(0, 2)
-})
+  if (!user.value) return "";
+  const parts = userName.value.split(" ");
+  return parts
+    .map((p) => p[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+});
 
-const unreadCount = computed(() => notificationsStore.unreadCount)
+const unreadCount = computed(() => notificationsStore.unreadCount);
 
 const navItems = computed(() => [
-  { id: 'profile', label: 'Профиль', path: '/profile', icon: ProfileIcon, badge: null, badgeType: null },
-  { id: 'orders', label: 'Заказы', path: '/profile/orders', icon: OrdersIcon, badge: null, badgeType: null },
-  { id: 'notifications', label: 'Уведомления', path: '/profile/notifications', icon: NotificationsIcon, badge: unreadCount.value || null, badgeType: 'notification' },
-  { id: 'security', label: 'Безопасность', path: '/profile/security', icon: SecurityIcon, badge: null, badgeType: null },
-])
+  {
+    id: "profile",
+    label: "Профиль",
+    path: "/profile",
+    icon: ProfileIcon,
+    badge: null,
+    badgeType: null,
+  },
+  {
+    id: "orders",
+    label: "Заказы",
+    path: "/profile/orders",
+    icon: OrdersIcon,
+    badge: null,
+    badgeType: null,
+  },
+  {
+    id: "notifications",
+    label: "Уведомления",
+    path: "/profile/notifications",
+    icon: NotificationsIcon,
+    badge: unreadCount.value || null,
+    badgeType: "notification",
+  },
+  {
+    id: "security",
+    label: "Безопасность",
+    path: "/profile/security",
+    icon: SecurityIcon,
+    badge: null,
+    badgeType: null,
+  },
+]);
 
 const isActiveRoute = (path: string) => {
-  if (path === '/profile') {
-    return route.path === '/profile'
+  if (path === "/profile") {
+    return route.path === "/profile";
   }
-  return route.path.startsWith(path)
-}
+  return route.path.startsWith(path);
+};
 
 const handleLogout = () => {
-  authStore.logout()
-  router.push('/')
-}
+  authStore.logout();
+  router.push("/");
+};
 
-// Icons
 const ProfileIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('path', { d: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2' }),
-    h('circle', { cx: '12', cy: '7', r: '4' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("path", { d: "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" }),
+        h("circle", { cx: "12", cy: "7", r: "4" }),
+      ]
+    ),
+};
 
 const OrdersIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('path', { d: 'M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("path", {
+          d: "M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414",
+        }),
+      ]
+    ),
+};
 
 const NotificationsIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('path', { d: 'M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9' }),
-    h('path', { d: 'M13.73 21a2 2 0 0 1-3.46 0' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("path", { d: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" }),
+        h("path", { d: "M13.73 21a2 2 0 0 1-3.46 0" }),
+      ]
+    ),
+};
 
 const SecurityIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('path', { d: '12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z' }),
-    h('circle', { cx: '12', cy: '12', r: '3' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("path", { d: "12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" }),
+        h("circle", { cx: "12", cy: "12", r: "3" }),
+      ]
+    ),
+};
 </script>
 
 <style scoped>
@@ -168,7 +249,11 @@ const SecurityIcon = {
 }
 
 .user-avatar-placeholder-large {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
   color: var(--color-text-inverse);
   display: flex;
   align-items: center;
@@ -229,7 +314,7 @@ const SecurityIcon = {
 }
 
 .nav-item.active::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 50%;
@@ -319,7 +404,7 @@ const SecurityIcon = {
   .profile-layout {
     flex-direction: column;
   }
-  
+
   .profile-sidebar {
     width: 100%;
     position: static;
@@ -327,17 +412,17 @@ const SecurityIcon = {
     border-right: none;
     border-bottom: 1px solid var(--color-border-light);
   }
-  
+
   .sidebar-nav {
     flex-direction: row;
     overflow-x: auto;
     padding: var(--spacing-4) var(--spacing-6);
   }
-  
+
   .nav-item {
     white-space: nowrap;
   }
-  
+
   .nav-item.active::before {
     left: 50%;
     top: auto;
@@ -346,11 +431,11 @@ const SecurityIcon = {
     width: 60%;
     height: 3px;
   }
-  
+
   .sidebar-footer {
     display: none;
   }
-  
+
   .content-container {
     padding: var(--spacing-6) var(--spacing-4);
   }

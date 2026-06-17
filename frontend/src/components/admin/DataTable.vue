@@ -8,7 +8,11 @@
     <table v-else class="data-table">
       <thead>
         <tr>
-          <th v-for="column in columns" :key="column.key" :style="{ width: column.width }">
+          <th
+            v-for="column in columns"
+            :key="column.key"
+            :style="{ width: column.width }"
+          >
             {{ column.label }}
           </th>
           <th v-if="hasActions" style="width: 120px">Действия</th>
@@ -16,13 +20,24 @@
       </thead>
       <tbody>
         <tr v-if="!items || items.length === 0">
-          <td :colspan="columns.length + (hasActions ? 1 : 0)" class="empty-state">
+          <td
+            :colspan="columns.length + (hasActions ? 1 : 0)"
+            class="empty-state"
+          >
             Нет данных
           </td>
         </tr>
-        <tr v-for="(item, index) in (items || [])" :key="getRowKey(item, index)">
-          <td v-for="column in columns" :key="column.key" :style="{ width: column.width }">
-            <slot :name="`cell-${column.key}`" :item="item" :value="getNestedValue(item, column.key)">
+        <tr v-for="(item, index) in items || []" :key="getRowKey(item, index)">
+          <td
+            v-for="column in columns"
+            :key="column.key"
+            :style="{ width: column.width }"
+          >
+            <slot
+              :name="`cell-${column.key}`"
+              :item="item"
+              :value="getNestedValue(item, column.key)"
+            >
               {{ formatCell(getNestedValue(item, column.key), column) }}
             </slot>
           </td>
@@ -58,76 +73,76 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
 export interface Column {
-  key: string
-  label: string
-  width?: string
-  type?: 'text' | 'number' | 'date' | 'boolean'
+  key: string;
+  label: string;
+  width?: string;
+  type?: "text" | "number" | "date" | "boolean";
 }
 
 interface Props {
-  columns: Column[]
-  items: any[]
-  isLoading?: boolean
-  currentPage?: number
-  totalPages?: number
-  rowKey?: string | ((item: any, index: number) => string | number)
-  hasActions?: boolean
+  columns: Column[];
+  items: any[];
+  isLoading?: boolean;
+  currentPage?: number;
+  totalPages?: number;
+  rowKey?: string | ((item: any, index: number) => string | number);
+  hasActions?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isLoading: false,
   currentPage: 1,
   totalPages: 1,
-  rowKey: 'id',
+  rowKey: "id",
   hasActions: false,
-})
+});
 
 const emit = defineEmits<{
-  pageChange: [page: number]
-}>()
+  pageChange: [page: number];
+}>();
 
-const showPagination = computed(() => props.totalPages > 1)
+const showPagination = computed(() => props.totalPages > 1);
 
 const getRowKey = (item: any, index: number): string | number => {
-  if (typeof props.rowKey === 'function') {
-    return props.rowKey(item, index)
+  if (typeof props.rowKey === "function") {
+    return props.rowKey(item, index);
   }
-  return item[props.rowKey] || index
-}
+  return item[props.rowKey] || index;
+};
 
 const getNestedValue = (obj: any, path: string): any => {
-  return path.split('.').reduce((current, prop) => current?.[prop], obj)
-}
+  return path.split(".").reduce((current, prop) => current?.[prop], obj);
+};
 
 const formatCell = (value: any, column: Column): string => {
-  if (value === null || value === undefined) return '—'
+  if (value === null || value === undefined) return "—";
 
   switch (column.type) {
-    case 'date':
-      return new Date(value).toLocaleDateString('ru-RU')
-    case 'boolean':
-      return value ? 'Да' : 'Нет'
-    case 'number':
-      return Number(value).toLocaleString('ru-RU')
+    case "date":
+      return new Date(value).toLocaleDateString("ru-RU");
+    case "boolean":
+      return value ? "Да" : "Нет";
+    case "number":
+      return Number(value).toLocaleString("ru-RU");
     default:
-      return String(value)
+      return String(value);
   }
-}
+};
 
 const prevPage = () => {
   if (props.currentPage > 1) {
-    emit('pageChange', props.currentPage - 1)
+    emit("pageChange", props.currentPage - 1);
   }
-}
+};
 
 const nextPage = () => {
   if (props.currentPage < props.totalPages) {
-    emit('pageChange', props.currentPage + 1)
+    emit("pageChange", props.currentPage + 1);
   }
-}
+};
 </script>
 
 <style scoped>

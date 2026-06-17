@@ -7,7 +7,6 @@
       </div>
     </div>
 
-    <!-- Toolbar -->
     <div class="toolbar">
       <div class="search-box">
         <svg
@@ -106,7 +105,6 @@
       </table>
     </div>
 
-    <!-- Pagination -->
     <div v-if="totalPages > 1" class="pagination">
       <button
         :disabled="page <= 1"
@@ -189,9 +187,7 @@ const deleteUserHandler = async (user: any) => {
   try {
     await adminStore.deleteUser(user._id || user.id);
     await loadUsers();
-  } catch (err) {
-    // error handled silently
-  }
+  } catch (err) {}
 };
 
 onMounted(() => {

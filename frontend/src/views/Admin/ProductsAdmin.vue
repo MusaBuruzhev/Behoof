@@ -19,7 +19,6 @@
       </router-link>
     </div>
 
-    <!-- Toolbar -->
     <div class="toolbar">
       <div class="search-box">
         <svg
@@ -59,10 +58,8 @@
       </select>
     </div>
 
-    <!-- Loading -->
     <div v-if="loading" class="loading-state">Загрузка...</div>
 
-    <!-- Table -->
     <div v-else-if="products.length > 0" class="table-wrapper">
       <table class="products-table">
         <thead>
@@ -164,7 +161,6 @@
       </table>
     </div>
 
-    <!-- Empty -->
     <div v-else class="empty-state">
       <div class="empty-icon">
         <svg
@@ -185,7 +181,6 @@
       >
     </div>
 
-    <!-- Pagination -->
     <div v-if="totalPages > 1" class="pagination">
       <button
         :disabled="page <= 1"
@@ -279,9 +274,7 @@ const deleteProductHandler = async (id: string) => {
   try {
     await adminStore.deleteProduct(id);
     await loadProducts();
-  } catch (err: any) {
-    // error handled silently
-  }
+  } catch (err: any) {}
 };
 
 onMounted(async () => {

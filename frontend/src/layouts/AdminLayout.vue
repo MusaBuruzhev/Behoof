@@ -20,7 +20,6 @@ import AdminHeader from '@/components/admin/AdminHeader.vue'
 const authStore = useAuthStore()
 const router = useRouter()
 
-// const isAdmin = computed(() => authStore.isAuthenticated && authStore.user?.role === 'admin')
 
 onMounted(() => {
   if (!authStore.isAuthenticated) {
@@ -55,7 +54,6 @@ onMounted(() => {
   padding: var(--spacing-6);
 }
 
-/* Адаптивность */
 @media (max-width: 768px) {
   .admin-layout {
     flex-direction: column;

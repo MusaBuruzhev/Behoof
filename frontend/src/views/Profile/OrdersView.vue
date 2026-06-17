@@ -26,18 +26,30 @@
     </div>
 
     <div v-else-if="filteredOrders.length === 0" class="empty-state">
-      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414" />
+      <svg
+        class="empty-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+      >
+        <path
+          d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414"
+        />
       </svg>
       <h3 class="empty-title">Нет заказов</h3>
       <p class="empty-text">
-        {{ currentFilter === 'active' ? 'У вас пока нет активных заказов' : 'История заказов пуста' }}
+        {{
+          currentFilter === "active"
+            ? "У вас пока нет активных заказов"
+            : "История заказов пуста"
+        }}
       </p>
       <router-link to="/catalog" class="btn btn-primary">
         Перейти в каталог
       </router-link>
     </div>
-    
+
     <div v-else class="orders-list">
       <div
         v-for="order in filteredOrders"

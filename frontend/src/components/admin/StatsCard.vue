@@ -6,8 +6,12 @@
     <div class="stats-content">
       <p class="stats-label">{{ label }}</p>
       <h3 class="stats-value">{{ formatValue(value) }}</h3>
-      <p v-if="change" class="stats-change" :class="{ positive: change > 0, negative: change < 0 }">
-        {{ change > 0 ? '+' : '' }}{{ change }}% от вчера
+      <p
+        v-if="change"
+        class="stats-change"
+        :class="{ positive: change > 0, negative: change < 0 }"
+      >
+        {{ change > 0 ? "+" : "" }}{{ change }}% от вчера
       </p>
     </div>
   </div>
@@ -15,27 +19,27 @@
 
 <script setup lang="ts">
 interface Props {
-  label: string
-  value: number | string
-  change?: number
-  color?: 'primary' | 'success' | 'error' | 'warning'
+  label: string;
+  value: number | string;
+  change?: number;
+  color?: "primary" | "success" | "error" | "warning";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  color: 'primary',
-})
+  color: "primary",
+});
 
 const iconBgColor = {
-  primary: 'var(--color-primary-light)',
-  success: '#D1FAE5',
-  error: '#FEE2E2',
-  warning: '#FEF3C7',
-}[props.color]
+  primary: "var(--color-primary-light)",
+  success: "#D1FAE5",
+  error: "#FEE2E2",
+  warning: "#FEF3C7",
+}[props.color];
 
 const formatValue = (value: number | string): string => {
-  if (typeof value === 'string') return value
-  return value.toLocaleString('ru-RU')
-}
+  if (typeof value === "string") return value;
+  return value.toLocaleString("ru-RU");
+};
 </script>
 
 <style scoped>

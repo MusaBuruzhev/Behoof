@@ -1,7 +1,6 @@
 <template>
   <header :class="['app-header', { 'header-scrolled': isScrolled }]">
     <div class="container header-container">
-      <!-- Левая часть: Логотип + Каталог -->
       <div class="header-left">
         <router-link to="/" class="logo">
           <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,7 +28,6 @@
         </button>
       </div>
       
-      <!-- Центр: Поиск -->
       <div class="header-center">
         <div class="search-wrapper">
           <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -55,7 +53,6 @@
         </div>
       </div>
       
-      <!-- Правая часть: Действия -->
       <div class="header-right">
         <router-link to="/cart" class="action-btn" title="Корзина">
           <svg class="action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -128,7 +125,6 @@
           </div>
         </div>
         
-        <!-- Мобильное меню -->
         <button class="mobile-menu-btn" @click="toggleMobileMenu">
           <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="12" x2="21" y2="12" />
@@ -139,7 +135,6 @@
       </div>
     </div>
     
-    <!-- Mega Menu -->
     <MegaMenu
       :visible="showMegaMenu"
       :categories="categories"
@@ -148,7 +143,6 @@
       @close="showMegaMenu = false"
     />
     
-    <!-- Мобильное меню -->
     <MobileMenu
       :visible="showMobileMenu"
       :categories="categories"

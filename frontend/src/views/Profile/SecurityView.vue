@@ -4,11 +4,15 @@
       <h1 class="page-title">Безопасность</h1>
       <p class="page-subtitle">Управление доступом к аккаунту</p>
     </header>
-    
-    <!-- Security Status -->
+
     <div class="security-status-card">
       <div class="status-icon status-secure">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <polyline points="9 12 11 14 15 10" />
         </svg>
@@ -18,34 +22,50 @@
         <p class="status-description">Ваш аккаунт находится в безопасности</p>
       </div>
     </div>
-    
-    <!-- Account Info -->
+
     <div class="info-section">
       <h2 class="section-title">Информация об аккаунте</h2>
-      
+
       <div class="info-cards">
         <div class="info-card">
           <div class="info-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </div>
           <div class="info-content">
             <span class="info-label">Email</span>
-            <span class="info-value">{{ user?.email || '-' }}</span>
+            <span class="info-value">{{ user?.email || "-" }}</span>
           </div>
           <div class="info-badge verified">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
             <span>Подтверждён</span>
           </div>
         </div>
-        
+
         <div class="info-card">
           <div class="info-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
@@ -57,10 +77,15 @@
             <span class="info-value">{{ registrationDate }}</span>
           </div>
         </div>
-        
+
         <div class="info-card">
           <div class="info-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
           </div>
@@ -74,22 +99,23 @@
         </div>
       </div>
     </div>
-    
-    <!-- Session Info -->
+
     <div class="info-section">
       <h2 class="section-title">Текущая сессия</h2>
-      
+
       <div class="session-card">
         <div class="session-header">
           <div class="session-info">
             <h4 class="session-title">Текущее устройство</h4>
-            <p class="session-description">Последняя активность: {{ lastActivity }}</p>
+            <p class="session-description">
+              Последняя активность: {{ lastActivity }}
+            </p>
           </div>
           <div class="session-badge active">
             <span>Активна</span>
           </div>
         </div>
-        
+
         <div class="session-details">
           <div class="session-row">
             <span class="session-label">Браузер:</span>
@@ -102,15 +128,19 @@
         </div>
       </div>
     </div>
-    
-    <!-- Actions -->
+
     <div class="actions-section">
       <h2 class="section-title">Действия</h2>
-      
+
       <div class="actions-grid">
         <button class="action-card" @click="handleLogout">
           <div class="action-icon logout">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -121,7 +151,12 @@
             <p class="action-description">Завершить текущую сессию</p>
           </div>
           <div class="action-arrow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </div>
@@ -132,59 +167,59 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores'
-import type { User } from '@/types'
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores";
+import type { User } from "@/types";
 
-const router = useRouter()
-const authStore = useAuthStore()
+const router = useRouter();
+const authStore = useAuthStore();
 
-const user = computed(() => authStore.user as User)
+const user = computed(() => authStore.user as User);
 
 const registrationDate = computed(() => {
-  if (!user.value?.createdAt) return '-'
-  const date = new Date(user.value.createdAt)
-  return date.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-})
+  if (!user.value?.createdAt) return "-";
+  const date = new Date(user.value.createdAt);
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+});
 
 const roleLabel = computed(() => {
-  if (!user.value) return '-'
-  return user.value.role === 'admin' ? 'Администратор' : 'Пользователь'
-})
+  if (!user.value) return "-";
+  return user.value.role === "admin" ? "Администратор" : "Пользователь";
+});
 
 const lastActivity = computed(() => {
-  const now = new Date()
-  return now.toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-})
+  const now = new Date();
+  return now.toLocaleTimeString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+});
 
 const browserInfo = computed(() => {
-  const userAgent = navigator.userAgent
-  if (userAgent.includes('Chrome')) return 'Google Chrome'
-  if (userAgent.includes('Firefox')) return 'Mozilla Firefox'
-  if (userAgent.includes('Safari')) return 'Safari'
-  if (userAgent.includes('Edge')) return 'Microsoft Edge'
-  return 'Неизвестный браузер'
-})
+  const userAgent = navigator.userAgent;
+  if (userAgent.includes("Chrome")) return "Google Chrome";
+  if (userAgent.includes("Firefox")) return "Mozilla Firefox";
+  if (userAgent.includes("Safari")) return "Safari";
+  if (userAgent.includes("Edge")) return "Microsoft Edge";
+  return "Неизвестный браузер";
+});
 
 const ipAddress = computed(() => {
   // В реальном приложении можно получить через API
-  return '192.168.1.1'
-})
+  return "192.168.1.1";
+});
 
 const handleLogout = () => {
-  if (!confirm('Вы уверены, что хотите выйти из аккаунта?')) return
-  
-  authStore.logout()
-  router.push('/')
-}
+  if (!confirm("Вы уверены, что хотите выйти из аккаунта?")) return;
+
+  authStore.logout();
+  router.push("/");
+};
 </script>
 
 <style scoped>
@@ -217,7 +252,11 @@ const handleLogout = () => {
   align-items: center;
   gap: var(--spacing-6);
   padding: var(--spacing-10);
-  background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(5, 150, 105, 0.1),
+    rgba(5, 150, 105, 0.05)
+  );
   border: 1px solid rgba(5, 150, 105, 0.2);
   border-radius: var(--radius-xl);
 }
@@ -349,7 +388,7 @@ const handleLogout = () => {
 
 .info-badge.admin {
   background: rgba(139, 92, 246, 0.1);
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 /* Session Card */
@@ -517,27 +556,27 @@ const handleLogout = () => {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .info-card {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .info-badge {
     align-self: center;
   }
-  
+
   .session-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-3);
   }
-  
+
   .action-card {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .action-arrow {
     display: none;
   }

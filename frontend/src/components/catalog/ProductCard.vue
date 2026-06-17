@@ -8,7 +8,7 @@
           class="product-image"
           loading="lazy"
         />
-        
+
         <div class="product-actions">
           <button
             type="button"
@@ -17,10 +17,15 @@
             @click.stop.prevent="handleAddToCart"
             title="В корзину"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
           </button>
           <button
@@ -30,8 +35,15 @@
             @click.stop.prevent="toggleFavorite"
             title="В избранное"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+              />
             </svg>
           </button>
           <button
@@ -41,25 +53,30 @@
             @click.stop.prevent="toggleCompare"
             title="Сравнить"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
             </svg>
           </button>
         </div>
-        
+
         <div v-if="hasPriceHistory" class="price-badge">
           {{ priceChangeLabel }}
         </div>
       </div>
-      
+
       <div class="product-info">
         <div class="product-brand">{{ product.brand }}</div>
         <h3 class="product-name">{{ product.name }}</h3>
-        
+
         <div class="product-price">
           <span class="price-current">{{ formatPrice(product.price) }} ₽</span>
         </div>
-        
+
         <div v-if="hasRatings" class="product-rating">
           <div class="rating-stars">
             <svg
@@ -71,15 +88,25 @@
               :stroke="star <= averageRating ? 'currentColor' : '#D1D5DB'"
               stroke-width="2"
             >
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              <path
+                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+              />
             </svg>
           </div>
           <span class="rating-value">{{ averageRating.toFixed(1) }}</span>
         </div>
-        
+
         <div v-if="product.reviews.length > 0" class="product-reviews">
-          <svg class="review-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          <svg
+            class="review-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            />
           </svg>
           <span class="reviews-count">{{ product.reviews.length }}</span>
         </div>
@@ -89,111 +116,116 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useComparisonStore, useCartStore, useFavoritesStore } from '@/stores'
-import { addToFavorites, removeFromFavorites } from '@/api'
-import type { Product } from '@/types'
+import { computed, ref } from "vue";
+import { useComparisonStore, useCartStore, useFavoritesStore } from "@/stores";
+import { addToFavorites, removeFromFavorites } from "@/api";
+import type { Product } from "@/types";
 
 const props = defineProps<{
-  product: Product
-}>()
+  product: Product;
+}>();
 
 const emit = defineEmits<{
-  removeFromFavorites: [productId: string]
-}>()
+  removeFromFavorites: [productId: string];
+}>();
 
-const comparisonStore = useComparisonStore()
-const cartStore = useCartStore()
-const favoritesStore = useFavoritesStore()
-const isAddingToCart = ref(false)
+const comparisonStore = useComparisonStore();
+const cartStore = useCartStore();
+const favoritesStore = useFavoritesStore();
+const isAddingToCart = ref(false);
 
-const isFavorite = computed(() => favoritesStore.isFavorite(props.product.id))
-const isInCompare = computed(() => comparisonStore.isInCompare(props.product.id))
-const isInCart = computed(() => cartStore.isInCart(props.product.id))
+const isFavorite = computed(() => favoritesStore.isFavorite(props.product.id));
+const isInCompare = computed(() =>
+  comparisonStore.isInCompare(props.product.id)
+);
+const isInCart = computed(() => cartStore.isInCart(props.product.id));
 
 const productImage = computed(() => {
   if (props.product.images && props.product.images.length > 0) {
-    return `http://localhost:5000${props.product.images[0]}`
+    return `http://localhost:5000${props.product.images[0]}`;
   }
-  return 'https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product'
-})
+  return "https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product";
+});
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('ru-RU')
-}
+  return price.toLocaleString("ru-RU");
+};
 
 const hasPriceHistory = computed(() => {
-  return props.product.priceHistory && props.product.priceHistory.length > 1
-})
+  return props.product.priceHistory && props.product.priceHistory.length > 1;
+});
 
 const priceChangeLabel = computed(() => {
-  if (!hasPriceHistory.value) return ''
-  
-  const history = props.product.priceHistory
-  const current = history[history.length - 1].price
-  const previous = history[history.length - 2].price
-  
-  const change = ((current - previous) / previous) * 100
-  
+  if (!hasPriceHistory.value) return "";
+
+  const history = props.product.priceHistory;
+  const current = history[history.length - 1].price;
+  const previous = history[history.length - 2].price;
+
+  const change = ((current - previous) / previous) * 100;
+
   if (change > 0) {
-    return `+${Math.round(change)}%`
+    return `+${Math.round(change)}%`;
   } else if (change < 0) {
-    return `${Math.round(change)}%`
+    return `${Math.round(change)}%`;
   }
-  return ''
-})
+  return "";
+});
 
 const hasRatings = computed(() => {
-  return props.product.traitRatings && Object.keys(props.product.traitRatings).length > 0
-})
+  return (
+    props.product.traitRatings &&
+    Object.keys(props.product.traitRatings).length > 0
+  );
+});
 
 const averageRating = computed(() => {
-  if (!hasRatings.value) return 0
-  
-  const ratings = Object.values(props.product.traitRatings)
-  const sum = ratings.reduce((acc, val) => acc + val, 0)
-  return sum / ratings.length
-})
+  if (!hasRatings.value) return 0;
+
+  const ratings = Object.values(props.product.traitRatings);
+  const sum = ratings.reduce((acc, val) => acc + val, 0);
+  return sum / ratings.length;
+});
 
 const toggleFavorite = async () => {
   try {
     if (isFavorite.value) {
-      await removeFromFavorites(props.product.id)
-      favoritesStore.removeFavorite(props.product.id)
-      emit('removeFromFavorites', props.product.id)
+      await removeFromFavorites(props.product.id);
+      favoritesStore.removeFavorite(props.product.id);
+      emit("removeFromFavorites", props.product.id);
     } else {
-      await addToFavorites(props.product.id)
-      favoritesStore.addFavorite(props.product.id)
+      await addToFavorites(props.product.id);
+      favoritesStore.addFavorite(props.product.id);
     }
   } catch (error) {
-    console.error('Failed to toggle favorite:', error)
+    console.error("Failed to toggle favorite:", error);
   }
-}
+};
 
 const toggleCompare = () => {
   if (isInCompare.value) {
-    comparisonStore.removeFromCompare(props.product.id)
+    comparisonStore.removeFromCompare(props.product.id);
   } else {
     if (!comparisonStore.maxReached) {
-      comparisonStore.addToCompare(props.product.id)
+      comparisonStore.addToCompare(props.product.id);
     } else {
-      alert('Максимум 4 товара для сравнения')
+      alert("Максимум 4 товара для сравнения");
     }
   }
-}
+};
 
 const handleAddToCart = async () => {
-  if (isInCart.value) return
-  
-  isAddingToCart.value = true
+  if (isInCart.value) return;
+
+  isAddingToCart.value = true;
   try {
-    await cartStore.addToCart(props.product.id, 1)
+    await cartStore.addToCart(props.product.id, 1);
   } catch (error) {
-    console.error('Failed to add to cart:', error)
+    console.error("Failed to add to cart:", error);
   } finally {
-    isAddingToCart.value = false
+    isAddingToCart.value = false;
   }
-}
+};
 </script>
 
 <style scoped>
@@ -371,7 +403,7 @@ const handleAddToCart = async () => {
 .star-icon {
   width: 14px;
   height: 14px;
-  color: #FBBF24;
+  color: #fbbf24;
 }
 
 .star-icon[fill="none"] {

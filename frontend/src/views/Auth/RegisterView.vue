@@ -277,7 +277,7 @@ const validateEmail = (email: string): string | null => {
 };
 
 const validatePhone = (phone: string): string | null => {
-  if (!phone) return null; // Phone is optional
+  if (!phone) return null;
   const phoneRegex = /^[\d\s\+\-\(\)]{10,}$/;
   if (!phoneRegex.test(phone)) return "Некорректный формат телефона";
   return null;

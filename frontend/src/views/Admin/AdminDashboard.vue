@@ -7,7 +7,6 @@
       </div>
     </div>
 
-    <!-- Stats Grid -->
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-icon" style="background: #dbeafe; color: #2563eb">
@@ -103,7 +102,6 @@
       </div>
     </div>
 
-    <!-- Recent Sections -->
     <div class="recent-grid">
       <div class="recent-section">
         <div class="section-header">

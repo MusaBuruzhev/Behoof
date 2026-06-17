@@ -30,7 +30,6 @@
 
     <div v-else class="order-content">
       <div class="info-grid">
-        <!-- Информация о клиенте -->
         <div class="info-card">
           <h3 class="card-title">Клиент</h3>
           <div class="info-row">
@@ -47,7 +46,6 @@
           </div>
         </div>
 
-        <!-- Способ получения -->
         <div class="info-card">
           <h3 class="card-title">Способ получения</h3>
           <div class="info-row">
@@ -65,7 +63,6 @@
         </div>
       </div>
 
-      <!-- Товары -->
       <div class="products-section">
         <h3 class="section-title">Товары</h3>
         <div class="products-list">
@@ -85,7 +82,6 @@
         </div>
       </div>
 
-      <!-- Блок наличия -->
       <div class="availability-section">
         <h3 class="section-title">Наличие товара</h3>
         <div class="availability-buttons">
@@ -127,7 +123,6 @@
         </div>
       </div>
 
-      <!-- Смена статуса -->
       <div class="status-section">
         <h3 class="section-title">Изменить статус</h3>
         <div class="status-buttons">
@@ -143,7 +138,6 @@
       </div>
     </div>
 
-    <!-- Модалка предзаказа -->
     <div v-if="showPreorderModal" class="modal-overlay" @click.self="showPreorderModal = false">
       <div class="modal">
         <h3>Предзаказ</h3>
@@ -156,7 +150,6 @@
       </div>
     </div>
 
-    <!-- Модалка отмены -->
     <div v-if="showUnavailableModal" class="modal-overlay" @click.self="showUnavailableModal = false">
       <div class="modal">
         <h3>Нет в наличии</h3>

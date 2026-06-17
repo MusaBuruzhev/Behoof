@@ -215,7 +215,6 @@
           </div>
         </div>
 
-        <!-- Бренд -->
         <div v-if="selected?.type === 'brand'" class="info-content">
           <div class="info-header">
             <span class="info-icon">🏷️</span>
@@ -277,7 +276,6 @@
           </div>
         </div>
 
-        <!-- Модель -->
         <div v-if="selected?.type === 'model'" class="info-content">
           <div class="info-header">
             <span class="info-icon">📦</span>
@@ -326,7 +324,6 @@
       </div>
     </div>
 
-    <!-- Модальные окна (категория, бренд, модель) -->
     <div
       v-if="showCategoryModal"
       class="modal-overlay"
@@ -384,7 +381,13 @@
     >
       <div class="modal">
         <div class="modal-header">
-          <h2>{{ editingBrand ? "Редактировать субкатегорию (бренд)" : "Новая субкатегория (бренд)" }}</h2>
+          <h2>
+            {{
+              editingBrand
+                ? "Редактировать субкатегорию (бренд)"
+                : "Новая субкатегория (бренд)"
+            }}
+          </h2>
           <button class="btn-close" @click="showBrandModal = false">
             <svg
               viewBox="0 0 24 24"
@@ -533,7 +536,6 @@ const getCategoryName = (categoryId: string) => {
 const getBrandName = (modelId: string) => {
   const model = models.value.find((m) => m.id === modelId);
   if (!model) return "";
-  // Поддержка обоих форматов
   const brandId = model.brandId || model.subcategoryId;
   return brands.value.find((b) => b.id === brandId)?.name || "";
 };
@@ -549,7 +551,6 @@ const getBrandCount = (categoryId: string) =>
 const getModelCount = (categoryId: string) => {
   return models.value.filter((m) => {
     if (m.categoryId) return m.categoryId === categoryId;
-    // Для старых моделей: categoryId = subcategoryId
     if (m.subcategoryId)
       return m.subcategoryId.startsWith(categoryId.replace("cat", "sub"));
     return false;
@@ -615,7 +616,6 @@ const saveCategory = async () => {
     showCategoryModal.value = false;
     await loadCatalog();
   } catch (err: any) {
-    // error handled silently
   }
 };
 
@@ -644,7 +644,6 @@ const saveBrand = async () => {
     showBrandModal.value = false;
     await loadCatalog();
   } catch (err: any) {
-    // error handled silently
   }
 };
 
@@ -674,7 +673,6 @@ const saveModel = async () => {
     showModelModal.value = false;
     await loadCatalog();
   } catch (err: any) {
-    // error handled silently
   }
 };
 
@@ -687,9 +685,12 @@ const openProductModal = (model: any) => {
 };
 
 const loadCatalog = async () => {
-  await Promise.all([adminStore.fetchCategories(), adminStore.fetchSubcategories()]);
+  await Promise.all([
+    adminStore.fetchCategories(),
+    adminStore.fetchSubcategories(),
+  ]);
   categories.value = adminStore.categories.items;
-  brands.value = adminStore.brands.items; // brands.items теперь заполняется из subcategories
+  brands.value = adminStore.brands.items; 
 
   try {
     const modelsRes = await api.get("/admin/models");
@@ -698,7 +699,6 @@ const loadCatalog = async () => {
     const catalogRes = await api.get("/catalog");
     products.value = Object.values(catalogRes.data.products || {});
   } catch (err) {
-    // error handled silently
   }
 };
 

@@ -1,7 +1,6 @@
 <template>
   <div class="comparison-view">
     <div class="container">
-      <!-- Header -->
       <div class="comparison-header">
         <div class="header-content">
           <h1 class="comparison-title">Сравнение товаров</h1>
@@ -15,7 +14,6 @@
         </div>
       </div>
       
-      <!-- Empty State -->
       <div v-if="products.length === 0" class="empty-state">
         <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M9 3v18M15 3v18M3 9h6M3 15h6M15 9h6M15 15h6" />
@@ -33,7 +31,6 @@
       </div>
       
       <div v-else>
-        <!-- Quick Summary -->
         <div class="quick-summary">
           <div class="summary-card">
             <div class="summary-icon price-icon">
@@ -75,7 +72,6 @@
           </div>
         </div>
         
-        <!-- Controls -->
         <div class="comparison-controls">
           <label class="toggle-control">
             <input
@@ -92,13 +88,10 @@
           </button>
         </div>
         
-        <!-- Sticky Product Cards -->
         <div class="products-sticky-wrapper" ref="stickyWrapper">
           <div class="products-cards">
-            <!-- Spacer for characteristics column -->
             <div class="characteristics-spacer"></div>
             
-            <!-- Product Cards -->
             <div
               v-for="product in products"
               :key="product.id"
@@ -138,9 +131,7 @@
           </div>
         </div>
         
-        <!-- Comparison Table -->
         <div class="comparison-table">
-          <!-- Characteristics Groups -->
           <div
             v-for="(group, groupIndex) in filteredCharacteristicGroups"
             :key="groupIndex"
@@ -197,7 +188,6 @@ const products = ref<Product[]>([])
 const isLoading = ref(true)
 const showOnlyDifferences = ref(false)
 
-// Определение характеристик для сравнения
 const characteristicGroups = ref([
   {
     name: 'Основные',
@@ -212,7 +202,6 @@ const characteristicGroups = ref([
   },
 ])
 
-// Загрузка товаров
 const loadProducts = async () => {
   isLoading.value = true
   const productPromises = comparisonStore.productIds.map(id => getProduct(id))
@@ -221,7 +210,6 @@ const loadProducts = async () => {
     const responses = await Promise.all(productPromises)
     products.value = responses.map(r => r.data)
     
-    // Динамическое создание характеристик из данных товаров
     generateCharacteristicGroups()
   } catch (error) {
     console.error('Failed to load products:', error)
@@ -231,11 +219,9 @@ const loadProducts = async () => {
   }
 }
 
-// Генерация групп характеристик на основе данных товаров
 const generateCharacteristicGroups = () => {
   if (products.value.length === 0) return
   
-  // Собираем все уникальные характеристики из всех товаров
   const allCharacteristics = new Map<string, { name: string; values: any[] }>()
   
   products.value.forEach(product => {
@@ -253,7 +239,6 @@ const generateCharacteristicGroups = () => {
     }
   })
   
-  // Создаём группы
   const characteristics = Array.from(allCharacteristics.entries())
     .filter(([_, data]) => data.values.length > 0)
     .map(([key, data]) => ({
@@ -272,21 +257,18 @@ const generateCharacteristicGroups = () => {
     },
     {
       name: 'Характеристики',
-      characteristics: characteristics.slice(0, 12), // Максимум 12 характеристик
+      characteristics: characteristics.slice(0, 12), 
     },
   ]
 }
 
-// Определение типа характеристики
 const getCharacteristicType = (values: any[]): string => {
   const hasNumbers = values.some(v => typeof v === 'number')
   if (hasNumbers) return 'number'
   return 'string'
 }
 
-// Парсинг значения характеристики
 const parseValue = (value: string): any => {
-  // Пробуем извлечь число
   const match = value.match(/(\d+(?:[.,]\d+)?)/)
   if (match) {
     return parseFloat(match[1].replace(',', '.'))
@@ -294,7 +276,6 @@ const parseValue = (value: string): any => {
   return value
 }
 
-// Получение значения характеристики для товара
 const getCharacteristicValue = (product: Product, char: { key: string }): string => {
   if (char.key === 'brand') return product.brand
   if (char.key === 'price') return `${product.price.toLocaleString('ru-RU')} ₽`
@@ -305,14 +286,12 @@ const getCharacteristicValue = (product: Product, char: { key: string }): string
   return characteristic?.value || '—'
 }
 
-// Проверка на различия
 const hasDifferences = (char: { key: string; name: string }): boolean => {
   const values = products.value.map(p => getCharacteristicValue(p, char))
   const uniqueValues = new Set(values)
   return uniqueValues.size > 1
 }
 
-// Фильтрация характеристик
 const filteredCharacteristicGroups = computed(() => {
   if (!showOnlyDifferences.value) return characteristicGroups.value
   
@@ -322,10 +301,9 @@ const filteredCharacteristicGroups = computed(() => {
   })).filter(group => group.characteristics.length > 0)
 })
 
-// Определение лучшего значения
 const isBestValue = (productId: string, char: { key: string; type: string }): boolean => {
   if (char.type !== 'number') return false
-  if (char.key === 'price') return false // Цену не подсвечиваем
+  if (char.key === 'price') return false 
   
   const values = products.value.map(p => {
     const value = getCharacteristicValue(p, char)
@@ -350,7 +328,6 @@ const getBestValueClass = (productId: string, char: { key: string; type: string 
   return ''
 }
 
-// Быстрые итоги
 const lowestPrice = computed(() => {
   if (products.value.length === 0) return 0
   return Math.min(...products.value.map(p => p.price))
@@ -392,19 +369,16 @@ const mostReviewsProductName = computed(() => {
   return product?.name || ''
 })
 
-// Удаление товара
 const removeProduct = (productId: string) => {
   comparisonStore.removeFromCompare(productId)
   products.value = products.value.filter(p => p.id !== productId)
 }
 
-// Очистка всего
 const clearAll = () => {
   comparisonStore.clearCompare()
   products.value = []
 }
 
-// Получение изображения товара
 const getProductImage = (product: Product): string => {
   if (product.images && product.images.length > 0) {
     return `http://localhost:5000${product.images[0]}`
@@ -412,12 +386,10 @@ const getProductImage = (product: Product): string => {
   return 'https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product'
 }
 
-// Форматирование цены
 const formatPrice = (price: number): string => {
   return price.toLocaleString('ru-RU')
 }
 
-// Следим за изменениями в store
 watch(
   () => comparisonStore.productIds,
   () => {

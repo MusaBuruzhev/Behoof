@@ -1,7 +1,6 @@
 <template>
   <div class="catalog-view">
     <div class="container">
-      <!-- Верхняя часть: хлебные крошки, заголовок, количество товаров -->
       <CatalogHeader
         :current-category="currentCategory"
         :current-subcategory="currentSubcategory"
@@ -69,7 +68,6 @@
             />
           </div>
 
-          <!-- Пагинация -->
           <CatalogPagination
             v-if="productsResponse.total > 0"
             :current-page="currentPage"
@@ -99,7 +97,6 @@ import ProductCard from "@/components/catalog/ProductCard.vue";
 const route = useRoute();
 const catalogStore = useCatalogStore();
 
-// Состояние
 const loading = ref(false);
 const categories = ref<Category[]>([]);
 const currentCategory = ref<Category | null>(null);
@@ -202,7 +199,6 @@ const loadProducts = async () => {
   }
 };
 
-// Обработчики
 const handleSearch = () => {
   productsResponse.page = 1;
   loadProducts();
@@ -233,16 +229,17 @@ const changePage = (page: number) => {
   productsResponse.page = page;
   loadProducts();
 
-  // Скролл к началу
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
-// Watch для параметров роута и query
 watch(
-  () => [route.params.categoryId, route.params.subcategoryId, route.query.category],
+  () => [
+    route.params.categoryId,
+    route.params.subcategoryId,
+    route.query.category,
+  ],
   ([_catId, _subcatId, queryCategory]) => {
-    // Если есть query параметр category, используем его
-    if (queryCategory && typeof queryCategory === 'string') {
+    if (queryCategory && typeof queryCategory === "string") {
       selectedCategory.value = queryCategory;
     }
     loadCatalog();
@@ -251,8 +248,7 @@ watch(
 );
 
 onMounted(() => {
-  // Проверяем query параметр category при монтировании
-  if (route.query.category && typeof route.query.category === 'string') {
+  if (route.query.category && typeof route.query.category === "string") {
     selectedCategory.value = route.query.category;
   }
   loadCatalog();

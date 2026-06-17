@@ -7,7 +7,7 @@
           Выберите категорию для просмотра всего ассортимента
         </p>
       </div>
-      
+
       <div class="categories-grid">
         <router-link
           v-for="category in categories"
@@ -28,7 +28,13 @@
             <h3 class="category-name">{{ category.name }}</h3>
             <span class="category-link">
               Смотреть товары
-              <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="arrow-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </span>
@@ -40,42 +46,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getCatalog } from '@/api'
-import type { Category } from '@/types'
+import { ref, onMounted } from "vue";
+import { getCatalog } from "@/api";
+import type { Category } from "@/types";
 
-const categories = ref<Category[]>([])
+const categories = ref<Category[]>([]);
 
-// Изображения для категорий (используем плейсхолдеры с тематическими цветами)
 const categoryImages: Record<string, string> = {
-  cat1: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=400&fit=crop', // Смартфоны
-  cat2: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop', // Ноутбуки
-  cat3: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&h=400&fit=crop', // Планшеты
-  cat4: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400&fit=crop', // Наушники
-  cat5: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&h=400&fit=crop', // Умные часы
-  cat6: 'https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=600&h=400&fit=crop', // Игровые приставки
-  cat7: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&h=400&fit=crop', // Портативные колонки
-  cat8: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop', // Аксессуары
-}
+  cat1: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&h=400&fit=crop", // Смартфоны
+  cat2: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&h=400&fit=crop", // Ноутбуки
+  cat3: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&h=400&fit=crop", // Планшеты
+  cat4: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400&fit=crop", // Наушники
+  cat5: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=600&h=400&fit=crop", // Умные часы
+  cat6: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=600&h=400&fit=crop", // Игровые приставки
+  cat7: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&h=400&fit=crop", // Портативные колонки
+  cat8: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=400&fit=crop", // Аксессуары
+};
 
-const defaultCategoryImage = 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop'
+const defaultCategoryImage =
+  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&h=400&fit=crop";
 
 const getCategoryImage = (category: Category): string => {
-  return categoryImages[category.id] || defaultCategoryImage
-}
+  return categoryImages[category.id] || defaultCategoryImage;
+};
 
 const loadCategories = async () => {
   try {
-    const response = await getCatalog()
-    categories.value = response.data.categories || []
+    const response = await getCatalog();
+    categories.value = response.data.categories || [];
   } catch (error) {
-    console.error('Failed to load categories:', error)
+    console.error("Failed to load categories:", error);
   }
-}
+};
 
 onMounted(() => {
-  loadCategories()
-})
+  loadCategories();
+});
 </script>
 
 <style scoped>
@@ -200,7 +206,7 @@ onMounted(() => {
   .categories-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .category-image-wrapper {
     height: 200px;
   }

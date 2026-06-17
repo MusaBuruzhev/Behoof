@@ -8,13 +8,19 @@
             <span class="text-primary">будущего</span>
           </h1>
           <p class="hero-description">
-            Современный магазин премиальной электроники.
-            Только оригинальные товары с гарантией качества.
+            Современный магазин премиальной электроники. Только оригинальные
+            товары с гарантией качества.
           </p>
-          
+
           <div class="hero-search">
             <div class="search-input-wrapper">
-              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                class="search-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -30,15 +36,21 @@
               Найти
             </button>
           </div>
-          
+
           <router-link to="/catalog" class="btn btn-primary btn-lg">
             Перейти в каталог
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg
+              class="btn-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </router-link>
         </div>
-        
+
         <div class="hero-visual">
           <div class="hero-products-grid">
             <div
@@ -62,50 +74,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { getCatalog } from '@/api'
-import type { Product } from '@/types'
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { getCatalog } from "@/api";
+import type { Product } from "@/types";
 
-const router = useRouter()
-const searchQuery = ref('')
-const heroProducts = ref<(Product & { animationDelay: string })[]>([])
+const router = useRouter();
+const searchQuery = ref("");
+const heroProducts = ref<(Product & { animationDelay: string })[]>([]);
 
 const getCatalogData = async () => {
   try {
-    const response = await getCatalog()
-    const products = Object.values(response.data.products || {}) as Product[]
-    
-    // Берём первые 6 товаров для hero секции
-    heroProducts.value = products
-      .slice(0, 6)
-      .map((product, index) => ({
-        ...product,
-        animationDelay: `${index * 0.1}s`,
-      }))
+    const response = await getCatalog();
+    const products = Object.values(response.data.products || {}) as Product[];
+
+    heroProducts.value = products.slice(0, 6).map((product, index) => ({
+      ...product,
+      animationDelay: `${index * 0.1}s`,
+    }));
   } catch (error) {
-    console.error('Failed to load catalog for hero:', error)
+    console.error("Failed to load catalog for hero:", error);
   }
-}
+};
 
 const getProductImage = (product: Product): string => {
   if (product.images && product.images.length > 0) {
-    // Backend возвращает пути вида "/uploads/...", добавляем базовый URL
-    return `http://localhost:5000${product.images[0]}`
+    return `http://localhost:5000${product.images[0]}`;
   }
-  // Placeholder если нет изображений
-  return 'https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product'
-}
+  return "https://via.placeholder.com/400x400/F5F7FA/2563EB?text=Product";
+};
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    router.push(`/catalog?q=${encodeURIComponent(searchQuery.value.trim())}`)
+    router.push(`/catalog?q=${encodeURIComponent(searchQuery.value.trim())}`);
   }
-}
+};
 
 onMounted(() => {
-  getCatalogData()
-})
+  getCatalogData();
+});
 </script>
 
 <style scoped>
@@ -113,7 +120,11 @@ onMounted(() => {
   min-height: 85vh;
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-background) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-surface) 0%,
+    var(--color-background) 100%
+  );
   padding: var(--spacing-16) 0;
 }
 
@@ -173,7 +184,8 @@ onMounted(() => {
 
 .search-input {
   width: 100%;
-  padding: var(--spacing-4) var(--spacing-4) var(--spacing-4) calc(var(--spacing-4) + 20px + var(--spacing-4));
+  padding: var(--spacing-4) var(--spacing-4) var(--spacing-4)
+    calc(var(--spacing-4) + 20px + var(--spacing-4));
   font-size: var(--font-size-body);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-input);
@@ -300,30 +312,30 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: var(--spacing-12);
   }
-  
+
   .hero-text {
     text-align: center;
     max-width: 100%;
   }
-  
+
   .hero-description {
     margin-left: auto;
     margin-right: auto;
   }
-  
+
   .hero-search {
     justify-content: center;
   }
-  
+
   .hero-visual {
     height: 400px;
   }
-  
+
   .hero-product-card:nth-child(1) {
     width: 240px;
     height: 280px;
   }
-  
+
   .hero-product-card:nth-child(3) {
     width: 220px;
     height: 260px;
@@ -335,23 +347,23 @@ onMounted(() => {
     min-height: 70vh;
     padding: var(--spacing-12) 0;
   }
-  
+
   .hero-title {
     font-size: var(--font-size-h2);
   }
-  
+
   .hero-search {
     flex-direction: column;
   }
-  
+
   .search-input-wrapper {
     width: 100%;
   }
-  
+
   .btn-lg {
     width: 100%;
   }
-  
+
   .hero-visual {
     display: none;
   }

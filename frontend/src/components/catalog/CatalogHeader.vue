@@ -1,19 +1,32 @@
 <template>
   <div class="catalog-header">
     <nav class="breadcrumbs">
-      <router-link to="/catalog" class="breadcrumb-item">
-        Каталог
-      </router-link>
+      <router-link to="/catalog" class="breadcrumb-item"> Каталог </router-link>
       <template v-if="currentCategory">
-        <svg class="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          class="breadcrumb-separator"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M9 18l6-6-6-6" />
         </svg>
-        <router-link :to="`/catalog/${currentCategory.id}`" class="breadcrumb-item">
+        <router-link
+          :to="`/catalog/${currentCategory.id}`"
+          class="breadcrumb-item"
+        >
           {{ currentCategory.name }}
         </router-link>
       </template>
       <template v-if="currentSubcategory">
-        <svg class="breadcrumb-separator" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          class="breadcrumb-separator"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M9 18l6-6-6-6" />
         </svg>
         <span class="breadcrumb-item breadcrumb-current">
@@ -21,7 +34,7 @@
         </span>
       </template>
     </nav>
-    
+
     <div class="catalog-title-section">
       <h1 class="catalog-title">
         {{ pageTitle }}
@@ -34,24 +47,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { Category, Subcategory } from '@/types'
+import { computed } from "vue";
+import type { Category, Subcategory } from "@/types";
 
 const props = defineProps<{
-  currentCategory: Category | null
-  currentSubcategory: Subcategory | null
-  totalProducts: number
-}>()
+  currentCategory: Category | null;
+  currentSubcategory: Subcategory | null;
+  totalProducts: number;
+}>();
 
 const pageTitle = computed(() => {
   if (props.currentSubcategory) {
-    return props.currentSubcategory.name
+    return props.currentSubcategory.name;
   }
   if (props.currentCategory) {
-    return props.currentCategory.name
+    return props.currentCategory.name;
   }
-  return 'Все товары'
-})
+  return "Все товары";
+});
 </script>
 
 <style scoped>
@@ -115,7 +128,7 @@ const pageTitle = computed(() => {
   .catalog-title {
     font-size: var(--font-size-h3);
   }
-  
+
   .catalog-title-section {
     flex-direction: column;
     align-items: flex-start;

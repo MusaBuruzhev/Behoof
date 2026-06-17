@@ -2,22 +2,54 @@
   <header class="admin-header">
     <div class="header-content">
       <div class="header-left">
-        <button class="menu-toggle" @click="$emit('toggleSidebar')" v-if="isMobile">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <button
+          class="menu-toggle"
+          @click="$emit('toggleSidebar')"
+          v-if="isMobile"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
         </button>
         <div class="breadcrumb" v-if="breadcrumbs.length">
           <template v-for="(crumb, i) in breadcrumbs" :key="i">
             <span v-if="i > 0" class="separator">/</span>
-            <router-link v-if="crumb.path" :to="crumb.path" class="crumb-link">{{ crumb.label }}</router-link>
+            <router-link
+              v-if="crumb.path"
+              :to="crumb.path"
+              class="crumb-link"
+              >{{ crumb.label }}</router-link
+            >
             <span v-else class="crumb-current">{{ crumb.label }}</span>
           </template>
         </div>
       </div>
 
       <div class="header-right">
-        <button class="btn-icon" title="Уведомления" @click="$router.push('/admin/notifications')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-          <span v-if="unreadCount > 0" class="notification-badge">{{ unreadCount > 9 ? '9+' : unreadCount }}</span>
+        <button
+          class="btn-icon"
+          title="Уведомления"
+          @click="$router.push('/admin/notifications')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+          >
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          <span v-if="unreadCount > 0" class="notification-badge">{{
+            unreadCount > 9 ? "9+" : unreadCount
+          }}</span>
         </button>
 
         <div class="user-menu">
@@ -30,53 +62,60 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores'
+import { computed, ref } from "vue";
+import { useRoute } from "vue-router";
+import { useAuthStore } from "@/stores";
 
-defineEmits(['toggleSidebar'])
+defineEmits(["toggleSidebar"]);
 
-const route = useRoute()
-const authStore = useAuthStore()
+const route = useRoute();
+const authStore = useAuthStore();
 
-const isMobile = ref(window.innerWidth <= 768)
+const isMobile = ref(window.innerWidth <= 768);
 
-const userName = computed(() => authStore.userName || 'Админ')
-const userInitials = computed(() => authStore.userInitials || 'A')
-const unreadCount = computed(() => 0)
+const userName = computed(() => authStore.userName || "Админ");
+const userInitials = computed(() => authStore.userInitials || "A");
+const unreadCount = computed(() => 0);
 
 const breadcrumbs = computed(() => {
-  const path = route.path
-  const parts: { label: string; path?: string }[] = []
+  const path = route.path;
+  const parts: { label: string; path?: string }[] = [];
 
-  if (path === '/admin') return [{ label: 'Dashboard' }]
+  if (path === "/admin") return [{ label: "Dashboard" }];
 
   const map: Record<string, string> = {
-    products: 'Товары',
-    categories: 'Категории',
-    brands: 'Бренды',
-    characteristics: 'Характеристики',
-    orders: 'Заказы',
-    users: 'Пользователи',
-    notifications: 'Уведомления',
-  }
+    products: "Товары",
+    categories: "Категории",
+    brands: "Бренды",
+    characteristics: "Характеристики",
+    orders: "Заказы",
+    users: "Пользователи",
+    notifications: "Уведомления",
+  };
 
-  const segments = path.split('/').filter(Boolean)
-  if (segments[0] === 'admin') {
-    let accumulated = '/admin'
+  const segments = path.split("/").filter(Boolean);
+  if (segments[0] === "admin") {
+    let accumulated = "/admin";
     for (let i = 1; i < segments.length; i++) {
-      const seg = segments[i]
-      accumulated += '/' + seg
-      const label = map[seg] || seg
-      parts.push({ label, path: i < segments.length - 1 ? accumulated : undefined })
+      const seg = segments[i];
+      accumulated += "/" + seg;
+      const label = map[seg] || seg;
+      parts.push({
+        label,
+        path: i < segments.length - 1 ? accumulated : undefined,
+      });
     }
   }
 
-  return parts.length > 0 ? parts : [{ label: map[segments[segments.length - 1]] || 'Админ-панель' }]
-})
+  return parts.length > 0
+    ? parts
+    : [{ label: map[segments[segments.length - 1]] || "Админ-панель" }];
+});
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('resize', () => { isMobile.value = window.innerWidth <= 768 })
+if (typeof window !== "undefined") {
+  window.addEventListener("resize", () => {
+    isMobile.value = window.innerWidth <= 768;
+  });
 }
 </script>
 
@@ -117,42 +156,111 @@ if (typeof window !== 'undefined') {
   color: var(--color-text-secondary);
 }
 
-.menu-toggle svg { width: 22px; height: 22px; }
+.menu-toggle svg {
+  width: 22px;
+  height: 22px;
+}
 
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 16px; }
-.separator { color: var(--color-border-dark, #D1D5DB); }
-.crumb-link { color: var(--color-text-tertiary); text-decoration: none; }
-.crumb-link:hover { color: var(--color-primary); text-decoration: underline; }
-.crumb-current { color: var(--color-text-primary); font-weight: 500; }
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+}
+.separator {
+  color: var(--color-border-dark, #d1d5db);
+}
+.crumb-link {
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+}
+.crumb-link:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+.crumb-current {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
 
-.header-right { display: flex; align-items: center; gap: 12px; }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
 .btn-icon {
-  position: relative; display: flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border: none; background: transparent; border-radius: 8px;
-  cursor: pointer; color: var(--color-text-secondary); transition: all 0.15s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.15s;
 }
-.btn-icon:hover { background: var(--color-surface-secondary, #F9FAFB); color: var(--color-text-primary); }
-.btn-icon svg { width: 20px; height: 20px; }
+.btn-icon:hover {
+  background: var(--color-surface-secondary, #f9fafb);
+  color: var(--color-text-primary);
+}
+.btn-icon svg {
+  width: 20px;
+  height: 20px;
+}
 
 .notification-badge {
-  position: absolute; top: 2px; right: 2px;
-  min-width: 18px; height: 18px; padding: 0 5px;
-  background: var(--color-error); color: white; border-radius: 9px;
-  font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--color-error);
+  color: white;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.user-menu { display: flex; align-items: center; gap: 10px; }
-.user-avatar {
-  display: flex; align-items: center; justify-content: center;
-  width: 36px; height: 36px; border-radius: 8px;
-  background: var(--color-primary); color: white; font-size: 14px; font-weight: 600;
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-.user-name { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+}
+.user-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
 
 @media (max-width: 768px) {
-  .menu-toggle { display: flex; }
-  .user-name { display: none; }
-  .admin-header { padding: 0 12px; }
+  .menu-toggle {
+    display: flex;
+  }
+  .user-name {
+    display: none;
+  }
+  .admin-header {
+    padding: 0 12px;
+  }
 }
 </style>

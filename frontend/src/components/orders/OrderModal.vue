@@ -1,10 +1,19 @@
 <template>
-  <div v-if="modelValue" class="modal-overlay" @click="$emit('update:modelValue', false)">
+  <div
+    v-if="modelValue"
+    class="modal-overlay"
+    @click="$emit('update:modelValue', false)"
+  >
     <div class="modal" @click.stop>
       <div class="modal-header">
         <h2>Оформление заказа</h2>
         <button class="modal-close" @click="$emit('update:modelValue', false)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
@@ -25,10 +34,18 @@
           <div class="delivery-type-selector">
             <button
               type="button"
-              :class="['delivery-type-btn', { active: form.deliveryType === 'pickup' }]"
+              :class="[
+                'delivery-type-btn',
+                { active: form.deliveryType === 'pickup' },
+              ]"
               @click="form.deliveryType = 'pickup'"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                 <polyline points="9 22 9 12 15 12 15 22" />
               </svg>
@@ -36,10 +53,18 @@
             </button>
             <button
               type="button"
-              :class="['delivery-type-btn', { active: form.deliveryType === 'delivery' }]"
+              :class="[
+                'delivery-type-btn',
+                { active: form.deliveryType === 'delivery' },
+              ]"
               @click="form.deliveryType = 'delivery'"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <rect x="1" y="3" width="15" height="13" />
                 <polygon points="16 8 20 8 23 11 23 16 16 16 8" />
                 <circle cx="5.5" cy="18.5" r="2.5" />
@@ -63,7 +88,9 @@
         </div>
 
         <div v-if="form.deliveryType === 'delivery'" class="form-group">
-          <label for="delivery-address" class="form-label">Адрес доставки *</label>
+          <label for="delivery-address" class="form-label"
+            >Адрес доставки *</label
+          >
           <input
             id="delivery-address"
             v-model="form.deliveryAddress"
@@ -111,7 +138,7 @@
             class="btn btn-primary"
             :disabled="isSubmitting"
           >
-            {{ isSubmitting ? 'Оформление...' : 'Оформить заказ' }}
+            {{ isSubmitting ? "Оформление..." : "Оформить заказ" }}
           </button>
         </div>
       </form>
@@ -120,73 +147,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import { createOrder } from '@/api'
-import type { Product } from '@/types'
+import { ref, reactive, computed } from "vue";
+import { createOrder } from "@/api";
+import type { Product } from "@/types";
 
 const props = defineProps<{
-  modelValue: boolean
-  product: Product | null
-}>()
+  modelValue: boolean;
+  product: Product | null;
+}>();
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'success'): void
-}>()
+  (e: "update:modelValue", value: boolean): void;
+  (e: "success"): void;
+}>();
 
-const isSubmitting = ref(false)
+const isSubmitting = ref(false);
 
 const form = reactive({
-  deliveryType: 'pickup' as 'pickup' | 'delivery',
-  deliveryAddress: '',
-  pickupDate: '',
-  contactName: '',
-  contactPhone: '',
-})
+  deliveryType: "pickup" as "pickup" | "delivery",
+  deliveryAddress: "",
+  pickupDate: "",
+  contactName: "",
+  contactPhone: "",
+});
 
 const minPickupDate = computed(() => {
-  const now = new Date()
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
-  return now.toISOString().slice(0, 16)
-})
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  return now.toISOString().slice(0, 16);
+});
 
 const productImage = computed(() => {
-  if (!props.product?.images?.[0]) return ''
-  if (props.product.images[0].startsWith('/uploads/')) {
-    return `http://localhost:5000${props.product.images[0]}`
+  if (!props.product?.images?.[0]) return "";
+  if (props.product.images[0].startsWith("/uploads/")) {
+    return `http://localhost:5000${props.product.images[0]}`;
   }
-  return props.product.images[0]
-})
+  return props.product.images[0];
+});
 
 const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('ru-RU', {
-    style: 'currency',
-    currency: 'RUB',
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
     maximumFractionDigits: 0,
-  }).format(price)
-}
+  }).format(price);
+};
 
 const handleSubmit = async () => {
-  if (!props.product) return
-  
-  isSubmitting.value = true
+  if (!props.product) return;
+
+  isSubmitting.value = true;
   try {
     await createOrder({
       items: [{ productId: props.product.id, quantity: 1 }],
       deliveryType: form.deliveryType,
-      deliveryAddress: form.deliveryType === 'delivery' ? form.deliveryAddress : undefined,
-      pickupDate: form.deliveryType === 'pickup' ? form.pickupDate : undefined,
+      deliveryAddress:
+        form.deliveryType === "delivery" ? form.deliveryAddress : undefined,
+      pickupDate: form.deliveryType === "pickup" ? form.pickupDate : undefined,
       contactName: form.contactName,
       contactPhone: form.contactPhone,
-    })
-    emit('update:modelValue', false)
-    emit('success')
+    });
+    emit("update:modelValue", false);
+    emit("success");
   } catch (error: any) {
-    alert('Ошибка: ' + (error.response?.data?.error || 'Не удалось оформить заказ'))
+    alert(
+      "Ошибка: " + (error.response?.data?.error || "Не удалось оформить заказ")
+    );
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
-}
+};
 </script>
 
 <style scoped>

@@ -90,7 +90,6 @@
       </table>
     </div>
 
-    <!-- Send Modal -->
     <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
       <div class="modal">
         <div class="modal-header">
@@ -238,7 +237,6 @@ const deleteHandler = async (notif: any) => {
     await deleteNotification(notif._id || notif.id);
     await loadNotifications();
   } catch (err) {
-    // error handled silently
   }
 };
 
@@ -253,14 +251,13 @@ const sendNotification = async () => {
       title: form.value.title,
       message: form.value.message,
     };
-    
-    // Отправляем userId только если выбран конкретный пользователь
+
     if (form.value.recipientType === "user" && form.value.userId) {
       payload.userId = form.value.userId;
     }
-    
+
     await sendAdminNotification(payload);
-    
+
     showModal.value = false;
     resetForm();
     await loadNotifications();

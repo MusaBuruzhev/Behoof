@@ -359,7 +359,6 @@ const proceedToCheckout = async () => {
   }
 };
 
-// Load related products (mock for now)
 const loadRelatedProducts = async () => {
   // В реальной реализации здесь будет API запрос
   relatedProducts.value = [];

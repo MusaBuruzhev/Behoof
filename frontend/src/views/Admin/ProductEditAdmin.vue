@@ -1,6 +1,5 @@
 <template>
   <div class="product-wizard">
-    <!-- Шаги -->
     <div class="wizard-steps">
       <button
         :class="['step', { active: currentStep === 1, done: currentStep > 1 }]"
@@ -20,7 +19,6 @@
       </button>
     </div>
 
-    <!-- Шаг 1: Основная информация -->
     <div v-if="currentStep === 1" class="step-content">
       <div class="form-grid">
         <div class="form-group full-width">
@@ -78,7 +76,6 @@
           </select>
         </div>
 
-        <!-- Характеристики -->
         <div class="form-group full-width">
           <label>Характеристики</label>
           <div v-if="characteristicGroups.length === 0" class="hint-text">
@@ -147,10 +144,8 @@
       </div>
     </div>
 
-    <!-- Шаг 2: Визуальный редактор -->
     <div v-if="currentStep === 2" class="step-content">
       <div class="editor-layout">
-        <!-- Левая колонка: Галерея изображений -->
         <div class="editor-gallery">
           <h3 class="section-title">Изображения</h3>
 
@@ -226,15 +221,12 @@
           </div>
         </div>
 
-        <!-- Правая колонка: Визуальное превью -->
         <div class="editor-preview">
           <h3 class="section-title">Превью товара</h3>
 
           <div class="preview-card">
-            <!-- Бренд -->
             <div class="preview-brand">{{ form.brand || "Бренд" }}</div>
 
-            <!-- Название -->
             <h1
               class="preview-title"
               contenteditable
@@ -243,12 +235,10 @@
               {{ form.name || "Название товара" }}
             </h1>
 
-            <!-- Цена -->
             <div class="preview-price">
               <span class="price-value">{{ formatPrice(form.price) }} ₽</span>
             </div>
 
-            <!-- Характеристики -->
             <div v-if="hasCharacteristics" class="preview-chars">
               <h3>Характеристики</h3>
               <div class="chars-grid">
@@ -266,23 +256,21 @@
               </button>
             </div>
 
-            <!-- Описание -->
-          <div class="preview-desc">
-            <h3>Описание</h3>
-            <div
-              class="desc-editor"
-              contenteditable
-              @blur="onDescEdit($event)"
-              @paste="handleDescPaste"
-              v-html="form.description"
-              ref="descEditor"
-            ></div>
-            <p class="hint" v-if="!form.description">
-              Кликните чтобы добавить описание...
-            </p>
-          </div>
+            <div class="preview-desc">
+              <h3>Описание</h3>
+              <div
+                class="desc-editor"
+                contenteditable
+                @blur="onDescEdit($event)"
+                @paste="handleDescPaste"
+                v-html="form.description"
+                ref="descEditor"
+              ></div>
+              <p class="hint" v-if="!form.description">
+                Кликните чтобы добавить описание...
+              </p>
+            </div>
 
-            <!-- Мета -->
             <div class="preview-meta">
               <div class="meta-item">
                 <span class="meta-label">Модель</span>
@@ -376,7 +364,6 @@ const step2Valid = computed(() => {
 
 const previewImages = computed(() => {
   const imgs: string[] = existingImages.value.map((img: string) => {
-    // Если путь относительный, добавляем baseURL
     if (img.startsWith("/uploads/")) {
       return "http://localhost:5000" + img;
     }
@@ -443,13 +430,11 @@ const onCategoryChange = async () => {
   }
 };
 
-// Шаг 1 → Шаг 2
 const goToStep2 = () => {
   if (!step1Valid.value) return;
   currentStep.value = 2;
 };
 
-// Изображения
 const handleImageUpload = (event: Event) => {
   const files = (event.target as HTMLInputElement).files;
   if (!files) return;
@@ -485,21 +470,17 @@ const removeImage = (index: number) => {
   }
 };
 
-// Редактирование текста в превью
 const onTitleEdit = (event: Event) => {
   const el = event.target as HTMLElement;
   form.value.name = el.textContent?.trim() || "";
 };
 
-// Очищает HTML от всех тегов — возвращает чистый текст
 const cleanHtml = (html: string): string => {
   const temp = document.createElement("div");
   temp.innerHTML = html;
-  // Возвращаем только текстовое содержимое без тегов
   return temp.textContent?.trim() || "";
 };
 
-// Обработка вставки текста - вставляем только чистый текст
 const handleDescPaste = (event: ClipboardEvent) => {
   event.preventDefault();
   const text = event.clipboardData?.getData("text/plain") || "";
@@ -511,7 +492,6 @@ const onDescEdit = (event: Event) => {
   form.value.description = cleanHtml(el.innerHTML);
 };
 
-// Сохранение
 const buildFormData = () => {
   const fd = new FormData();
 
@@ -534,7 +514,6 @@ const buildFormData = () => {
   return fd;
 };
 
-// Сохранение товара
 const saveProduct = async () => {
   saving.value = true;
   try {
@@ -552,31 +531,26 @@ const saveProduct = async () => {
 
     router.push("/admin/products");
   } catch (err: any) {
-    // error handled silently
   } finally {
     saving.value = false;
   }
 };
 
-// Форматирование
 const formatPrice = (price: number) => {
   if (!price && price !== 0) return "0";
   return price.toLocaleString("ru-RU");
 };
 
-// Загрузка данных
 onMounted(async () => {
   await Promise.all([adminStore.fetchCategories(), adminStore.fetchBrands()]);
   categories.value = adminStore.categories.items;
   brands.value = adminStore.brands.items;
 
-  // Загружаем модели
   try {
     const modelsRes = await api.get("/admin/models");
     models.value = modelsRes.data.models || [];
   } catch {}
 
-  // Загружаем существующий товар при редактировании
   if (isEdit.value) {
     try {
       const res = await api.get(`/products/${productId.value}`);
@@ -594,17 +568,14 @@ onMounted(async () => {
         customCharacteristics: {},
       };
 
-      // Заполняем характеристики
       if (p.characteristics) {
         for (const ch of p.characteristics) {
           form.value.characteristics[ch.trait] = ch.value;
         }
       }
 
-      // Загружаем изображения
       existingImages.value = p.images || [];
 
-      // Загружаем группы характеристик для категории
       if (p.categoryId) {
         try {
           const charRes = await api.get(

@@ -9,7 +9,6 @@
       </div>
     </div>
 
-    <!-- Вкладки -->
     <div class="tabs">
       <button
         class="tab"
@@ -47,7 +46,6 @@
       </button>
     </div>
 
-    <!-- Группы -->
     <div v-if="activeTab === 'groups'" class="tab-content">
       <div class="toolbar">
         <div class="search-box">
@@ -147,7 +145,6 @@
       </div>
     </div>
 
-    <!-- Значения -->
     <div v-if="activeTab === 'values'" class="tab-content">
       <div class="toolbar">
         <div class="search-box">
@@ -254,7 +251,6 @@
       </div>
     </div>
 
-    <!-- Модальное окно группы -->
     <div
       v-if="showGroupModal"
       class="modal-overlay"
@@ -369,7 +365,6 @@
       </div>
     </div>
 
-    <!-- Модальное окно значения -->
     <div
       v-if="showValueModal"
       class="modal-overlay"
@@ -467,7 +462,6 @@
 import { ref, computed, onMounted } from "vue";
 import api from "@/api/axios";
 
-// --- Data ---
 const groups = ref<any[]>([]);
 const allValues = ref<any[]>([]);
 const categories = ref<any[]>([]);
@@ -499,7 +493,6 @@ const valueForm = ref({
   sortOrder: 0,
 });
 
-// --- Computed ---
 const filteredGroups = computed(() => {
   if (!groupSearch.value) return groups.value;
   const q = groupSearch.value.toLowerCase();
@@ -535,7 +528,6 @@ const availableTraitsForGroup = computed(() => {
   return group?.traitNames || [];
 });
 
-// --- Methods ---
 const fetchGroups = async () => {
   try {
     const res = await api.get("/admin/characteristic-groups");
@@ -580,7 +572,6 @@ const selectGroup = (group: any) => {
   activeTab.value = "values";
 };
 
-// Group CRUD
 const openGroupModal = (group: any | null) => {
   editingGroup.value = group;
   if (group) {
@@ -625,9 +616,7 @@ const saveGroup = async () => {
     editingGroup.value = null;
     await fetchGroups();
     await fetchAllValues();
-  } catch (err: any) {
-    // error handled silently
-  }
+  } catch (err: any) {}
 };
 
 const deleteGroupHandler = async (groupId: string) => {
@@ -635,12 +624,9 @@ const deleteGroupHandler = async (groupId: string) => {
     await api.delete(`/admin/characteristic-groups/${groupId}`);
     await fetchGroups();
     await fetchAllValues();
-  } catch (err: any) {
-    // error handled silently
-  }
+  } catch (err: any) {}
 };
 
-// Value CRUD
 const openValueModal = (val: any | null) => {
   editingValue.value = val;
   if (val) {
@@ -679,18 +665,14 @@ const saveValue = async () => {
     showValueModal.value = false;
     editingValue.value = null;
     await fetchAllValues();
-  } catch (err: any) {
-    // error handled silently
-  }
+  } catch (err: any) {}
 };
 
 const deleteValueHandler = async (valueId: string) => {
   try {
     await api.delete(`/admin/characteristic-values/${valueId}`);
     await fetchAllValues();
-  } catch (err: any) {
-    // error handled silently
-  }
+  } catch (err: any) {}
 };
 
 onMounted(async () => {

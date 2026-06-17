@@ -3,24 +3,22 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title h2">Отзывы покупателей</h2>
-        <p class="section-description">
-          Реальные отзывы от наших клиентов
-        </p>
+        <p class="section-description">Реальные отзывы от наших клиентов</p>
       </div>
-      
+
       <div v-if="loading" class="reviews-loading">
         <div class="loading-spinner"></div>
         <p>Загрузка отзывов...</p>
       </div>
-      
+
       <div v-else-if="error" class="reviews-error">
         <p>Не удалось загрузить отзывы</p>
       </div>
-      
+
       <div v-else-if="reviews.length === 0" class="reviews-empty">
         <p>Отзывов пока нет</p>
       </div>
-      
+
       <div v-else class="reviews-grid">
         <ReviewCard
           v-for="review in reviews"
@@ -33,26 +31,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getCatalog } from '@/api'
-import type { Review } from '@/types'
-import ReviewCard from '@/components/home/ReviewCard.vue'
+import { ref, onMounted } from "vue";
+import { getCatalog } from "@/api";
+import type { Review } from "@/types";
+import ReviewCard from "@/components/home/ReviewCard.vue";
 
-const reviews = ref<(Review & { productName?: string })[]>([])
-const loading = ref(false)
-const error = ref(false)
+const reviews = ref<(Review & { productName?: string })[]>([]);
+const loading = ref(false);
+const error = ref(false);
 
 const loadReviews = async () => {
-  loading.value = true
-  error.value = false
-  
+  loading.value = true;
+  error.value = false;
+
   try {
-    const response = await getCatalog()
-    const products = response.data.products || {}
-    
-    // Собираем все отзывы из всех товаров
-    const allReviews: (Review & { productName?: string; productId?: string })[] = []
-    
+    const response = await getCatalog();
+    const products = response.data.products || {};
+
+    const allReviews: (Review & {
+      productName?: string;
+      productId?: string;
+    })[] = [];
+
     Object.values(products).forEach((product: any) => {
       if (product.reviews && product.reviews.length > 0) {
         product.reviews.forEach((review: Review) => {
@@ -60,28 +60,27 @@ const loadReviews = async () => {
             ...review,
             productName: product.name,
             productId: product.id,
-          })
-        })
+          });
+        });
       }
-    })
-    
-    // Сортируем по дате (новые первыми) и берём последние 6
+    });
+
     allReviews.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    })
-    
-    reviews.value = allReviews.slice(0, 6)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    reviews.value = allReviews.slice(0, 6);
   } catch (err) {
-    console.error('Failed to load reviews:', err)
-    error.value = true
+    console.error("Failed to load reviews:", err);
+    error.value = true;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  loadReviews()
-})
+  loadReviews();
+});
 </script>
 
 <style scoped>

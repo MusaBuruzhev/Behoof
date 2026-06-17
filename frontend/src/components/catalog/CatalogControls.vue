@@ -1,25 +1,37 @@
 <template>
   <div class="catalog-controls">
-    <!-- Поиск -->
     <div class="search-wrapper">
-      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        class="search-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <circle cx="11" cy="11" r="8" />
         <path d="M21 21l-4.35-4.35" />
       </svg>
       <input
         :value="search"
-        @input="$emit('update:search', ($event.target as HTMLInputElement).value)"
+        @input="
+          $emit('update:search', ($event.target as HTMLInputElement).value)
+        "
         @keyup.enter="$emit('search')"
         type="text"
         class="search-input"
         placeholder="Поиск товаров..."
       />
     </div>
-    
-    <!-- Сортировка -->
+
     <div class="sort-wrapper">
       <label class="sort-label">Сортировать:</label>
-      <select :value="sort" @change="$emit('update:sort', ($event.target as HTMLSelectElement).value)" class="sort-select">
+      <select
+        :value="sort"
+        @change="
+          $emit('update:sort', ($event.target as HTMLSelectElement).value)
+        "
+        class="sort-select"
+      >
         <option value="date-desc">Сначала новые</option>
         <option value="price-asc">Сначала дешёвые</option>
         <option value="price-desc">Сначала дорогие</option>
@@ -27,15 +39,19 @@
         <option value="name-desc">По названию (Я-А)</option>
       </select>
     </div>
-    
-    <!-- Переключатель вида -->
+
     <div class="view-toggle">
       <button
         :class="['view-btn', { active: view === 'grid' }]"
         @click="$emit('update:view', 'grid')"
         title="Сетка"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <rect x="3" y="3" width="7" height="7" />
           <rect x="14" y="3" width="7" height="7" />
           <rect x="3" y="14" width="7" height="7" />
@@ -47,7 +63,12 @@
         @click="$emit('update:view', 'list')"
         title="Список"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <line x1="8" y1="6" x2="21" y2="6" />
           <line x1="8" y1="12" x2="21" y2="12" />
           <line x1="8" y1="18" x2="21" y2="18" />
@@ -57,8 +78,7 @@
         </svg>
       </button>
     </div>
-    
-    <!-- Количество товаров (для мобильных) -->
+
     <span class="products-count-mobile">
       {{ totalProducts }}
     </span>
@@ -67,19 +87,19 @@
 
 <script setup lang="ts">
 defineProps<{
-  search: string
-  sort: string
-  view: 'grid' | 'list'
-  totalProducts: number
-}>()
+  search: string;
+  sort: string;
+  view: "grid" | "list";
+  totalProducts: number;
+}>();
 
 defineEmits<{
-  'update:search': [value: string]
-  'update:sort': [value: string]
-  'update:view': [value: 'grid' | 'list']
-  'search': []
-  'sort': []
-}>()
+  "update:search": [value: string];
+  "update:sort": [value: string];
+  "update:view": [value: "grid" | "list"];
+  search: [];
+  sort: [];
+}>();
 </script>
 
 <style scoped>
@@ -113,7 +133,8 @@ defineEmits<{
 
 .search-input {
   width: 100%;
-  padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) calc(var(--spacing-4) + 18px + var(--spacing-2));
+  padding: var(--spacing-3) var(--spacing-4) var(--spacing-3)
+    calc(var(--spacing-4) + 18px + var(--spacing-2));
   font-size: var(--font-size-body);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -210,22 +231,22 @@ defineEmits<{
     flex-wrap: wrap;
     gap: var(--spacing-3);
   }
-  
+
   .search-wrapper {
     order: 1;
     flex-basis: 100%;
     max-width: none;
   }
-  
+
   .sort-wrapper {
     order: 2;
     flex: 1;
   }
-  
+
   .view-toggle {
     order: 3;
   }
-  
+
   .products-count-mobile {
     display: block;
     order: 4;
@@ -236,11 +257,11 @@ defineEmits<{
   .sort-wrapper {
     flex-basis: 100%;
   }
-  
+
   .sort-label {
     display: none;
   }
-  
+
   .sort-select {
     flex: 1;
   }

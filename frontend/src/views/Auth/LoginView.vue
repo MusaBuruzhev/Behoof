@@ -207,7 +207,6 @@ const handleSubmit = async () => {
     const { user, token } = response.data as LoginResponse;
     authStore.setAuth(user, token);
 
-    // Redirect to intended page or profile
     const redirect = (route.query.redirect as string) || "/profile";
     router.push(redirect);
   } catch (error: any) {
@@ -228,7 +227,6 @@ const handleSubmit = async () => {
 };
 
 onMounted(() => {
-  // If already logged in, redirect to profile
   if (authStore.isAuthenticated) {
     const redirect = (route.query.redirect as string) || "/profile";
     router.push(redirect);

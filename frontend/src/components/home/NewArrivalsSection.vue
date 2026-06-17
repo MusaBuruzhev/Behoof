@@ -3,27 +3,25 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title h2">Новинки</h2>
-        <p class="section-description">
-          Последние поступления в наш каталог
-        </p>
+        <p class="section-description">Последние поступления в наш каталог</p>
       </div>
-      
+
       <div v-if="loading" class="products-loading">
         <div class="loading-spinner"></div>
         <p>Загрузка товаров...</p>
       </div>
-      
+
       <div v-else-if="error" class="products-error">
         <p>Не удалось загрузить товары</p>
         <button class="btn btn-secondary" @click="loadProducts">
           Попробовать снова
         </button>
       </div>
-      
+
       <div v-else-if="products.length === 0" class="products-empty">
         <p>Новинок пока нет</p>
       </div>
-      
+
       <div v-else class="products-grid">
         <ProductCardSimple
           v-for="product in products"
@@ -31,11 +29,20 @@
           :product="product"
         />
       </div>
-      
+
       <div class="section-footer">
-        <router-link to="/catalog?sortBy=date-desc" class="btn btn-secondary btn-lg">
+        <router-link
+          to="/catalog?sortBy=date-desc"
+          class="btn btn-secondary btn-lg"
+        >
           Все новинки
-          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg
+            class="btn-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
         </router-link>
@@ -45,34 +52,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { getProducts } from '@/api'
-import type { Product } from '@/types'
-import ProductCardSimple from '@/components/home/ProductCardSimple.vue'
+import { ref, onMounted } from "vue";
+import { getProducts } from "@/api";
+import type { Product } from "@/types";
+import ProductCardSimple from "@/components/home/ProductCardSimple.vue";
 
-const products = ref<Product[]>([])
-const loading = ref(false)
-const error = ref(false)
+const products = ref<Product[]>([]);
+const loading = ref(false);
+const error = ref(false);
 
 const loadProducts = async () => {
-  loading.value = true
-  error.value = false
-  
+  loading.value = true;
+  error.value = false;
+
   try {
-    // Сортируем по дате добавления (новые первыми)
-    const response = await getProducts({ limit: 8, sortBy: 'date-desc' })
-    products.value = response.data.products || []
+    const response = await getProducts({ limit: 8, sortBy: "date-desc" });
+    products.value = response.data.products || [];
   } catch (err) {
-    console.error('Failed to load new arrivals:', err)
-    error.value = true
+    console.error("Failed to load new arrivals:", err);
+    error.value = true;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  loadProducts()
-})
+  loadProducts();
+});
 </script>
 
 <style scoped>

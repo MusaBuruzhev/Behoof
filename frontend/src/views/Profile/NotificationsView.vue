@@ -24,12 +24,12 @@
         </div>
       </div>
     </header>
-    
+
     <div v-if="isLoading" class="loading-state">
       <div class="loading-spinner"></div>
       <p>Загрузка уведомлений...</p>
     </div>
-    
+
     <div v-else class="notifications-list">
       <div
         v-for="(group, date) in groupedNotifications"
@@ -37,7 +37,7 @@
         class="notification-group"
       >
         <h3 class="group-date">{{ formatGroupDate(date) }}</h3>
-        
+
         <div class="group-notifications">
           <div
             v-for="notification in group"
@@ -47,7 +47,7 @@
             <div class="notification-icon" :class="notification.type">
               <component :is="getNotificationIcon(notification.type)" />
             </div>
-            
+
             <div class="notification-content">
               <div class="notification-header">
                 <h4 class="notification-title">{{ notification.title }}</h4>
@@ -55,11 +55,17 @@
               </div>
               <p class="notification-message">{{ notification.message }}</p>
               <div class="notification-meta">
-                <span class="notification-time">{{ formatNotificationTime(notification.createdAt) }}</span>
-                <span v-if="!notification.isRead" class="notification-type-label">Новое</span>
+                <span class="notification-time">{{
+                  formatNotificationTime(notification.createdAt)
+                }}</span>
+                <span
+                  v-if="!notification.isRead"
+                  class="notification-type-label"
+                  >Новое</span
+                >
               </div>
             </div>
-            
+
             <div class="notification-actions">
               <button
                 v-if="!notification.isRead"
@@ -67,7 +73,12 @@
                 title="Отметить прочитанным"
                 @click="markAsRead(notification.id)"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </button>
@@ -76,8 +87,15 @@
                 title="Удалить"
                 @click="deleteNotificationById(notification.id)"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  />
                 </svg>
               </button>
             </div>
@@ -89,33 +107,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, h } from 'vue'
-import { getNotifications, markAsRead as markAsReadApi, markAllAsRead as markAllAsReadApi, deleteNotification, clearReadNotifications } from '@/api'
-import { useNotificationsStore } from '@/stores'
-import type { Notification, NotificationType } from '@/types'
+import { ref, computed, onMounted, h } from "vue";
+import {
+  getNotifications,
+  markAsRead as markAsReadApi,
+  markAllAsRead as markAllAsReadApi,
+  deleteNotification,
+  clearReadNotifications,
+} from "@/api";
+import { useNotificationsStore } from "@/stores";
+import type { Notification, NotificationType } from "@/types";
 
-const notificationsStore = useNotificationsStore()
+const notificationsStore = useNotificationsStore();
 
-const notifications = ref<Notification[]>([])
-const isLoading = ref(true)
+const notifications = ref<Notification[]>([]);
+const isLoading = ref(true);
 
 const hasUnread = computed(() => {
-  return notifications.value.some(n => !n.isRead)
-})
+  return notifications.value.some((n) => !n.isRead);
+});
 
 const groupedNotifications = computed(() => {
-  const groups: Record<string, Notification[]> = {}
-  
-  notifications.value.forEach(notification => {
-    const date = new Date(notification.createdAt).toDateString()
+  const groups: Record<string, Notification[]> = {};
+
+  notifications.value.forEach((notification) => {
+    const date = new Date(notification.createdAt).toDateString();
     if (!groups[date]) {
-      groups[date] = []
+      groups[date] = [];
     }
-    groups[date].push(notification)
-  })
-  
-  return groups
-})
+    groups[date].push(notification);
+  });
+
+  return groups;
+});
 
 const getNotificationIcon = (type: NotificationType) => {
   const icons: Record<NotificationType, any> = {
@@ -123,133 +147,190 @@ const getNotificationIcon = (type: NotificationType) => {
     order_status: StatusIcon,
     promo: PromoIcon,
     new_product: ProductIcon,
-  }
-  return icons[type] || DefaultIcon
-}
+  };
+  return icons[type] || DefaultIcon;
+};
 
 const formatGroupDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-  
+  const date = new Date(dateString);
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
   if (date.toDateString() === today.toDateString()) {
-    return 'Сегодня'
+    return "Сегодня";
   }
   if (date.toDateString() === yesterday.toDateString()) {
-    return 'Вчера'
+    return "Вчера";
   }
-  
-  return date.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
-}
+
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
 
 const formatNotificationTime = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleTimeString('ru-RU', {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+  const date = new Date(dateString);
+  return date.toLocaleTimeString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
 
 const loadNotifications = async () => {
-  isLoading.value = true
+  isLoading.value = true;
   try {
-    const response = await getNotifications({ limit: 50 })
-    notifications.value = response.data.notifications || []
-    notificationsStore.setNotifications(notifications.value)
-    notificationsStore.setUnreadCount(response.data.unreadCount || 0)
+    const response = await getNotifications({ limit: 50 });
+    notifications.value = response.data.notifications || [];
+    notificationsStore.setNotifications(notifications.value);
+    notificationsStore.setUnreadCount(response.data.unreadCount || 0);
   } catch (error) {
-    console.error('Failed to load notifications:', error)
+    console.error("Failed to load notifications:", error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 const markAsRead = async (notificationId: string) => {
   try {
-    await markAsReadApi(notificationId)
-    const notification = notifications.value.find(n => n.id === notificationId)
+    await markAsReadApi(notificationId);
+    const notification = notifications.value.find(
+      (n) => n.id === notificationId
+    );
     if (notification) {
-      notification.isRead = true
-      notificationsStore.markAsRead(notificationId)
+      notification.isRead = true;
+      notificationsStore.markAsRead(notificationId);
     }
   } catch (error) {
-    console.error('Failed to mark as read:', error)
+    console.error("Failed to mark as read:", error);
   }
-}
+};
 
 const markAllAsRead = async () => {
   try {
-    await markAllAsReadApi()
-    notifications.value.forEach(n => n.isRead = true)
-    notificationsStore.markAllAsRead()
+    await markAllAsReadApi();
+    notifications.value.forEach((n) => (n.isRead = true));
+    notificationsStore.markAllAsRead();
   } catch (error) {
-    console.error('Failed to mark all as read:', error)
+    console.error("Failed to mark all as read:", error);
   }
-}
+};
 
 const deleteNotificationById = async (notificationId: string) => {
   try {
-    await deleteNotification(notificationId)
-    notifications.value = notifications.value.filter(n => n.id !== notificationId)
+    await deleteNotification(notificationId);
+    notifications.value = notifications.value.filter(
+      (n) => n.id !== notificationId
+    );
   } catch (error) {
-    console.error('Failed to delete notification:', error)
+    console.error("Failed to delete notification:", error);
   }
-}
+};
 
 const clearRead = async () => {
   try {
-    await clearReadNotifications()
-    await loadNotifications()
+    await clearReadNotifications();
+    await loadNotifications();
   } catch (error) {
-    console.error('Failed to clear read notifications:', error)
+    console.error("Failed to clear read notifications:", error);
   }
-}
+};
 
-// Icons
 const OrderIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('path', { d: 'M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("path", {
+          d: "M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7m16 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5m16 0h-2.586a1 1 0 0 0-.707.293l-2.414 2.414a1 1 0 0 1-.707.293h-3.172a1 1 0 0 1-.707-.293l-2.414-2.414",
+        }),
+      ]
+    ),
+};
 
 const StatusIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('circle', { cx: '12', cy: '12', r: '10' }),
-    h('polyline', { points: '12 6 12 12 16 14' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("circle", { cx: "12", cy: "12", r: "10" }),
+        h("polyline", { points: "12 6 12 12 16 14" }),
+      ]
+    ),
+};
 
 const PromoIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('path', { d: 'M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z' }),
-    h('line', { x1: '7', y1: '7', x2: '7.01', y2: '7' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("path", {
+          d: "M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z",
+        }),
+        h("line", { x1: "7", y1: "7", x2: "7.01", y2: "7" }),
+      ]
+    ),
+};
 
 const ProductIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('circle', { cx: '12', cy: '12', r: '10' }),
-    h('path', { d: 'M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20' }),
-    h('path', { d: 'M2 12h20' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("circle", { cx: "12", cy: "12", r: "10" }),
+        h("path", { d: "M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" }),
+        h("path", { d: "M2 12h20" }),
+      ]
+    ),
+};
 
 const DefaultIcon = {
-  render: () => h('svg', { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2' }, [
-    h('circle', { cx: '12', cy: '12', r: '10' }),
-    h('line', { x1: '12', y1: '8', x2: '12', y2: '12' }),
-    h('line', { x1: '12', y1: '16', x2: '12.01', y2: '16' })
-  ])
-}
+  render: () =>
+    h(
+      "svg",
+      {
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        "stroke-width": "2",
+      },
+      [
+        h("circle", { cx: "12", cy: "12", r: "10" }),
+        h("line", { x1: "12", y1: "8", x2: "12", y2: "12" }),
+        h("line", { x1: "12", y1: "16", x2: "12.01", y2: "16" }),
+      ]
+    ),
+};
 
 onMounted(() => {
-  loadNotifications()
-})
+  loadNotifications();
+});
 </script>
 
 <style scoped>
@@ -315,7 +396,9 @@ onMounted(() => {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-state p {
@@ -417,12 +500,12 @@ onMounted(() => {
 
 .notification-icon.promo {
   background: rgba(236, 72, 153, 0.1);
-  color: #EC4899;
+  color: #ec4899;
 }
 
 .notification-icon.new_product {
   background: rgba(139, 92, 246, 0.1);
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 .notification-content {
@@ -520,29 +603,29 @@ onMounted(() => {
   .notifications-view {
     padding: var(--spacing-6) var(--spacing-4);
   }
-  
+
   .header-content {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-3);
   }
-  
+
   .header-actions {
     width: 100%;
   }
-  
+
   .header-actions .btn {
     flex: 1;
   }
-  
+
   .notifications-list {
     grid-template-columns: 1fr;
   }
-  
+
   .notification-card {
     flex-direction: column;
   }
-  
+
   .notification-actions {
     flex-direction: row;
     align-self: flex-end;

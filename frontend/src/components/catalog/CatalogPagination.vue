@@ -3,7 +3,7 @@
     <div class="pagination-info">
       Показано {{ startItem }}–{{ endItem }} из {{ totalProducts }} товаров
     </div>
-    
+
     <div class="pagination-controls">
       <button
         class="pagination-btn"
@@ -11,11 +11,16 @@
         @click="$emit('change-page', currentPage - 1)"
         title="Предыдущая"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
-      
+
       <div class="pagination-pages">
         <button
           v-for="page in visiblePages"
@@ -27,14 +32,19 @@
           {{ page }}
         </button>
       </div>
-      
+
       <button
         class="pagination-btn"
         :disabled="currentPage === totalPages"
         @click="$emit('change-page', currentPage + 1)"
         title="Следующая"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M9 18l6-6-6-6" />
         </svg>
       </button>
@@ -43,44 +53,44 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from "vue";
 
 const props = defineProps<{
-  currentPage: number
-  totalPages: number
-  totalProducts: number
-}>()
+  currentPage: number;
+  totalPages: number;
+  totalProducts: number;
+}>();
 
 defineEmits<{
-  'change-page': [page: number]
-}>()
+  "change-page": [page: number];
+}>();
 
-const itemsPerPage = 20
+const itemsPerPage = 20;
 const startItem = computed(() => {
-  return (props.currentPage - 1) * itemsPerPage + 1
-})
+  return (props.currentPage - 1) * itemsPerPage + 1;
+});
 
 const endItem = computed(() => {
-  return Math.min(props.currentPage * itemsPerPage, props.totalProducts)
-})
+  return Math.min(props.currentPage * itemsPerPage, props.totalProducts);
+});
 
 const visiblePages = computed(() => {
-  const pages: number[] = []
-  const maxVisible = 5
-  
-  let start = Math.max(1, props.currentPage - Math.floor(maxVisible / 2))
-  let end = Math.min(props.totalPages, start + maxVisible - 1)
-  
+  const pages: number[] = [];
+  const maxVisible = 5;
+
+  let start = Math.max(1, props.currentPage - Math.floor(maxVisible / 2));
+  let end = Math.min(props.totalPages, start + maxVisible - 1);
+
   if (end - start < maxVisible - 1) {
-    start = Math.max(1, end - maxVisible + 1)
+    start = Math.max(1, end - maxVisible + 1);
   }
-  
+
   for (let i = start; i <= end; i++) {
-    pages.push(i)
+    pages.push(i);
   }
-  
-  return pages
-})
+
+  return pages;
+});
 </script>
 
 <style scoped>
@@ -166,7 +176,7 @@ const visiblePages = computed(() => {
     flex-direction: column;
     gap: var(--spacing-4);
   }
-  
+
   .pagination-info {
     text-align: center;
   }

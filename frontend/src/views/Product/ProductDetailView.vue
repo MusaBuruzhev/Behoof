@@ -39,7 +39,11 @@
             <div class="sticky-bar-price">
               {{ formatPrice(product.price) }} ₽
             </div>
-            <button class="btn btn-primary btn-buy" @click="handleBuyNow" :disabled="isBuying">
+            <button
+              class="btn btn-primary btn-buy"
+              @click="handleBuyNow"
+              :disabled="isBuying"
+            >
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -50,7 +54,7 @@
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              {{ isBuying ? '...' : 'Купить' }}
+              {{ isBuying ? "..." : "Купить" }}
             </button>
           </div>
         </div>
@@ -130,7 +134,6 @@
 
           <p class="hero-description">{{ product.description }}</p>
 
-          <!-- Quick Specs -->
           <div v-if="shortCharacteristics.length > 0" class="hero-quick-specs">
             <div
               v-for="spec in shortCharacteristics"
@@ -158,7 +161,7 @@
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              {{ isBuying ? 'Оформление...' : 'Оформить заказ' }}
+              {{ isBuying ? "Оформление..." : "Оформить заказ" }}
             </button>
 
             <div class="action-buttons">
@@ -379,7 +382,6 @@
         </div>
       </section>
 
-      <!-- RATINGS -->
       <section v-if="hasTraitRatings" class="ratings-section">
         <div class="section-header">
           <div class="section-title-block">
@@ -419,7 +421,6 @@
         </div>
       </section>
 
-      <!-- PRODUCT DESCRIPTION -->
       <section v-if="product.description" class="description-section">
         <div class="section-header">
           <div class="section-title-block">
@@ -447,7 +448,6 @@
         </div>
       </section>
 
-      <!-- REVIEWS -->
       <section id="reviews" class="reviews-section">
         <div class="reviews-header-block">
           <div class="section-title-block">
@@ -467,7 +467,6 @@
           <span class="reviews-badge">{{ product.reviews.length }}</span>
         </div>
 
-        <!-- Review Form -->
         <div v-if="isAuthenticated" class="review-form-section">
           <form @submit.prevent="submitReview" class="review-form">
             <div class="form-group">
@@ -523,7 +522,6 @@
           <router-link to="/auth/login" class="link-primary">войти</router-link>
         </div>
 
-        <!-- Reviews List -->
         <div class="reviews-list">
           <div
             v-for="review in product.reviews"
@@ -613,7 +611,6 @@
         </div>
       </section>
 
-      <!-- RELATED PRODUCTS -->
       <section v-if="relatedProducts.length > 0" class="related-section">
         <div class="section-header">
           <div class="section-title-block">
@@ -1031,14 +1028,18 @@ const handleBuyNow = async () => {
   try {
     await createOrder({
       items: [{ productId: product.value.id, quantity: 1 }],
-      deliveryType: 'pickup',
-      pickupDate: '',
-      contactName: authStore.user?.firstName + ' ' + authStore.user?.lastName || '',
-      contactPhone: authStore.user?.phoneNumber || '',
+      deliveryType: "pickup",
+      pickupDate: "",
+      contactName:
+        authStore.user?.firstName + " " + authStore.user?.lastName || "",
+      contactPhone: authStore.user?.phoneNumber || "",
     });
-    router.push('/profile/orders');
+    router.push("/profile/orders");
   } catch (error: any) {
-    alert('Ошибка оформления заказа: ' + (error.response?.data?.error || 'Не удалось оформить заказ'));
+    alert(
+      "Ошибка оформления заказа: " +
+        (error.response?.data?.error || "Не удалось оформить заказ")
+    );
   } finally {
     isBuying.value = false;
   }
