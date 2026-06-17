@@ -126,6 +126,7 @@
             <div class="price-current">{{ formatPrice(product.price) }} ₽</div>
             <div v-if="hasPriceHistory" class="price-analytics">
               <span :class="['price-change', priceChangeClass]">
+                <span class="price-arrow">{{ priceChangeIcon }}</span>
                 {{ priceChangeLabel }}
               </span>
               <span class="price-period">за последний месяц</span>
@@ -714,25 +715,58 @@ const hasPriceHistory = computed(() => {
   return product.value?.priceHistory && product.value.priceHistory.length > 1;
 });
 
+// Сортируем priceHistory по дате (от старых к новым)
+const sortedPriceHistory = computed(() => {
+  if (!product.value?.priceHistory) return [];
+  return [...product.value.priceHistory].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+});
+
+// Цена 30 дней назад (или первая в истории, если данных меньше)
+const price30DaysAgo = computed(() => {
+  const history = sortedPriceHistory.value;
+  if (history.length === 0) return null;
+  if (history.length === 1) return history[0].price;
+  
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  // Ищем первую запись старше 30 дней
+  for (let i = 0; i < history.length; i++) {
+    if (new Date(history[i].date) >= thirtyDaysAgo) {
+      return i > 0 ? history[i - 1].price : history[0].price;
+    }
+  }
+  // Все записи за последние 30 дней — берём первую
+  return history[0].price;
+});
+
 const priceChange = computed(() => {
   if (!hasPriceHistory.value || !product.value) return 0;
-  const history = product.value.priceHistory;
-  const current = history[history.length - 1].price;
-  const previous = history[history.length - 2].price;
+  const current = sortedPriceHistory.value[sortedPriceHistory.value.length - 1].price;
+  const previous = price30DaysAgo.value;
+  if (!previous || previous === 0) return 0;
   return ((current - previous) / previous) * 100;
 });
 
 const priceChangeLabel = computed(() => {
   const change = priceChange.value;
+  if (Math.abs(change) < 0.5) return "0%";
   if (change > 0) return `+${Math.round(change)}%`;
-  if (change < 0) return `${Math.round(change)}%`;
-  return "0%";
+  return `${Math.round(change)}%`;
 });
 
 const priceChangeClass = computed(() => {
-  if (priceChange.value > 0) return "price-increase";
-  if (priceChange.value < 0) return "price-decrease";
+  if (priceChange.value > 0.5) return "price-increase";
+  if (priceChange.value < -0.5) return "price-decrease";
   return "";
+});
+
+const priceChangeIcon = computed(() => {
+  if (priceChange.value > 0.5) return "↑";
+  if (priceChange.value < -0.5) return "↓";
+  return "—";
 });
 
 const shortCharacteristics = computed(() => {
@@ -753,7 +787,7 @@ const chartPadding = 40;
 
 const chartData = computed(() => {
   if (!hasPriceHistory.value || !product.value) return [];
-  return product.value.priceHistory.map((entry) => ({
+  return sortedPriceHistory.value.map((entry) => ({
     date: new Date(entry.date),
     price: entry.price,
   }));
@@ -1360,13 +1394,24 @@ onUnmounted(() => {
   font-weight: var(--font-weight-semibold);
   padding: var(--spacing-1) var(--spacing-3);
   border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
 }
 
+.price-arrow {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+/* Рост цены — зелёный (хорошо для покупателя) */
 .price-increase {
   color: var(--color-error);
   background: rgba(220, 38, 38, 0.1);
 }
 
+/* Падение цены — зелёный (хорошо для покупателя) */
 .price-decrease {
   color: #059669;
   background: rgba(5, 150, 105, 0.1);
@@ -1515,6 +1560,34 @@ onUnmounted(() => {
   font-size: var(--font-size-h4);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
+}
+
+/* Карточка изменения цены */
+.analytics-change {
+  border: 1px solid var(--color-border);
+}
+
+.analytics-change.price-increase .analytics-value {
+  color: var(--color-error);
+}
+
+.analytics-change.price-decrease .analytics-value {
+  color: #059669;
+}
+
+.analytics-value {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.analytics-change {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  padding: var(--spacing-5);
+  background: var(--color-background);
+  border-radius: var(--radius-md);
 }
 
 .analytics-change.price-increase .analytics-value {

@@ -58,8 +58,11 @@ const priceChange = computed(() => {
   const history = props.product.priceHistory;
   if (!history || history.length < 2) return 0;
 
-  const current = history[history.length - 1].price;
-  const previous = history[history.length - 2].price;
+  const sorted = [...history].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const current = sorted[sorted.length - 1].price;
+  const previous = sorted[0].price;
 
   const change = ((current - previous) / previous) * 100;
   return Math.round(Math.abs(change));

@@ -155,12 +155,20 @@ const hasPriceHistory = computed(() => {
   return props.product.priceHistory && props.product.priceHistory.length > 1;
 });
 
+// Сортируем priceHistory по дате (от старых к новым)
+const sortedPriceHistory = computed(() => {
+  if (!props.product.priceHistory) return [];
+  return [...props.product.priceHistory].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+});
+
 const priceChangeLabel = computed(() => {
   if (!hasPriceHistory.value) return "";
 
-  const history = props.product.priceHistory;
+  const history = sortedPriceHistory.value;
   const current = history[history.length - 1].price;
-  const previous = history[history.length - 2].price;
+  const previous = history[0].price;
 
   const change = ((current - previous) / previous) * 100;
 
