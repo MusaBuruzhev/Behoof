@@ -320,7 +320,6 @@ const currentImageIndex = ref(0);
 const imageFiles = ref<File[]>([]);
 const existingImages = ref<string[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
-const descEditor = ref<HTMLElement | null>(null);
 
 const form = ref({
   name: "",

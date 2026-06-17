@@ -161,7 +161,7 @@
                 v-for="product in products"
                 :key="product.id"
                 class="characteristic-value"
-                :class="getBestValueClass(product.id, char)"
+                :class="getBestValueClass(product.id, { ...char, name: char.name })"
               >
                 <span v-if="isBestValue(product.id, char)" class="best-badge">
                   Лучшее
@@ -263,7 +263,7 @@ const generateCharacteristicGroups = () => {
 }
 
 const getCharacteristicType = (values: any[]): string => {
-  const hasNumbers = values.some(v => typeof v === 'number')
+  const hasNumbers = values.some(v => typeof v === 'number' && !isNaN(v))
   if (hasNumbers) return 'number'
   return 'string'
 }
@@ -271,7 +271,8 @@ const getCharacteristicType = (values: any[]): string => {
 const parseValue = (value: string): any => {
   const match = value.match(/(\d+(?:[.,]\d+)?)/)
   if (match) {
-    return parseFloat(match[1].replace(',', '.'))
+    const num = parseFloat(match[1].replace(',', '.'))
+    return isNaN(num) ? value : num
   }
   return value
 }
@@ -301,27 +302,263 @@ const filteredCharacteristicGroups = computed(() => {
   })).filter(group => group.characteristics.length > 0)
 })
 
-const isBestValue = (productId: string, char: { key: string; type: string }): boolean => {
-  if (char.type !== 'number') return false
-  if (char.key === 'price') return false 
-  
-  const values = products.value.map(p => {
-    const value = getCharacteristicValue(p, char)
-    const num = parseFloat(value.replace(/[^\d.]/g, ''))
-    return isNaN(num) ? 0 : num
-  })
-  
-  const maxValue = Math.max(...values)
-  const productValue = getCharacteristicValue(
-    products.value.find(p => p.id === productId)!,
-    char
-  )
-  const numValue = parseFloat(productValue.replace(/[^\d.]/g, ''))
-  
-  return !isNaN(numValue) && numValue === maxValue && maxValue > 0
+// Извлекаем число из строки значения
+const extractNumber = (value: string): number => {
+  if (!value || value === '—') return 0
+  const match = value.match(/(\d+(?:[.,]\d+)?)/)
+  if (match) return parseFloat(match[1].replace(',', '.'))
+  return 0
 }
 
-const getBestValueClass = (productId: string, char: { key: string; type: string }): string => {
+// Определяет направление сравнения для характеристики
+const getComparisonDirection = (charName: string): 'higher-is-better' | 'lower-is-better' => {
+  const lower = charName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '') // убираем диакритики
+  
+  // Чем МЕНЬШЕ — лучше (цена, вес и т.д.)
+  const lowerIsBetter = [
+    'цена', 'price', 'вес', 'weight',
+  ]
+  
+  // Чем БОЛЬШЕ — лучше (почти всё остальное)
+  const higherIsBetter = [
+    'частота', 'resolution', 'разрешение', 'диагональ', 'диаг',
+    'памяти', 'гб', 'gb', 'мп', 'mp',
+    'ватт', 'wh', 'мач', 'mah',
+    'дюйм', 'inch', 'bit', 'hz', 'fps',
+    'мощность', 'чувствительность', 'импеданс',
+    'время работы', 'автономность', 'батареи',
+    'оператив', 'встроенн', 'накопитель',
+    'камера', 'камер',
+    'дисплей', 'экран',
+    'bluetooth', 'nfc', 'gps', 'пульс',
+    'защит', 'зарядк',
+    'rtx', 'core', 'ryzen', 'intel', 'apple', 'snapdragon',
+    'процессор', 'проц',
+    'видео', 'video',
+    'отзывов', 'reviews',
+    'ram', 'rom', 'storage', 'display', 'battery', 'camera',
+    'processor', 'performance', 'screen', 'resolution', 'refresh',
+  ]
+  
+  // Сначала проверяем "меньше лучше"
+  for (const keyword of lowerIsBetter) {
+    if (lower.includes(keyword)) return 'lower-is-better'
+  }
+  
+  // Потом проверяем "больше лучше"
+  for (const keyword of higherIsBetter) {
+    if (lower.includes(keyword)) return 'higher-is-better'
+  }
+  
+  // По умолчанию — больше лучше
+  return 'higher-is-better'
+}
+
+// Парсинг видео-качества: "4K @ 60fps", "1080p @ 30fps" и т.д.
+const parseVideoQuality = (value: string): number => {
+  const lower = value.toLowerCase()
+  
+  // Определяем разрешение
+  let resolutionScore = 0
+  if (lower.includes('8k') || lower.includes('4320')) resolutionScore = 4
+  else if (lower.includes('4k') || lower.includes('2160')) resolutionScore = 3
+  else if (lower.includes('2k') || lower.includes('1440') || lower.includes('qhd')) resolutionScore = 2.5
+  else if (lower.includes('1080') || lower.includes('fhd') || lower.includes('1920')) resolutionScore = 2
+  else if (lower.includes('720') || lower.includes('hd') || lower.includes('1280')) resolutionScore = 1
+  else if (lower.includes('480') || lower.includes('sd')) resolutionScore = 0.5
+  
+  // Извлекаем fps
+  const fpsMatch = lower.match(/(\d+)\s*fps/)
+  const fps = fpsMatch ? parseInt(fpsMatch[1]) : 0
+  
+  // Формула: разрешение * 100 + fps
+  // 4K@60fps = 400 + 60 = 460
+  // 1080p@30fps = 200 + 30 = 230
+  return resolutionScore * 100 + fps
+}
+
+// Парсинг разрешения экрана: "1920x1080", "2560x1600" и т.д.
+const parseResolution = (value: string): number => {
+  const parts = value.match(/(\d+)\s*[xх×]\s*(\d+)/i)
+  if (parts) {
+    return parseInt(parts[1]) * parseInt(parts[2]) // общее количество пикселей
+  }
+  return extractNumber(value)
+}
+
+// Парсинг процессора: "Intel Core i7-13700H", "Snapdragon 8 Gen 3" и т.д.
+const parseProcessorScore = (value: string): number => {
+  const lower = value.toLowerCase()
+  
+  // Apple M-серия
+  if (lower.includes('m4')) return 500
+  if (lower.includes('m3 max') || lower.includes('m3 max')) return 480
+  if (lower.includes('m3')) return 450
+  if (lower.includes('m2 max') || lower.includes('m2 max')) return 400
+  if (lower.includes('m2')) return 380
+  if (lower.includes('m1')) return 350
+  
+  // Intel Core
+  const intelMatch = lower.match(/i[579](?:-\d+)?(?:h|u)?/)
+  if (intelMatch) {
+    const generationMatch = lower.match(/(\d{4})/)
+    if (generationMatch) {
+      const gen = parseInt(generationMatch[1])
+      if (gen >= 14000) return 300
+      if (gen >= 13000) return 280
+      if (gen >= 12000) return 260
+      if (gen >= 11000) return 240
+      return 200
+    }
+    return 200
+  }
+  
+  // AMD Ryzen
+  const ryzenMatch = lower.match(/ryzen\s*(\d)(\d+)/)
+  if (ryzenMatch) {
+    const series = parseInt(ryzenMatch[1] + ryzenMatch[2])
+    if (series >= 9000) return 280
+    if (series >= 8000) return 260
+    if (series >= 7000) return 240
+    if (series >= 5000) return 220
+    return 200
+  }
+  
+  // Snapdragon
+  const snapMatch = lower.match(/snapdragon\s*(\d)\s*gen\s*(\d)/)
+  if (snapMatch) {
+    const gen = parseInt(snapMatch[2])
+    if (gen >= 3) return 450
+    if (gen >= 2) return 400
+    if (gen >= 1) return 350
+    return 300
+  }
+  
+  // Общий номер в названии процессора
+  const numMatch = lower.match(/(\d{3,})/)
+  if (numMatch) {
+    return parseInt(numMatch[1])
+  }
+  
+  return 0
+}
+
+// Парсинг видеокарты: "RTX 4060", "RTX 3050" и т.д.
+const parseGraphicsScore = (value: string): number => {
+  const lower = value.toLowerCase()
+  
+  if (lower.includes('rtx 4090')) return 500
+  if (lower.includes('rtx 4080')) return 480
+  if (lower.includes('rtx 4070')) return 450
+  if (lower.includes('rtx 4060')) return 400
+  if (lower.includes('rtx 4050')) return 350
+  if (lower.includes('rtx 3080')) return 400
+  if (lower.includes('rtx 3070')) return 350
+  if (lower.includes('rtx 3060')) return 300
+  if (lower.includes('rtx 3050')) return 250
+  if (lower.includes('gtx')) return 150
+  if (lower.includes('интегрир') || lower.includes('integrated') || lower.includes('встроенн')) return 50
+  
+  return 0
+}
+
+// Главная функция — определяет лучшее значение
+const isBestValue = (productId: string, char: { key: string; type: string; name?: string }): boolean => {
+  if (char.key === 'price') return false
+  
+  const charValues = products.value.map(p => {
+    const charForProduct = p.characteristics?.find(
+      c => c.trait.toLowerCase().trim() === char.key
+    )
+    return {
+      productId: p.id,
+      value: charForProduct?.value || getCharacteristicValue(p, char),
+      trait: charForProduct?.trait || ''
+    }
+  })
+  
+  const charName = char.name || char.key
+  
+  // Отладка — раскомментируйте для отладки
+  // console.log(`isBestValue: productId=${productId}, charName="${charName}", key="${char.key}", type="${char.type}", direction="${direction}"`)
+  // console.log('charValues:', JSON.stringify(charValues))
+  
+  // Видео — спец. парсинг
+  if (charName.includes('видео') || charName.includes('video')) {
+    const scores = charValues.map(v => ({
+      productId: v.productId,
+      score: parseVideoQuality(v.value)
+    }))
+    const maxScore = Math.max(...scores.map(s => s.score))
+    const productScore = scores.find(s => s.productId === productId)?.score || 0
+    return maxScore > 0 && productScore === maxScore
+  }
+  
+  if (charName.includes('разрешение') || charName.includes('resolution')) {
+    const scores = charValues.map(v => ({
+      productId: v.productId,
+      score: parseResolution(v.value)
+    }))
+    const maxScore = Math.max(...scores.map(s => s.score))
+    const productScore = scores.find(s => s.productId === productId)?.score || 0
+    return maxScore > 0 && productScore === maxScore
+  }
+  
+  if (charName.includes('процессор') || charName.includes('processor') || charName.includes('проц')) {
+    const scores = charValues.map(v => ({
+      productId: v.productId,
+      score: parseProcessorScore(v.value)
+    }))
+    const maxScore = Math.max(...scores.map(s => s.score))
+    const productScore = scores.find(s => s.productId === productId)?.score || 0
+    return maxScore > 0 && productScore === maxScore
+  }
+  
+  if (charName.includes('видеокарт') || charName.includes('graphics') || charName.includes('gpu')) {
+    const scores = charValues.map(v => ({
+      productId: v.productId,
+      score: parseGraphicsScore(v.value)
+    }))
+    const maxScore = Math.max(...scores.map(s => s.score))
+    const productScore = scores.find(s => s.productId === productId)?.score || 0
+    return maxScore > 0 && productScore === maxScore
+  }
+  
+  if (charName.includes('камер') || charName.includes('camera')) {
+    const scores = charValues.map(v => ({
+      productId: v.productId,
+      score: extractNumber(v.value)
+    }))
+    const maxScore = Math.max(...scores.map(s => s.score))
+    const productScore = scores.find(s => s.productId === productId)?.score || 0
+    return maxScore > 0 && productScore === maxScore
+  }
+  
+  if (char.type !== 'number') return false
+  
+  const direction = getComparisonDirection(charName)
+  
+  const valuesWithNums = charValues.map(v => ({
+    productId: v.productId,
+    value: v.value,
+    num: extractNumber(v.value)
+  })).filter(v => v.num > 0)
+  
+  if (valuesWithNums.length === 0) return false
+  
+  const productVal = valuesWithNums.find(v => v.productId === productId)
+  if (!productVal) return false
+  
+  if (direction === 'higher-is-better') {
+    const maxNum = Math.max(...valuesWithNums.map(v => v.num))
+    return productVal.num === maxNum
+  } else {
+    const minNum = Math.min(...valuesWithNums.map(v => v.num))
+    return productVal.num === minNum
+  }
+}
+
+const getBestValueClass = (productId: string, char: { key: string; type: string; name: string }): string => {
   if (isBestValue(productId, char)) {
     return 'best-value'
   }
@@ -693,12 +930,16 @@ onMounted(() => {
   background: var(--color-background);
   border-radius: var(--radius-md);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: var(--spacing-3);
 }
 
 .product-details {

@@ -426,6 +426,83 @@ export const addProduct = async (req, res) => {
       finalModelId = modelDoc.id
     }
 
+    // Автоматически создаём отсутствующие значения характеристик в справочнике
+    const newValuesCreated = []
+    for (const char of parsedCharacteristics) {
+      const trait = char.trait || char.name
+      const value = char.value || char.val
+      
+      // Ищем группу характеристик для этой категории
+      const groups = await CharacteristicGroup.find({
+        $or: [{ categoryId }, { categoryId: null }],
+      }).sort({ sortOrder: 1 })
+      
+      let foundGroup = null
+      for (const group of groups) {
+        if (group.traitNames.includes(trait)) {
+          foundGroup = group
+          break
+        }
+      }
+      
+      if (foundGroup) {
+        // Проверяем, есть ли уже такое значение
+        const existingValue = await CharacteristicValue.findOne({
+          groupId: foundGroup.id,
+          traitName: trait,
+          value: { $regex: new RegExp('^' + value + '$', 'i') }
+        })
+        
+        if (!existingValue) {
+          // Создаём новое значение в справочнике
+          const newValue = new CharacteristicValue({
+            id: await getNextId('cv'),
+            groupId: foundGroup.id,
+            traitName: trait,
+            value: value.trim(),
+            normalizedValue: value.trim().toLowerCase(),
+            unit: '',
+            sortOrder: 999,
+          })
+          await newValue.save()
+          
+          // Добавляем trait в traitNames группы, если его там нет
+          if (!foundGroup.traitNames.includes(trait)) {
+            foundGroup.traitNames.push(trait)
+            await foundGroup.save()
+          }
+          
+          newValuesCreated.push(`${trait}: ${value}`)
+        }
+      } else {
+        // Группы нет — создаём новую группу для категории
+        const newGroup = new CharacteristicGroup({
+          id: await getNextId('cg'),
+          name: `${trait} (${category.name})`,
+          slug: trait.toLowerCase().replace(/\s+/g, '-'),
+          description: '',
+          categoryId: categoryId,
+          traitNames: [trait],
+          sortOrder: 999,
+          isActive: true,
+        })
+        await newGroup.save()
+        
+        const newValue = new CharacteristicValue({
+          id: await getNextId('cv'),
+          groupId: newGroup.id,
+          traitName: trait,
+          value: value.trim(),
+          normalizedValue: value.trim().toLowerCase(),
+          unit: '',
+          sortOrder: 0,
+        })
+        await newValue.save()
+        
+        newValuesCreated.push(`[Группа] ${trait}: ${value}`)
+      }
+    }
+
     const product = new Product({
       id: productId,
       name,
@@ -481,10 +558,11 @@ export const addProduct = async (req, res) => {
     }
 
     res.status(201).json({
-      message: 'Товар успешно добавлен',
+      message: 'Товар успешно добавлен' + (newValuesCreated.length > 0 ? `. Создано значений в справочнике: ${newValuesCreated.join(', ')}` : ''),
       product: mapProductResponse(product),
       subcategoryCreated: !subcategory.isNew,
       subcategoryId: subcategory.id,
+      newCharacteristicValues: newValuesCreated,
     })
   } catch (error) {
     console.error('Ошибка добавления товара:', error)
@@ -518,6 +596,8 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ error: 'Товар не найден' })
     }
 
+    const category = await Category.findOne({ id: product.categoryId })
+
     // Парсим characteristics если пришли как JSON строка (FormData)
     if (updates.characteristics && typeof updates.characteristics === 'string') {
       try {
@@ -530,6 +610,84 @@ export const updateProduct = async (req, res) => {
     // Специальная обработка для цены - добавляем в историю если цена изменилась
     if (updates.price !== undefined && Number(updates.price) !== product.price) {
       product.priceHistory.push({ date: new Date(), price: Number(updates.price) })
+    }
+
+    // Автоматически создаём отсутствующие значения характеристик при обновлении
+    if (updates.characteristics && Array.isArray(updates.characteristics)) {
+      const newValuesCreated = []
+      for (const char of updates.characteristics) {
+        const trait = char.trait || char.name
+        const value = char.value || char.val
+        
+        const groups = await CharacteristicGroup.find({
+          $or: [{ categoryId: product.categoryId }, { categoryId: null }],
+        }).sort({ sortOrder: 1 })
+        
+        let foundGroup = null
+        for (const group of groups) {
+          if (group.traitNames.includes(trait)) {
+            foundGroup = group
+            break
+          }
+        }
+        
+        if (foundGroup) {
+          const existingValue = await CharacteristicValue.findOne({
+            groupId: foundGroup.id,
+            traitName: trait,
+            value: { $regex: new RegExp('^' + value + '$', 'i') }
+          })
+          
+          if (!existingValue) {
+            const newValue = new CharacteristicValue({
+              id: await getNextId('cv'),
+              groupId: foundGroup.id,
+              traitName: trait,
+              value: value.trim(),
+              normalizedValue: value.trim().toLowerCase(),
+              unit: '',
+              sortOrder: 999,
+            })
+            await newValue.save()
+            
+            if (!foundGroup.traitNames.includes(trait)) {
+              foundGroup.traitNames.push(trait)
+              await foundGroup.save()
+            }
+            
+            newValuesCreated.push(`${trait}: ${value}`)
+          }
+        } else {
+          const newGroup = new CharacteristicGroup({
+            id: await getNextId('cg'),
+            name: `${trait} (${category?.name || product.categoryId})`,
+            slug: trait.toLowerCase().replace(/\s+/g, '-'),
+            description: '',
+            categoryId: product.categoryId,
+            traitNames: [trait],
+            sortOrder: 999,
+            isActive: true,
+          })
+          await newGroup.save()
+          
+          const newValue = new CharacteristicValue({
+            id: await getNextId('cv'),
+            groupId: newGroup.id,
+            traitName: trait,
+            value: value.trim(),
+            normalizedValue: value.trim().toLowerCase(),
+            unit: '',
+            sortOrder: 0,
+          })
+          await newValue.save()
+          
+          newValuesCreated.push(`[Группа] ${trait}: ${value}`)
+        }
+      }
+      
+      if (newValuesCreated.length > 0) {
+        console.log('Новые значения характеристик при обновлении:', newValuesCreated)
+      }
     }
 
     // Обновляем разрешенные поля
@@ -802,13 +960,11 @@ export const initializeData = async (req, res) => {
     await phoneCameraGroup.save()
 
     await CharacteristicValue.insertMany([
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Основная камера', value: '48 МП', unit: 'MP', sortOrder: 1 },
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Основная камера', value: '50 МП', unit: 'MP', sortOrder: 2 },
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Основная камера', value: '200 МП', unit: 'MP', sortOrder: 3 },
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Фронтальная камера', value: '12 МП', unit: 'MP', sortOrder: 1 },
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Фронтальная камера', value: '32 МП', unit: 'MP', sortOrder: 2 },
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '4K @ 60fps', sortOrder: 1 },
-      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '8K @ 30fps', sortOrder: 2 },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '4K @ 60fps', sortOrder: 2, metadata: { comparisonOrder: 2 } },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '8K @ 30fps', sortOrder: 3, metadata: { comparisonOrder: 3 } },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '1080p @ 30fps', sortOrder: 1, metadata: { comparisonOrder: 1 } },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '1080p @ 60fps', sortOrder: 1, metadata: { comparisonOrder: 1 } },
+      { id: await getNextId('cv'), groupId: phoneCameraGroup.id, traitName: 'Видео', value: '1080p @ 120fps', sortOrder: 2, metadata: { comparisonOrder: 2 } },
     ])
 
     const phoneBatteryGroup = new CharacteristicGroup({
