@@ -257,17 +257,21 @@ const handleAddToCart = async () => {
   aspect-ratio: 1;
   overflow: hidden;
   background: var(--color-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform var(--transition-slow);
+  padding: var(--spacing-4);
 }
 
 .product-card:hover .product-image {
-  transform: scale(1.08);
+  transform: scale(1.15);
 }
 
 .product-actions {

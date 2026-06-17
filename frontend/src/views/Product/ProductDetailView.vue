@@ -1210,6 +1210,9 @@ onUnmounted(() => {
   background: var(--color-background);
   border-radius: var(--radius-card);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gallery-main {
@@ -1221,8 +1224,10 @@ onUnmounted(() => {
 .main-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform var(--transition-slow);
+  padding: var(--spacing-6);
+  background: var(--color-background);
 }
 
 .zoom-lens {
@@ -1265,7 +1270,8 @@ onUnmounted(() => {
 .thumbnail img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 4px;
 }
 
 .hero-info {
