@@ -93,19 +93,31 @@ export interface AuthResponse {
 
 // ==================== Заказы ====================
 
-export type OrderStatus = 'pending' | 'confirmed' | 'ready' | 'completed' | 'cancelled'
+export type OrderStatus = 'pending' | 'processing' | 'confirmed' | 'preorder' | 'ready_for_pickup' | 'delivering' | 'completed' | 'cancelled'
+
+export interface OrderItem {
+  productId: string
+  name: string
+  price: number
+  quantity: number
+  image: string
+}
 
 export interface Order {
   id: string
   userId: string
-  productId: string
+  items: OrderItem[]
+  totalAmount: number
   status: OrderStatus
-  pickupAt: string
+  deliveryType: 'pickup' | 'delivery'
+  deliveryAddress?: string
+  pickupDate?: string
+  preorderMessage?: string
+  verificationCode?: string
   contactPhone: string
-  comment: string
+  contactName: string
   isDeleted: boolean
-  deletedAt: string | null
-  isActive?: boolean
+  deletedAt?: string | null
   createdAt: string
   updatedAt: string
 }
@@ -165,8 +177,6 @@ export interface Cart {
 export interface CartResponse extends Cart {
   message?: string
 }
-
-// ==================== Админ ====================
 
 export interface AdminStats {
   totalUsers: number

@@ -12,26 +12,68 @@ const orderSchema = new mongoose.Schema(
  ref: 'User',
  required: true,
  },
+ items: [{
  productId: {
  type: String,
  required: true,
  },
+ name: {
+ type: String,
+ required: true,
+ },
+ price: {
+ type: Number,
+ required: true,
+ },
+ quantity: {
+ type: Number,
+ default: 1,
+ },
+ image: {
+ type: String,
+ default: '',
+ },
+ }],
+ totalAmount: {
+ type: Number,
+ required: true,
+ },
  status: {
  type: String,
- enum: ['pending', 'confirmed', 'ready', 'completed', 'cancelled'],
+ enum: ['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering', 'completed', 'cancelled'],
  default: 'pending',
  },
- pickupAt: {
+ deliveryType: {
+ type: String,
+ enum: ['pickup', 'delivery'],
+ default: 'pickup',
+ },
+ deliveryAddress: {
+ type: String,
+ default: '',
+ },
+ pickupDate: {
  type: Date,
- required: true,
+ },
+ preorderMessage: {
+ type: String,
+ default: '',
+ },
+ verificationCode: {
+ type: String,
+ default: '',
+ },
+ codeVerified: {
+ type: Boolean,
+ default: false,
  },
  contactPhone: {
  type: String,
- default: '',
+ required: true,
  },
- comment: {
+ contactName: {
  type: String,
- default: '',
+ required: true,
  },
  isDeleted: {
  type: Boolean,
@@ -47,9 +89,8 @@ const orderSchema = new mongoose.Schema(
  }
 );
 
-// Виртуальное поле для определения активного заказа
 orderSchema.virtual('isActive').get(function() {
- return ['pending', 'confirmed', 'ready'].includes(this.status) && !this.isDeleted;
+ return ['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering'].includes(this.status) && !this.isDeleted;
 });
 
 orderSchema.set('toJSON', { virtuals: true });

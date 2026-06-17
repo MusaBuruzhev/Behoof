@@ -269,6 +269,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-8);
+  padding: var(--spacing-8) var(--spacing-6);
 }
 
 .page-header {
@@ -358,15 +359,13 @@ onMounted(() => {
 
 /* Notifications List */
 .notifications-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: var(--spacing-6);
 }
 
 .notification-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
+  display: contents;
 }
 
 .group-date {
@@ -375,13 +374,12 @@ onMounted(() => {
   color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
-  margin: 0;
+  margin: var(--spacing-4) 0 var(--spacing-2) 0;
+  grid-column: 1 / -1;
 }
 
 .group-notifications {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-3);
+  display: contents;
 }
 
 /* Notification Card */
@@ -404,6 +402,7 @@ onMounted(() => {
 
 .notification-card:hover {
   box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .notification-icon {
@@ -535,6 +534,10 @@ onMounted(() => {
 
 /* Responsive */
 @media (max-width: 768px) {
+  .notifications-view {
+    padding: var(--spacing-6) var(--spacing-4);
+  }
+  
   .header-content {
     flex-direction: column;
     align-items: flex-start;
@@ -547,6 +550,10 @@ onMounted(() => {
   
   .header-actions .btn {
     flex: 1;
+  }
+  
+  .notifications-list {
+    grid-template-columns: 1fr;
   }
   
   .notification-card {

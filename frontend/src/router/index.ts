@@ -96,15 +96,11 @@ const router = createRouter({
     },
     {
       path: '/orders',
-      name: 'orders',
-      component: () => import('@/views/Order/OrdersView.vue'),
-      meta: { requiresAuth: true },
+      redirect: '/profile/orders',
     },
     {
       path: '/orders/:id',
-      name: 'order',
-      component: () => import('@/views/Order/OrderDetailView.vue'),
-      meta: { requiresAuth: true },
+      redirect: (to) => `/profile/orders/${to.params.id}`,
     },
     {
       path: '/notifications',
@@ -149,6 +145,11 @@ const router = createRouter({
           path: 'orders',
           name: 'admin-orders',
           component: () => import('@/views/Admin/OrdersAdmin.vue'),
+        },
+        {
+          path: 'orders/:id',
+          name: 'admin-order-detail',
+          component: () => import('@/views/Admin/OrderDetailAdminView.vue'),
         },
         {
           path: 'catalog',

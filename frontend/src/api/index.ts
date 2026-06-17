@@ -100,20 +100,27 @@ export const getFavorites = () => api.get('/favorites')
 
 /** Создать заказ */
 export const createOrder = (data: {
-  productId: string
-  pickupAt: string
-  contactPhone?: string
-  comment?: string
+  items: Array<{ productId: string; quantity: number }>
+  deliveryType: 'pickup' | 'delivery'
+  deliveryAddress?: string
+  pickupDate?: string
+  contactPhone: string
+  contactName: string
 }) => api.post('/orders', data)
 
-/** Получить мои заказы */
-export const getMyOrders = () => api.get('/orders/my')
+export const getMyOrders = (params?: { filter?: string }) => api.get('/orders/my', { params })
 
-/** Отменить мой заказ */
+export const getMyOrderById = (orderId: string) => api.get(`/orders/my/${orderId}`)
+
 export const cancelMyOrder = (orderId: string) =>
   api.put(`/orders/my/${orderId}/cancel`)
 
-/** Удалить мой заказ (в историю) */
+export const updateOrderDelivery = (orderId: string, data: {
+  deliveryType: 'pickup' | 'delivery'
+  deliveryAddress?: string
+  pickupDate?: string
+}) => api.put(`/orders/my/${orderId}/delivery`, data)
+
 export const deleteMyOrder = (orderId: string) =>
   api.delete(`/orders/my/${orderId}`)
 
@@ -164,8 +171,12 @@ export const deleteUserByAdmin = (userId: string) =>
 export const getAllOrdersAdmin = () => api.get('/admin/orders')
 
 /** Обновить статус заказа (только админ) */
-export const updateOrderStatusAdmin = (orderId: string, status: string) =>
-  api.put(`/admin/orders/${orderId}/status`, { status })
+export const updateOrderStatusAdmin = (orderId: string, status: string, preorderMessage?: string) =>
+  api.put(`/admin/orders/${orderId}/status`, { status, preorderMessage })
+
+/** Проверить код подтверждения и выдать заказ (только админ) */
+export const verifyOrderCodeAdmin = (orderId: string, code: string) =>
+  api.put(`/admin/orders/${orderId}/verify-code`, { code })
 
 /** Удалить заказ (только админ) */
 export const deleteOrderAdmin = (orderId: string) =>

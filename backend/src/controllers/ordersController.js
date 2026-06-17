@@ -5,75 +5,95 @@ import { getNextId } from '../utils/idGenerator.js';
 import { createNotification } from './notificationsController.js';
 import logger from '../utils/logger.js';
 
-const AVAILABLE_STATUSES = ['pending', 'confirmed', 'ready', 'completed', 'cancelled'];
+const AVAILABLE_STATUSES = ['pending', 'processing', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering', 'completed', 'cancelled'];
 
 const STATUS_TITLES = {
-  pending: 'Ожидает подтверждения',
-  confirmed: 'Подтвержден',
-  ready: 'Готов к выдаче',
-  completed: 'Завершен',
-  cancelled: 'Отменен',
+  pending: 'В обработке',
+  processing: 'Проверка продавцом',
+  confirmed: 'Подтверждение',
+  preorder: 'Предзаказ',
+  ready_for_pickup: 'Готов к выдаче',
+  delivering: 'Доставляется',
+  completed: 'Получен',
+  cancelled: 'Отменён',
+};
+
+// Генерация 5-значного кода
+const generateVerificationCode = () => {
+  return Math.floor(10000 + Math.random() * 90000).toString();
 };
 
 export const createOrder = async (req, res) => {
  try {
- const { productId, pickupAt, contactPhone, comment } = req.body;
+ const { items, deliveryType, deliveryAddress, pickupDate, contactPhone, contactName } = req.body;
 
- if (!productId || !pickupAt) {
- return res.status(400).json({ error: 'productId и pickupAt обязательны' });
+ if (!items || !Array.isArray(items) || items.length === 0) {
+ return res.status(400).json({ error: 'Заказ должен содержать хотя бы один товар' });
  }
 
- const product = await Product.findOne({ id: productId });
+ if (!contactPhone || !contactName) {
+ return res.status(400).json({ error: 'Укажите контактное имя и телефон' });
+ }
+
+ const orderItems = [];
+ let totalAmount = 0;
+
+ for (const item of items) {
+ if (!item.productId || !item.quantity || item.quantity < 1) {
+ return res.status(400).json({ error: 'Некорректные данные товара' });
+ }
+
+ const product = await Product.findOne({ id: item.productId });
  if (!product) {
- return res.status(404).json({ error: 'Товар не найден' });
+ return res.status(404).json({ error: `Товар ${item.productId} не найден` });
  }
 
- const pickupDate = new Date(pickupAt);
- if (Number.isNaN(pickupDate.getTime())) {
- return res.status(400).json({ error: 'Некорректная дата получения' });
- }
+ orderItems.push({
+ productId: item.productId,
+ name: product.name,
+ price: product.price,
+ quantity: item.quantity,
+ image: product.images?.[0] || '',
+ });
 
- if (pickupDate <= new Date()) {
- return res.status(400).json({ error: 'Дата получения должна быть в будущем' });
+ totalAmount += product.price * item.quantity;
  }
 
  const order = new Order({
  id: await getNextId('ord'),
  userId: req.user._id,
- productId,
- pickupAt: pickupDate,
- contactPhone: contactPhone?.trim() || req.user.phoneNumber || '',
- comment: comment?.trim() || '',
+ items: orderItems,
+ totalAmount,
+ deliveryType: deliveryType || 'pickup',
+ deliveryAddress: deliveryAddress?.trim() || '',
+ pickupDate: pickupDate ? new Date(pickupDate) : null,
+ contactPhone: contactPhone.trim(),
+ contactName: contactName.trim(),
+ status: 'pending',
  });
 
  await order.save();
 
- // Уведомление пользователю о создании заказа
  try {
-   const userId = req.user._id;
-   logger.info(`Создаю уведомление для пользователя ${userId}`);
+   const user = await User.findById(req.user._id);
+   const userName = `${user.firstName} ${user.lastName}`.trim() || user.email;
 
    await createNotification(
-     userId,
+     req.user._id,
      'new_order',
      'Заказ оформлен',
-     `Ваш заказ #${order.id} на ${product.name} успешно оформлен. Ожидает подтверждения.`,
+     `Ваш заказ #${order.id} на сумму ${totalAmount} ₽ оформлен. Ожидает подтверждения.`,
      order.id,
      'order'
    );
-   logger.info('Уведомление пользователю создано');
 
-   // Уведомление админу о новом заказе
    const admins = await User.find({ role: 'admin' });
-   logger.info(`Найдено админов: ${admins.length}`);
-
    for (const admin of admins) {
-     logger.info(`Создаю уведомление для админа ${admin._id}`);
      await createNotification(
        admin._id,
        'new_order',
        'Новый заказ',
-       `Поступил новый заказ #${order.id} от ${req.user.firstName} ${req.user.lastName} на сумму ${product.price} руб.`,
+       `Поступил новый заказ #${order.id} от ${userName} на сумму ${totalAmount} ₽.`,
        order.id,
        'order'
      );
@@ -96,54 +116,42 @@ export const getMyOrders = async (req, res) => {
  try {
  const { filter = 'active' } = req.query;
 
- // Фильтр по умолчанию - только активные заказы
  const baseFilter = { userId: req.user._id };
  if (filter === 'active') {
    baseFilter.isDeleted = false;
-   baseFilter.status = { $in: ['pending', 'confirmed', 'ready'] };
+   baseFilter.status = { $in: ['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering'] };
  } else if (filter === 'history') {
    baseFilter.isDeleted = true;
- } else if (filter === 'all') {
-   // Все записи включая удалённые
  }
 
  const orders = await Order.find(baseFilter).sort({ createdAt: -1 });
- const productIds = [...new Set(orders.map((order) => order.productId))];
- const products = await Product.find({ id: { $in: productIds } });
- const productMap = new Map(products.map((product) => [product.id, product]));
-
- const result = orders.map((order) => {
- const product = productMap.get(order.productId);
- return {
- ...order.toObject(),
- product: product
- ? {
- id: product.id,
- name: product.name,
- brand: product.brand,
- images: product.images,
- price: product.price,
- }
- : null,
- };
- });
-
- // Получаем общее количество для статистики
- const [activeCount, historyCount] = await Promise.all([
-   Order.countDocuments({ userId: req.user._id, isDeleted: false, status: { $in: ['pending', 'confirmed', 'ready'] } }),
-   Order.countDocuments({ userId: req.user._id, isDeleted: true })
- ]);
 
  res.json({
- orders: result,
+ orders,
  stats: {
-   active: activeCount,
-   history: historyCount
+   active: await Order.countDocuments({ userId: req.user._id, isDeleted: false, status: { $in: ['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering'] } }),
+   history: await Order.countDocuments({ userId: req.user._id, isDeleted: true })
  }
  });
  } catch (err) {
  logger.error('Ошибка получения заказов:', err.message);
  res.status(500).json({ error: err.message || 'Ошибка получения заказов' });
+ }
+};
+
+export const getMyOrderById = async (req, res) => {
+ try {
+ const { id } = req.params;
+
+ const order = await Order.findOne({ id, userId: req.user._id });
+ if (!order) {
+ return res.status(404).json({ error: 'Заказ не найден' });
+ }
+
+ res.json({ order });
+ } catch (err) {
+ logger.error('Ошибка получения заказа:', err.message);
+ res.status(500).json({ error: err.message || 'Ошибка получения заказа' });
  }
 };
 
@@ -154,42 +162,23 @@ export const getAllOrdersAdmin = async (req, res) => {
  const baseFilter = {};
  if (filter === 'active') {
    baseFilter.isDeleted = false;
-   baseFilter.status = { $in: ['pending', 'confirmed', 'ready'] };
+   baseFilter.status = { $in: ['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering'] };
  } else if (filter === 'history') {
    baseFilter.isDeleted = true;
  }
 
  const orders = await Order.find(baseFilter).populate('userId', 'firstName lastName email phoneNumber role').sort({ createdAt: -1 });
- const productIds = [...new Set(orders.map((order) => order.productId))];
- const products = await Product.find({ id: { $in: productIds } });
- const productMap = new Map(products.map((product) => [product.id, product]));
 
- const result = orders.map((order) => {
- const product = productMap.get(order.productId);
- return {
- ...order.toObject(),
- product: product
- ? {
- id: product.id,
- name: product.name,
- brand: product.brand,
- images: product.images,
- price: product.price,
- }
- : null,
- };
- });
-
- // Статистика
  const [activeCount, historyCount, pendingCount] = await Promise.all([
-   Order.countDocuments({ isDeleted: false, status: { $in: ['pending', 'confirmed', 'ready'] } }),
+   Order.countDocuments({ isDeleted: false, status: { $in: ['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering'] } }),
    Order.countDocuments({ isDeleted: true }),
    Order.countDocuments({ isDeleted: false, status: 'pending' })
  ]);
 
  res.json({
- orders: result,
+ orders,
  stats: {
+   total: activeCount + historyCount,
    active: activeCount,
    history: historyCount,
    pending: pendingCount
@@ -201,7 +190,6 @@ export const getAllOrdersAdmin = async (req, res) => {
  }
 };
 
-// Отмена заказа пользователем
 export const cancelMyOrder = async (req, res) => {
  try {
  const { id } = req.params;
@@ -211,15 +199,13 @@ export const cancelMyOrder = async (req, res) => {
    return res.status(404).json({ error: 'Заказ не найден' });
  }
 
- // Можно отменить только активные заказы
- if (!['pending', 'confirmed', 'ready'].includes(order.status)) {
-   return res.status(400).json({ error: 'Нельзя отменить завершённый или уже отменённый заказ' });
+ if (!['pending', 'confirmed', 'preorder'].includes(order.status)) {
+   return res.status(400).json({ error: 'Нельзя отменить этот заказ' });
  }
 
  order.status = 'cancelled';
  await order.save();
 
- // Уведомление админу
  try {
    const admins = await User.find({ role: 'admin' });
    for (const admin of admins) {
@@ -246,7 +232,6 @@ export const cancelMyOrder = async (req, res) => {
  }
 };
 
-// Мягкое удаление заказа (в историю)
 export const deleteMyOrder = async (req, res) => {
  try {
  const { id } = req.params;
@@ -256,8 +241,7 @@ export const deleteMyOrder = async (req, res) => {
    return res.status(404).json({ error: 'Заказ не найден' });
  }
 
- // Нельзя удалить активный заказ - только отменить
- if (['pending', 'confirmed', 'ready'].includes(order.status)) {
+ if (['pending', 'confirmed', 'preorder', 'ready_for_pickup', 'delivering'].includes(order.status)) {
    return res.status(400).json({ error: 'Сначала отмените заказ' });
  }
 
@@ -275,7 +259,6 @@ export const deleteMyOrder = async (req, res) => {
  }
 };
 
-// Мягкое удаление заказа админом
 export const deleteOrderAdmin = async (req, res) => {
  try {
  const { id } = req.params;
@@ -302,7 +285,7 @@ export const deleteOrderAdmin = async (req, res) => {
 export const updateOrderStatusAdmin = async (req, res) => {
  try {
  const { id } = req.params;
- const { status } = req.body;
+ const { status, preorderMessage } = req.body;
 
  if (!AVAILABLE_STATUSES.includes(status)) {
  return res.status(400).json({ error: 'Некорректный статус заказа' });
@@ -315,18 +298,32 @@ export const updateOrderStatusAdmin = async (req, res) => {
 
  const oldStatus = order.status;
  order.status = status;
+ if (preorderMessage) {
+   order.preorderMessage = preorderMessage;
+ }
+
+ // Автоматически перемещаем в историю при завершении
+ if (status === 'completed') {
+   order.isDeleted = true;
+   order.deletedAt = new Date();
+ }
+
  await order.save();
 
- // Получаем информацию о товаре
- const product = await Product.findOne({ id: order.productId });
-
- // Уведомление пользователю об изменении статуса
  try {
+   const user = await User.findById(order.userId);
+   const userName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+
+   let notificationMessage = `Ваш заказ #${order.id} теперь: ${STATUS_TITLES[status]}.`;
+   if (preorderMessage) {
+     notificationMessage += ` ${preorderMessage}`;
+   }
+
    await createNotification(
      order.userId,
      'order_status',
-     'Статус заказа изменен',
-     `Ваш заказ #${order.id} на ${product?.name || 'товар'} теперь: ${STATUS_TITLES[status]}`,
+     'Статус заказа изменён',
+     notificationMessage.trim(),
      order.id,
      'order'
    );
@@ -341,5 +338,97 @@ export const updateOrderStatusAdmin = async (req, res) => {
  } catch (err) {
  logger.error('Ошибка обновления статуса заказа:', err.message);
  res.status(500).json({ error: err.message || 'Ошибка обновления заказа' });
+ }
+};
+
+export const updateOrderDelivery = async (req, res) => {
+ try {
+ const { id } = req.params;
+ const { deliveryType, deliveryAddress, pickupDate } = req.body;
+
+ const order = await Order.findOne({ id, userId: req.user._id });
+ if (!order) {
+ return res.status(404).json({ error: 'Заказ не найден' });
+ }
+
+ if (order.status !== 'confirmed') {
+ return res.status(400).json({ error: 'Можно выбрать способ получения только для подтверждённых заказов' });
+ }
+
+ if (deliveryType === 'delivery' && !deliveryAddress) {
+ return res.status(400).json({ error: 'Укажите адрес доставки' });
+ }
+
+ if (deliveryType === 'pickup' && !pickupDate) {
+ return res.status(400).json({ error: 'Укажите дату самовывоза' });
+ }
+
+ const pickupDateTime = pickupDate ? new Date(pickupDate) : null;
+ if (pickupDateTime && (Number.isNaN(pickupDateTime.getTime()) || pickupDateTime <= new Date())) {
+ return res.status(400).json({ error: 'Некорректная дата получения' });
+ }
+
+ order.deliveryType = deliveryType;
+ if (deliveryAddress) order.deliveryAddress = deliveryAddress.trim();
+ if (pickupDate) order.pickupDate = pickupDateTime;
+
+ await order.save();
+
+ res.json({
+ message: 'Способ получения обновлён',
+ order,
+ });
+ } catch (err) {
+ logger.error('Ошибка обновления доставки:', err.message);
+ res.status(500).json({ error: err.message || 'Ошибка обновления доставки' });
+ }
+};
+
+// Проверка кода подтверждения и выдача заказа
+export const verifyOrderCode = async (req, res) => {
+ try {
+ const { id } = req.params;
+ const { code } = req.body;
+
+ const order = await Order.findOne({ id });
+ if (!order) {
+ return res.status(404).json({ error: 'Заказ не найден' });
+ }
+
+ if (order.status !== 'ready_for_pickup') {
+ return res.status(400).json({ error: 'Заказ ещё не готов к выдаче' });
+ }
+
+ if (order.verificationCode !== code) {
+ return res.status(400).json({ error: 'Неверный код подтверждения' });
+ }
+
+ order.codeVerified = true;
+ order.status = 'completed';
+ await order.save();
+
+ try {
+   const user = await User.findById(order.userId);
+   const userName = `${user.firstName} ${user.lastName}`.trim() || user.email;
+
+   await createNotification(
+     order.userId,
+     'order_completed',
+     'Заказ получен',
+     `Ваш заказ #${order.id} успешно получен. Спасибо за покупку!`,
+     order.id,
+     'order'
+   );
+ } catch (notifyError) {
+   logger.error('Ошибка отправки уведомления:', notifyError);
+ }
+
+ res.json({
+ message: 'Код подтверждён. Заказ выдан.',
+ order,
+ });
+ } catch (err) {
+ logger.error('Ошибка проверки кода:', err.message);
+ res.status(500).json({ error: err.message || 'Ошибка проверки кода' });
  }
 };

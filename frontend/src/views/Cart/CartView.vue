@@ -337,26 +337,25 @@ const proceedToCheckout = async () => {
   if (cartStore.isEmpty) return;
 
   try {
-    // Создаём заказ для первого товара в корзине
-    // В реальной реализации нужно создать модальное окно с выбором способа доставки
-    const firstItem = cartStore.items[0];
-    if (!firstItem) return;
+    const items = cartStore.items.map(item => ({
+      productId: item.productId,
+      quantity: item.quantity,
+    }));
 
     await createOrder({
-      productId: firstItem.productId,
-      pickupAt: new Date(Date.now() + 86400000).toISOString(), // Завтра
-      contactPhone: authStore.user?.phoneNumber || undefined,
-      comment: `Заказ из корзины (${cartStore.items.length} товаров)`,
+      items,
+      deliveryType: 'pickup',
+      pickupDate: '',
+      contactName: authStore.user?.firstName + ' ' + authStore.user?.lastName || '',
+      contactPhone: authStore.user?.phoneNumber || '',
     });
 
-    // Очищаем корзину после успешного заказа
     await cartStore.clearCart();
 
-    // Перенаправляем на страницу заказов
-    router.push("/orders");
-  } catch (error) {
+    router.push("/profile/orders");
+  } catch (error: any) {
     console.error("Failed to create order:", error);
-    alert("Не удалось оформить заказ. Попробуйте позже.");
+    alert("Не удалось оформить заказ: " + (error.response?.data?.error || 'Попробуйте позже'));
   }
 };
 

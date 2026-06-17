@@ -377,6 +377,8 @@ export const useAdminStore = defineStore('admin', {
     orders: {
       items: [] as any[],
       total: 0,
+      active: 0,
+      history: 0,
       page: 1,
       limit: 20,
       isLoading: false,
@@ -524,14 +526,17 @@ export const useAdminStore = defineStore('admin', {
       this.orders.total = data.total || data.orders?.length || 0
     },
 
-    async fetchOrders(page: number = 1) {
+    async fetchOrders(page: number = 1, filter: string = 'active') {
       this.orders.isLoading = true
       try {
         const response = await api.get('/admin/orders', {
-          params: { page, limit: this.orders.limit },
+          params: { page, limit: this.orders.limit, filter },
         })
         this.setOrders(response.data)
         this.orders.page = page
+        this.orders.total = response.data.stats?.total || response.data.orders?.length || 0
+        this.orders.active = response.data.stats?.active || 0
+        this.orders.history = response.data.stats?.history || 0
       } catch (error) {
         // error handled silently
       } finally {
@@ -539,9 +544,9 @@ export const useAdminStore = defineStore('admin', {
       }
     },
 
-    async updateOrderStatus(orderId: string, status: string) {
+    async updateOrderStatus(orderId: string, status: string, preorderMessage?: string) {
       try {
-        await api.put(`/admin/orders/${orderId}/status`, { status })
+        await api.put(`/admin/orders/${orderId}/status`, { status, preorderMessage })
         await this.fetchOrders(this.orders.page)
       } catch (error) {
         throw error

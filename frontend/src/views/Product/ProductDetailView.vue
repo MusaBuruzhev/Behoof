@@ -39,7 +39,7 @@
             <div class="sticky-bar-price">
               {{ formatPrice(product.price) }} ₽
             </div>
-            <button class="btn btn-primary btn-buy" @click="openOrderModal">
+            <button class="btn btn-primary btn-buy" @click="handleBuyNow" :disabled="isBuying">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -50,7 +50,7 @@
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              Купить
+              {{ isBuying ? '...' : 'Купить' }}
             </button>
           </div>
         </div>
@@ -145,7 +145,8 @@
           <div class="hero-actions">
             <button
               class="btn btn-primary btn-buy-large"
-              @click="openOrderModal"
+              @click="handleBuyNow"
+              :disabled="isBuying"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -157,7 +158,7 @@
                 <line x1="3" y1="6" x2="21" y2="6" />
                 <path d="M16 10a4 4 0 0 1-8 0" />
               </svg>
-              Оформить заказ
+              {{ isBuying ? 'Оформление...' : 'Оформить заказ' }}
             </button>
 
             <div class="action-buttons">
@@ -639,97 +640,11 @@
         </div>
       </section>
     </div>
-
-    <!-- Order Modal -->
-    <div v-if="showOrderModal" class="modal-overlay" @click="closeOrderModal">
-      <div class="modal" @click.stop>
-        <div class="modal-header">
-          <h3>Оформление заказа</h3>
-          <button class="modal-close" @click="closeOrderModal">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <form @submit.prevent="submitOrder" class="order-form">
-          <div class="order-product-info">
-            <img
-              :src="allImages[0]"
-              :alt="product?.name"
-              class="order-product-image"
-            />
-            <div class="order-product-details">
-              <h4>{{ product?.name }}</h4>
-              <span class="order-product-price"
-                >{{ formatPrice(product?.price) }} ₽</span
-              >
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="pickup-date" class="form-label">Дата получения *</label>
-            <input
-              id="pickup-date"
-              v-model="orderForm.pickupAt"
-              type="datetime-local"
-              class="form-input"
-              required
-              :min="minPickupDate"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="contact-phone" class="form-label">Телефон</label>
-            <input
-              id="contact-phone"
-              v-model="orderForm.contactPhone"
-              type="tel"
-              class="form-input"
-              placeholder="+7 (___) ___-__-__"
-            />
-          </div>
-
-          <div class="form-group">
-            <label for="order-comment" class="form-label">Комментарий</label>
-            <textarea
-              id="order-comment"
-              v-model="orderForm.comment"
-              class="form-textarea"
-              placeholder="Дополнительная информация"
-              rows="3"
-            ></textarea>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              @click="closeOrderModal"
-            >
-              Отмена
-            </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="isOrderSubmitting"
-            >
-              {{ isOrderSubmitting ? "Оформление..." : "Заказать" }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, reactive } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   getProduct,
@@ -761,27 +676,17 @@ const relatedProducts = ref<Product[]>([]);
 const isLoading = ref(true);
 const currentImageIndex = ref(0);
 const isFavorite = ref(false);
-const showOrderModal = ref(false);
-const isSubmitting = ref(false);
-const isOrderSubmitting = ref(false);
 const showStickyBar = ref(false);
 const isAddingToCart = ref(false);
+const isSubmitting = ref(false);
+const isBuying = ref(false);
 
-// Zoom
 const mainImageRef = ref<HTMLImageElement | null>(null);
 const isZoomed = ref(false);
 const lensStyle = ref({ left: "0px", top: "0px" });
 
-// Форма отзыва
 const reviewText = ref("");
 const reviewRatings = ref<Record<string, number>>({});
-
-// Форма заказа
-const orderForm = reactive({
-  pickupAt: "",
-  contactPhone: "",
-  comment: "",
-});
 
 const isAuthenticated = computed(() => authStore.isAuthenticated);
 const isInCompare = computed(() =>
@@ -845,13 +750,6 @@ const hasTraitRatings = computed(() => {
   );
 });
 
-const minPickupDate = computed(() => {
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-  return now.toISOString().slice(0, 16);
-});
-
-// Chart
 const chartWidth = 800;
 const chartHeight = 200;
 const chartPadding = 40;
@@ -957,7 +855,6 @@ const getRatingClass = (rating: number): string => {
   return "rating-poor";
 };
 
-// Zoom functions
 const enableZoom = () => {
   isZoomed.value = true;
 };
@@ -979,7 +876,6 @@ const handleZoom = (e: MouseEvent) => {
   };
 };
 
-// Scroll handler for sticky bar
 const handleScroll = () => {
   const heroSection = document.querySelector(
     ".hero-product"
@@ -1123,39 +1019,28 @@ const deleteReviewById = async (reviewId: string) => {
   }
 };
 
-const openOrderModal = () => {
+const handleBuyNow = async () => {
   if (!isAuthenticated.value) {
     router.push("/auth/login");
     return;
   }
-  showOrderModal.value = true;
-};
 
-const closeOrderModal = () => {
-  showOrderModal.value = false;
-  orderForm.pickupAt = "";
-  orderForm.contactPhone = "";
-  orderForm.comment = "";
-};
+  if (!product.value) return;
 
-const submitOrder = async () => {
-  if (!product.value || !orderForm.pickupAt) return;
-
-  isOrderSubmitting.value = true;
+  isBuying.value = true;
   try {
     await createOrder({
-      productId: product.value.id,
-      pickupAt: orderForm.pickupAt,
-      contactPhone: orderForm.contactPhone || undefined,
-      comment: orderForm.comment || undefined,
+      items: [{ productId: product.value.id, quantity: 1 }],
+      deliveryType: 'pickup',
+      pickupDate: '',
+      contactName: authStore.user?.firstName + ' ' + authStore.user?.lastName || '',
+      contactPhone: authStore.user?.phoneNumber || '',
     });
-
-    closeOrderModal();
-    router.push("/orders");
-  } catch (error) {
-    console.error("Failed to create order:", error);
+    router.push('/profile/orders');
+  } catch (error: any) {
+    alert('Ошибка оформления заказа: ' + (error.response?.data?.error || 'Не удалось оформить заказ'));
   } finally {
-    isOrderSubmitting.value = false;
+    isBuying.value = false;
   }
 };
 

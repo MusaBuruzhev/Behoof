@@ -155,21 +155,42 @@ export const reviewSchema = Joi.object({
 
 // Заказ
 export const orderSchema = Joi.object({
-  productId: Joi.string()
+  items: Joi.array()
+    .min(1)
     .required()
+    .items(
+      Joi.object({
+        productId: Joi.string().required(),
+        quantity: Joi.number().min(1).required(),
+      })
+    )
     .messages({
-      'any.required': 'ID товара обязателен',
+      'array.min': 'Заказ должен содержать хотя бы один товар',
+      'any.required': 'Товары заказа обязательны',
     }),
-  pickupAt: Joi.string()
-    .required()
+  deliveryType: Joi.string()
+    .valid('pickup', 'delivery')
+    .optional()
+    .default('pickup')
     .messages({
-      'any.required': 'Дата самовывоза обязательна',
+      'string.valid': 'Некорректный тип доставки',
     }),
+  deliveryAddress: Joi.string()
+    .allow('', null)
+    .optional(),
+  pickupDate: Joi.string()
+    .allow('', null)
+    .optional(),
   contactPhone: Joi.string()
-  .allow('', null),
-  comment: Joi.string()
-    .max(500)
-    .allow('', null),
+    .required()
+    .messages({
+      'any.required': 'Контактный телефон обязателен',
+    }),
+  contactName: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Контактное имя обязательно',
+    }),
 });
 
 // Пагинация и фильтры
