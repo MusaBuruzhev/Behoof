@@ -28,11 +28,7 @@
 
 <style scoped>
 .cta-section {
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-primary-dark) 100%
-  );
+  background-color: black;
   padding: var(--spacing-24) 0;
 }
 
@@ -73,7 +69,6 @@
   margin-left: var(--spacing-2);
 }
 
-/* Адаптивность */
 @media (max-width: 640px) {
   .cta-section {
     padding: var(--spacing-16) 0;

@@ -97,7 +97,6 @@ const averageRating = computed(() => {
 }
 
 .product-card-simple:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-card-hover);
 }
 

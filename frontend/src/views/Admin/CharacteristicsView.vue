@@ -945,7 +945,7 @@ onMounted(async () => {
   padding: 2px 8px;
   border-radius: 10px;
   background: var(--color-primary-light, #dbeafe);
-  color: var(--color-primary);
+  color: white;
   font-weight: 500;
 }
 

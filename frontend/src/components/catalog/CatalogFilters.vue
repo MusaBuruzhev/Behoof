@@ -8,7 +8,6 @@
     </div>
     
     <div class="filters-content">
-      <!-- Цена -->
       <div class="filter-section">
         <h3 class="filter-section-title">Цена</h3>
         <div class="price-range">
