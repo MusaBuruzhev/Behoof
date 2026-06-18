@@ -248,7 +248,6 @@ const handleAddToCart = async () => {
 }
 
 .product-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-card-hover);
 }
 

@@ -649,7 +649,7 @@ onUnmounted(() => {
     display: none;
   }
   
-  .catalog-btn span {
+  .catalog-btn {
     display: none;
   }
   

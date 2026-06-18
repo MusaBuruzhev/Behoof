@@ -237,10 +237,14 @@ watch(
     route.params.categoryId,
     route.params.subcategoryId,
     route.query.category,
+    route.query.q,
   ],
-  ([_catId, _subcatId, queryCategory]) => {
+  ([_catId, _subcatId, queryCategory, queryQ]) => {
     if (queryCategory && typeof queryCategory === "string") {
       selectedCategory.value = queryCategory;
+    }
+    if (queryQ && typeof queryQ === "string") {
+      searchQuery.value = queryQ;
     }
     loadCatalog();
     loadProducts();
@@ -250,6 +254,9 @@ watch(
 onMounted(() => {
   if (route.query.category && typeof route.query.category === "string") {
     selectedCategory.value = route.query.category;
+  }
+  if (route.query.q && typeof route.query.q === "string") {
+    searchQuery.value = route.query.q;
   }
   loadCatalog();
   loadProducts();
